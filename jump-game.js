@@ -983,6 +983,7 @@
       this.wallClingT=0;
       this.wallClingCooldown=0;
       this.wallClingSide=0;
+      this.wallTongueHeld=false;
 
       // 水中ダッシュ
       this.dashT=0;
@@ -1119,33 +1120,19 @@
         }
       }
 
-      // JUMP版共通：壁際でガードすると短時間だけ空中停止。
+      // JUMP版共通：後ろ＋舌で壁へ吸着。舌ボタンを押している間は滞空。
       const floorNow=jumpFloorY();
-      const nearLeft=this.x<=58;
-      const nearRight=this.x>=innerWidth-58;
       const airborne=this.y<floorNow-28;
-      const canCling=this.guard && airborne && !this.throwState && this.stun<=0 &&
-        this.attackT<=0 && this.specialT<=0 && this.wallClingCooldown<=0;
-
-      if(this.wallClingT<=0 && canCling && (nearLeft||nearRight)){
-        this.wallClingT=.58;
-        this.wallClingSide=nearLeft?-1:1;
-        this.x=nearLeft?47:innerWidth-47;
-        this.vx=0;this.vy=0;
-      }
-
-      // ガードを離す／時間切れで解除。連続張り付き防止に短いクールダウン。
-      if(this.wallClingT>0 && (!this.guard || !airborne)){
-        this.wallClingT=0;
-        this.wallClingCooldown=.72;
-      }
-
       if(this.wallClingT>0){
-        this.x=this.wallClingSide<0?47:innerWidth-47;
-        this.vx=0;
-        this.vy=0;
-      }else{
-        // 水中浮遊ではなく重力＋蓮の葉の自動バウンド。
+        if(!this.wallTongueHeld || !airborne){
+          this.wallClingT=0;this.wallClingCooldown=.30;this.wallClingSide=0;
+        }else{
+          this.wallClingT=.12;
+          this.x=this.wallClingSide<0?47:innerWidth-47;
+          this.vx=0;this.vy=0;
+        }
+      }
+      if(this.wallClingT<=0){
         this.vy += JUMP_GRAVITY * dt;
         if(this.specialType==='urielTackle') this.vx *= Math.pow(.90,dt);
         else if(this.dashT>0) this.vx *= Math.pow(.82,dt);
@@ -1341,11 +1328,6 @@
             }
           }
         }
-      }
-
-      if(this.wallClingT<=0 && this.wallClingSide!==0){
-        this.wallClingCooldown=Math.max(this.wallClingCooldown,.72);
-        this.wallClingSide=0;
       }
 
       this.x += this.vx * dt;
@@ -2002,10 +1984,8 @@
               else ctx.lineTo(59,8);
               ctx.stroke();
             }
-            if(this.attack==='kick'){
-              ctx.strokeStyle=pal.limb;ctx.lineWidth=13;ctx.beginPath();
-              ctx.moveTo(15,48);ctx.lineTo(67,49);ctx.stroke();
-            }
+            if(this.attack==='kick'){ctx.strokeStyle=pal.limb;ctx.lineWidth=13;ctx.beginPath();ctx.moveTo(15,48);ctx.lineTo(67,49);ctx.stroke();}
+            if(mir.tongueT>0){const target=this.isPlayer?enemy:player;const len=Math.min((this.tongueRange||220)*1.28,target?Math.abs(target.x-this.x):(this.tongueRange||220));ctx.strokeStyle='#ff718e';ctx.lineWidth=8;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(0,8);ctx.lineTo(len,8+(mir.tongueAimY||0));ctx.stroke();}
             ctx.restore();
           };
 
@@ -2461,19 +2441,11 @@
 
       if(this.tongueT>0 || (this.tonguePullTarget && this.tonguePullTimer>0) || (this.tongueClashTarget && this.tongueClashTimer>0)){
         const target = this.tongueClashTarget || this.tonguePullTarget || (this.isPlayer ? enemy : player);
-        let len = Math.min(this.tongueRange, Math.abs(target.x-this.x));
-        ctx.strokeStyle=this.type==='samael'?'#9a72e8':'#ff718e';
-        ctx.lineWidth=this.type==='samael'?9:8;
-        ctx.lineCap='round';
-        ctx.beginPath();
-        // 舌だけは口の中央から出す
-        ctx.moveTo(0,8);
-        if(this.type==='beelzebub'){
-          const ty=Math.max(-62,Math.min(62,(target.y-this.y)*.42));
-          ctx.lineTo(len,8+ty);
-        }else{
-          ctx.lineTo(len,8);
-        }
+        const wallTongue=this.wallClingT>0&&this.wallClingSide!==0;
+        let len=wallTongue?Math.abs(this.x-(this.wallClingSide<0?0:innerWidth)):Math.min((this.tongueRange||220)*1.28,Math.abs(target.x-this.x));
+        ctx.strokeStyle=this.type==='samael'?'#9a72e8':'#ff718e';ctx.lineWidth=this.type==='samael'?9:8;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(0,8);
+        if(wallTongue)ctx.lineTo(this.wallClingSide*len,0);
+        else{const ty=this.type==='beelzebub'?Math.max(-88,Math.min(88,(target.y-this.y)*.55)):Math.max(-105,Math.min(105,(target.y-this.y)*.72));ctx.lineTo(len,8+ty);}
         ctx.stroke();
       }
 
@@ -5340,6 +5312,16 @@
     }
 
     if(gameOver || f.guard) return;
+
+    // 壁際の後ろ＋舌：壁へ舌を伸ばして張り付く。
+    if(kind==='tongue' && f && f.isPlayer){
+      const backHeld=(f.face>0&&input.x<-.35)||(f.face<0&&input.x>.35);
+      const floor=jumpFloorY(),nearLeft=f.x<=68,nearRight=f.x>=innerWidth-68;
+      if(backHeld&&f.y<floor-28&&(nearLeft||nearRight)&&f.wallClingCooldown<=0&&!f.throwState){
+        f.wallTongueHeld=true;f.wallClingSide=nearLeft?-1:1;f.wallClingT=.12;
+        f.tongueT=.12;f.attack='tongue';f.attackT=.12;f.vx=0;f.vy=0;return;
+      }
+    }
     if(f.type==='green' && f.michaelPowerReady && (kind==='punch'||kind==='kick')){
       consumeMichaelPower(f,kind);
     }
@@ -5453,7 +5435,7 @@
         setTimeout(()=>damageHit(f,other,2.6*f.damageMul,52*dir,ky),125);
       }
     } else if(kind==='kick'){
-      f.attack='kick';f.attackT=.50;
+      f.attack='kick';f.attackT=.50;remielMirageAttack(f,'kick');
       const v=f.attackVariant;
       const yAim=v==='down'?42:0;
       if(dist<106 && Math.abs((other.y-f.y)-yAim)<72){
@@ -5521,18 +5503,18 @@
       }
 
       // 通常の舌。コンボ中でなくても小ダメージ＋引き寄せ。
+      remielMirageAttack(f,'tongue');
       playSfx('tongue');
       f.tongueT=.22;
       f.attack='tongue';
       f.attackT=.3;
 
+      const jumpTongueRange=(f.tongueRange||220)*1.28;
       const tongueDy=Math.abs(other.y-f.y);
-      const tongueTolerance=f.type==='beelzebub' ? 145 : 82;
-      if(Math.abs(other.x-f.x)<f.tongueRange && tongueDy<tongueTolerance && Math.sign(other.x-f.x)===dir){
-        if(f.type==='beelzebub'){
-          // 軽く上下へ追尾するよう、舌を出す瞬間に相手側へ少し寄せる
-          f.bossTongueAimY=(other.y-f.y)*.42;
-        }
+      const tongueTolerance=f.type==='beelzebub'?180:150;
+      f.jumpTongueAimY=Math.max(-105,Math.min(105,(other.y-f.y)*.72));
+      if(Math.abs(other.x-f.x)<jumpTongueRange&&tongueDy<tongueTolerance&&Math.sign(other.x-f.x)===dir){
+        if(f.type==='beelzebub')f.bossTongueAimY=(other.y-f.y)*.55;
         setTimeout(()=>{
           if(!other.guard){
             // まず小ダメージ
@@ -5553,6 +5535,19 @@
         },70);
       }
     }
+  }
+
+
+  function remielMirageAttack(owner,kind){
+    if(!owner||owner.type!=='remiel')return;
+    const mir=remielMirages.find(m=>m.owner===owner&&m.t>0&&(m.age||0)>=.28),target=owner.isPlayer?enemy:player;
+    if(!mir||!target)return;
+    const dx=target.x-owner.x,dy=target.y-(owner.y+mir.offsetY),front=dx*owner.face>=-12;
+    let hit=false,dmg=0,kx=0,ky=0;
+    if(kind==='punch'){hit=front&&Math.abs(dx)<104&&Math.abs(dy)<72;dmg=1.3;kx=owner.face*42;ky=-8;}
+    else if(kind==='kick'){hit=front&&Math.abs(dx)<116&&Math.abs(dy)<82;dmg=2.1;kx=owner.face*68;ky=20;}
+    else if(kind==='tongue'){hit=front&&Math.abs(dx)<(owner.tongueRange||220)*1.28&&Math.abs(dy)<150;dmg=.9;kx=owner.face*25;mir.tongueT=.24;mir.tongueAimY=Math.max(-105,Math.min(105,dy*.72));}
+    if(hit)setTimeout(()=>{if(!mir||mir.t<=0||!target||gameOver)return;if(target.guard)spawnImpact(target.x,target.y,'guard');else{damageHit(owner,target,dmg*(owner.damageMul||1),kx,ky);spawnImpact(target.x,target.y,'hit');}mir.t=0;},kind==='kick'?150:90);
   }
 
   function damageHit(attacker,target,dmg,kx,ky,bypassCounter=false){
@@ -5978,10 +5973,11 @@
         if(backHeld&&startThunderCharge(player)){btn.dataset.jihalCharge='1';return;}
         attack(player,action);
       }
-      else if(player) attack(player,action);
+      else if(player){if(action==='tongue')player.wallTongueHeld=true;attack(player,action);}
     };
     const up=e=>{
       e.preventDefault(); btn.classList.remove('pressed');
+      if(action==='tongue'&&player){player.wallTongueHeld=false;if(player.wallClingT>0){player.wallClingT=0;player.wallClingCooldown=.30;player.wallClingSide=0;player.attackT=0;player.attack=null;}}
       if(action==='kick'&&player&&btn.dataset.jihalCharge==='1'){
         btn.dataset.jihalCharge='';releaseThunderCharge(player);
       }
@@ -6955,7 +6951,7 @@ function drawBackground(dt){
       jihalBursts=jihalBursts.filter(b=>b.t>0);
 
       remielMirages.forEach(m=>{
-        m.t-=dt;m.age=(m.age||0)+dt;
+        m.t-=dt;m.age=(m.age||0)+dt;if(m.tongueT>0)m.tongueT-=dt;
         const splitTime=.28;
         if(m.owner && m.age<=splitTime && m.originY!=null){
           const p=Math.max(0,Math.min(1,m.age/splitTime));

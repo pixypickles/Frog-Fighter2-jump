@@ -190,3 +190,8 @@ v2.20
 - Meteor Rain: reduced from five wide meteors to three larger meteors concentrated around the opponent.
 - Universal wall cling: while airborne and near a side wall, holding Guard freezes the fighter on the wall for about 0.58 sec.
 - Wall cling has about 0.72 sec re-use cooldown and releases immediately when Guard is released.
+
+v2.21
+- JUMP tongue ~28% longer with vertical aim assist.
+- Wall cling: Back + Tongue; remains while Tongue is held, releases on button-up; 0.30s reuse delay.
+- Remiel mirage copies punch/kick/tongue. Small damage; mirage tongue never grabs. Mirage vanishes after copied melee/tongue connects.
