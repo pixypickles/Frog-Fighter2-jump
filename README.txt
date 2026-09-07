@@ -1,11 +1,8 @@
-FROG FIGHTER 2 JUMP Prototype v0.3
+FROG FIGHTER 2 JUMP prototype v0.4
 
-変更点
-- タイトル画面が必ず最初に表示されるよう修正
-- 提供された FROG FIGHTER 2 JUMP ロゴ画像を採用
-- 黒背景は画像加工せず CSS の blend で画面背景になじませる方式
-- 「横にすると自動で始まる」導線を廃止
-- 開始ボタンを1つに統一
-- v0.2 の蓮の葉競技場・4段観客席・レフリー・描画順修正を継承
-
-index.html を開いてください。
+v0.4 fixes:
+- Title logo embedded directly in HTML so it cannot go missing.
+- Portrait fighter select: face centered, name underneath; eye/face alignment stabilized.
+- Four spectator tiers moved lower in the vertical stadium.
+- Referee moved off the main lotus-leaf fighting surface.
+- CPU vertical damping removed so rival automatic jump height matches the player.

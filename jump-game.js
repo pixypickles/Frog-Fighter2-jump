@@ -6265,7 +6265,7 @@ function drawBackground(dt){
     ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
 
     // 四段の観客席。縦長画面で上へ跳ぶほど違う段が目に入る。
-    const tierH=Math.max(70,h*.095), top=Math.max(58,h*.10);
+    const tierH=Math.max(72,h*.105), top=Math.max(118,h*.205);
     for(let tier=0;tier<4;tier++){
       const y=top+tier*tierH;
       ctx.fillStyle=tier%2?'rgba(20,46,52,.78)':'rgba(28,62,65,.82)';ctx.fillRect(0,y,w,tierH-5);
@@ -6304,12 +6304,10 @@ function drawBackground(dt){
   function drawLotusReferee(dt){
     const w=innerWidth,h=innerHeight,floor=jumpFloorY();
     refereeFrog.t=(refereeFrog.t||0)+(dt||.016);
-    if(!refereeFrog.x)refereeFrog.x=w*.5;
-    refereeFrog.x += refereeFrog.dir*Math.max(18,w*.028)*(dt||.016);
-    const minRef=w*.36,maxRef=w*.64;
-    if(refereeFrog.x<minRef){refereeFrog.x=minRef;refereeFrog.dir=1;}
-    if(refereeFrog.x>maxRef){refereeFrog.x=maxRef;refereeFrog.dir=-1;}
-    const x=refereeFrog.x,y=floor+12+Math.sin(refereeFrog.t*4)*1.5;
+    // JUMP版ではレフリーは競技用の大蓮葉の外側で見守る。
+    refereeFrog.x=w*.82;
+    refereeFrog.dir=-1;
+    const x=w*.82,y=floor-38+Math.sin(refereeFrog.t*4)*1.5;
     const s=Math.max(.72,Math.min(1.05,w/760));
     ctx.save();ctx.translate(x,y);ctx.scale(refereeFrog.dir*s,s);ctx.globalAlpha=.95;
     // yellow referee frog
@@ -6337,8 +6335,8 @@ function drawBackground(dt){
         // JUMP版：上下入力はコマンド専用。カエルは蓮の葉から自動ジャンプする。
       }
       enemyAI(dt);
-      // JUMP版ではCPUの上下遊泳を抑え、横移動と技選択に集中させる。
-      if(enemy && !['piranha','crayfish'].includes(enemy.type)) enemy.vy*=.90;
+      // JUMP版：CPUもプレイヤーと同じ重力・自動ジャンプを使う。
+      // 縦速度を毎フレーム減衰させない（ジャンプ高度を公平にする）。
       player.update(dt);enemy.update(dt);
       updateNewSpecialMoves(player,dt);
       updateNewSpecialMoves(enemy,dt);

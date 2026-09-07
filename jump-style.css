@@ -3769,3 +3769,82 @@ body.portrait-play .pause-button{z-index:46 !important;}
   #titleScreen .frog-logo-sub{font-size:clamp(11px,3.3vw,17px) !important;margin-bottom:20px !important;}
   #titleScreen .start-version{font-size:clamp(12px,3vw,16px) !important;}
 }
+
+/* ===== v0.4 portrait polish ===== */
+/* Embedded title image: black pixels visually disappear into the cyan background. */
+#titleScreen .title-logo-image{
+  mix-blend-mode:screen !important;
+  width:min(96vw,900px) !important;
+  max-height:42dvh !important;
+  object-fit:contain !important;
+}
+
+/* Portrait roster: portrait centered, name directly underneath. */
+@media (orientation:portrait){
+  #selectScreen.screen.active.split-select-screen{
+    grid-template-rows:42% 58% !important;
+  }
+  #selectScreen .select-right-panel .fighter-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:7px !important;
+  }
+  #selectScreen .select-right-panel .fighter-card{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    height:112px !important;
+    min-height:112px !important;
+    max-height:112px !important;
+    padding:6px 3px 5px !important;
+    text-align:center !important;
+    overflow:hidden !important;
+  }
+  #selectScreen .select-right-panel .fighter-card .fighter-emoji{
+    position:relative !important;
+    left:auto !important;
+    top:auto !important;
+    width:82px !important;
+    height:68px !important;
+    margin:-2px auto 1px !important;
+    transform:scale(.72) !important;
+    transform-origin:center center !important;
+    flex:0 0 70px !important;
+  }
+  #selectScreen .select-right-panel .fighter-card > strong{
+    position:relative !important;
+    width:100% !important;
+    padding:0 !important;
+    margin:0 !important;
+    font-size:11px !important;
+    line-height:1.15 !important;
+    text-align:center !important;
+    white-space:nowrap !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+  }
+  #selectScreen .select-right-panel .fighter-card[data-fighter="piranha"],
+  #selectScreen .select-right-panel .fighter-card[data-fighter="crayfish"]{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    padding:7px 3px 5px !important;
+  }
+  #selectScreen .select-right-panel .fighter-card[data-fighter="piranha"] .fighter-emoji,
+  #selectScreen .select-right-panel .fighter-card[data-fighter="crayfish"] .fighter-emoji{
+    position:relative !important;
+    left:auto !important;
+    top:auto !important;
+    width:auto !important;
+    height:68px !important;
+    margin:0 auto 2px !important;
+    transform:none !important;
+    font-size:54px !important;
+    line-height:68px !important;
+  }
+  #selectScreen .select-right-panel .fighter-card[data-fighter="piranha"] > strong,
+  #selectScreen .select-right-panel .fighter-card[data-fighter="crayfish"] > strong{
+    text-align:center !important;
+  }
+}
