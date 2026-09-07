@@ -5757,13 +5757,17 @@
             }
           }
 
-          // ウリエル：ガード×2でホワイトカウンター。
-          if(player.type==='orange' && !player.throwState && input.simpleGuardTapTimes.length>=2){
-            input.simpleGuardTapTimes=[];
-            input.lastSimpleGuardTapTime=0;
-            if(specialWhiteCounter(player)){
-              btn.classList.remove('pressed');
-              return;
+          // ウリエル：下→後ろ＋ガードでホワイトカウンター。
+          // 以前は誤って「ガード×2」でも発動していたため、技表どおりの入力に統一。
+          if(player.type==='orange' && !player.throwState){
+            const back=player.face>0?'left':'right';
+            if(hasCommand(['down',back],900)){
+              input.simpleGuardTapTimes=[];
+              input.lastSimpleGuardTapTime=0;
+              if(specialWhiteCounter(player)){
+                btn.classList.remove('pressed');
+                return;
+              }
             }
           }
 

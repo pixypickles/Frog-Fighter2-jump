@@ -161,3 +161,8 @@ v2.14 - Raphael hover attacks
 - Air Guillotine and upward Air Blade can now be fired during Air Hover.
 - Using these attacks does not cancel Air Hover or reset its remaining duration.
 - Normal attack recovery still applies, so attacks cannot be infinitely stacked on the same frame.
+
+v2.15
+- Character select order: Samael and Satanael swapped, placing Satanael next to Seraphiel.
+- Uriel White Counter input bug fixed: it now uses Down -> Back + Guard as shown in the move list.
+- Removed the accidental Guard x2 activation for White Counter.
