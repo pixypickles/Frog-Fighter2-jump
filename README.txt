@@ -137,3 +137,9 @@ v2.10 - startup fix
 - Fixed a JavaScript syntax error introduced while replacing Raphael's Air Boost movement with Air Hover.
 - The extra closing brace prevented jump-game.js from loading, so the title Start button had no handler.
 - Air Hover behavior from v2.9 is retained.
+
+v2.11 - Air Blade visibility fix
+- Added dedicated rendering for Raphael's Air Blade.
+- Air Blade is now a large crescent-shaped wind blade with white/cyan glow.
+- Added a short wind trail so the curved up/down trajectories are easier to see.
+- Uses a known visible projectile color token internally while retaining airBlade behavior.

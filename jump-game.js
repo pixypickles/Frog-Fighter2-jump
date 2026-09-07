@@ -4260,7 +4260,7 @@
     specialWater2Shot(f,{
       name:'エアブレード',
       attack:f.attack,
-      color:'air',
+      color:'aqua',
       style:'airBlade',
       speed,
       angle:startDeg,
@@ -6980,6 +6980,7 @@ function drawBackground(dt){
         if(q.curve){ q.vy += q.curve*dt; }
         if(q.style==='iceChargeOrb'){ q.trail=q.trail||[]; q.trail.push({x:q.x,y:q.y,t:.75}); if(q.trail.length>22)q.trail.shift(); q.trail.forEach(v=>v.t-=dt); q.trail=q.trail.filter(v=>v.t>0); }
         if(q.style==='aquaPressure'){ q.trail=q.trail||[]; q.trail.push({x:q.x,y:q.y,t:.28}); if(q.trail.length>10)q.trail.shift(); q.trail.forEach(v=>v.t-=dt); q.trail=q.trail.filter(v=>v.t>0); }
+        if(q.style==='airBlade'){ q.trail=q.trail||[]; q.trail.push({x:q.x,y:q.y,t:.32}); if(q.trail.length>12)q.trail.shift(); q.trail.forEach(v=>v.t-=dt); q.trail=q.trail.filter(v=>v.t>0); }
 
         // JUMP版アクアショット：上へ消え、相手付近へ落下して戻る。
         if(q.style==='aquaDrop' && q.dropPhase==='rising' && q.y<-85){
@@ -8135,6 +8136,52 @@ function drawBackground(dt){
         ctx.shadowColor='#8ef1ff';ctx.shadowBlur=14;
         ctx.fillStyle='rgba(115,229,255,.40)';ctx.beginPath();ctx.ellipse(0,0,20,13,0,0,Math.PI*2);ctx.fill();
         ctx.strokeStyle='#e4ffff';ctx.lineWidth=4;ctx.beginPath();ctx.arc(0,0,18,-1.1,1.1);ctx.stroke();
+      }else if(q.style==='airBlade'){
+        // JUMP版ラファエル：大型の三日月状エアブレード。
+        // 進行方向に合わせて回転し、白〜水色の発光と残像で見やすくする。
+        ctx.save();
+        ctx.rotate(ang);
+
+        ctx.globalCompositeOperation='lighter';
+        ctx.shadowColor='#bff7ff';
+        ctx.shadowBlur=18;
+
+        // 外側の風圧
+        ctx.globalAlpha=.28;
+        ctx.strokeStyle='#8eeaff';
+        ctx.lineWidth=18;
+        ctx.lineCap='round';
+        ctx.beginPath();
+        ctx.arc(0,0,34,-1.18,1.18);
+        ctx.stroke();
+
+        // 主刃
+        ctx.globalAlpha=.90;
+        ctx.strokeStyle='#efffff';
+        ctx.lineWidth=7;
+        ctx.beginPath();
+        ctx.arc(0,0,32,-1.16,1.16);
+        ctx.stroke();
+
+        // 内側の青い芯
+        ctx.globalAlpha=.72;
+        ctx.strokeStyle='#7ad8ff';
+        ctx.lineWidth=3;
+        ctx.beginPath();
+        ctx.arc(-2,0,27,-1.12,1.12);
+        ctx.stroke();
+
+        // 尾を引く風
+        ctx.globalAlpha=.22;
+        ctx.strokeStyle='#dffcff';
+        ctx.lineWidth=5;
+        ctx.beginPath();
+        ctx.moveTo(-42,-8);
+        ctx.quadraticCurveTo(-60,0,-44,11);
+        ctx.stroke();
+
+        ctx.restore();
+
       }else if(q.style==='carpBlade'){
         // カープ水圧カッターも通常の水圧カッターと同じ刃を使う。
         // ここに追加の90度回転は掛けず、上で計算済みの進行方向(ang)に沿わせる。
