@@ -74,3 +74,11 @@ v1.8
 - Selected-card legacy scaling/expansion is neutralized.
 - Move list is rendered only in the independent full-width panel.
 - Move panel now uses explicit command data, including Flauros commands.
+
+
+v1.9
+- Increased contrast on the pale title screen: subtitle/version/start/note are darker and easier to read.
+- Added ultra-high-specificity portrait roster rules to override the old split-select absolute positioning.
+- Fighter cards now remain three equal columns with centered faces and names directly underneath.
+- Selected fighters never resize or move; selection is border-only.
+- The independent move panel remains full-width and is the only element allowed to span all three columns.
