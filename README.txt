@@ -201,3 +201,7 @@ v2.22
 - Gravity Ball hit applies 1.35 sec lingering strong downward gravity.
 - Remiel mirage can also connect Mirage Kick for 50% damage (4.9), then disappears.
 - Remiel mirage can also connect Mirage Counter for 50% damage (3.6), then disappears.
+
+v2.23
+- Sariel Blood Moon formation/survival time shortened by about 17%: moon life 3.0s -> 2.5s, special lock 3.25s -> 2.75s.
+- Added four subtle gold wall-anchor balls to each extreme side of the arena as visual cues for Back + Tongue wall cling.

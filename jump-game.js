@@ -4658,9 +4658,9 @@
   }
   function specialBloodMoon(f){
     if(gameOver||!f||f.type!=='sariel'||f.stun>0||f.specialT>0)return false;
-    f.guard=false;f.specialType='bloodMoon';f.specialT=3.25;
+    f.guard=false;f.specialType='bloodMoon';f.specialT=2.75;
     bloodMoons=bloodMoons.filter(m=>m.owner!==f);
-    bloodMoons.push({owner:f,t:3.0,life:3.0,broken:false,startHp:f.hp});
+    bloodMoons.push({owner:f,t:2.5,life:2.5,broken:false,startHp:f.hp});
     comboEl.textContent='ブラッドムーン…';return true;
   }
   function specialMoonSaltKick(f){
@@ -6508,6 +6508,21 @@ function drawBackground(dt){
     const th=themes[Math.max(0,Math.min(3,stageTheme||0))];
     const sky=ctx.createLinearGradient(0,0,0,h);sky.addColorStop(0,th[0]);sky.addColorStop(.52,th[1]);sky.addColorStop(1,th[2]);
     ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
+
+    // JUMP壁張り付き用の金色アンカー。端の端だけに置き、競技場装飾にも見える程度に控えめ。
+    ctx.save();
+    const anchorYs=[h*.31,h*.43,h*.55,h*.67];
+    anchorYs.forEach(ay=>{
+      [-1,1].forEach(sideSign=>{
+        const ax=sideSign<0?5:w-5;
+        const g=ctx.createRadialGradient(ax-2,ay-2,1,ax,ay,9);
+        g.addColorStop(0,'#fff4b0');g.addColorStop(.42,'#e8bf4d');g.addColorStop(1,'#8d6418');
+        ctx.fillStyle=g;ctx.shadowColor='#f5d76b';ctx.shadowBlur=7;
+        ctx.beginPath();ctx.arc(ax,ay,7,0,Math.PI*2);ctx.fill();
+        ctx.strokeStyle='rgba(255,238,151,.9)';ctx.lineWidth=1.5;ctx.stroke();
+      });
+    });
+    ctx.restore();
 
     const floor=jumpFloorY();
     const top=Math.max(178,h*.235);
