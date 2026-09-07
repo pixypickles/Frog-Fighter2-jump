@@ -208,6 +208,29 @@
 }
 </style>
 
+
+<style id="jump22-real-title-contrast">
+/* v2.2: target the elements actually rendered on the portrait title screen */
+#titleScreen.screen.active > .frog-logo-sub{
+  color:#174b5a!important; opacity:1!important;
+  text-shadow:0 1px 0 rgba(255,255,255,.9),0 2px 3px rgba(0,0,0,.18)!important;
+  font-weight:1000!important;
+}
+#titleScreen.screen.active > .start-version{
+  color:#ffffff!important; background:#356b78!important; opacity:1!important;
+  border:3px solid rgba(255,255,255,.88)!important;
+  text-shadow:0 2px 2px rgba(0,0,0,.38)!important; font-weight:1000!important;
+}
+#titleScreen.screen.active .portrait-start-btn{
+  color:#164b43!important; background:#9bd38f!important; opacity:1!important;
+  border:3px solid rgba(48,105,88,.58)!important;
+  text-shadow:0 1px 0 rgba(255,255,255,.55)!important; font-weight:1000!important;
+}
+#titleScreen.screen.active > .portrait-start-note{
+  color:#245b68!important; opacity:1!important;
+  text-shadow:0 1px 0 rgba(255,255,255,.95)!important; font-weight:900!important;
+}
+</style>
 </head>
 <body>
   <div id="app">
@@ -225,7 +248,7 @@
       <p class="frog-logo-sub">LOTUS STADIUM JUMP BATTLE</p>
       <p class="rotate-note">蓮の葉競技場・縦ジャンプバトル</p>
       <div class="build-marker">BUILD JUMP 0.4</div>
-      <div class="start-version">FROG FIGHTER 2 JUMP　PROTOTYPE v2.1</div>
+      <div class="start-version">FROG FIGHTER 2 JUMP　PROTOTYPE v2.2</div>
       <div class="title-start-actions">
         <button id="portraitStart" class="soft-btn portrait-start-btn">はじめる</button>
         
