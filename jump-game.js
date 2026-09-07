@@ -4244,33 +4244,62 @@
   }
 
   function specialAirBlade(f,variant='down'){
-    if(gameOver || f.stun>0 || f.guard || f.specialT>0) return false;
-    f.specialType='airBlade';
-    f.specialT=.48;
-    f.attack=variant==='down'?'punch':'kick';
-    f.attackT=.48;
+    if(gameOver || f.stun>0 || f.guard || f.specialT>0 || f.attackT>0) return false;
 
     const airborne=f.y < jumpFloorY()-18;
     const speed=airborne?405:360;
-    const dir=f.face;
-
-    // 上→下 / 下→上が明確に分かる、大きな風の刃。
     const startDeg=variant==='down' ? -42 : 42;
     const curve=variant==='down' ? 185 : -185;
-    specialWater2Shot(f,{
-      name:'エアブレード',
-      attack:f.attack,
-      color:'aqua',
-      style:'airBlade',
-      speed,
-      angle:startDeg,
-      damage:airborne?4.5:4.0,
-      r:airborne?20:18,
-      charge:.30,
-      curve,
-      maxReflect:5
-    });
-    comboEl.textContent=variant==='down'?'エアブレード 上→下!':'エアブレード 下→上!';
+    const charge=.30;
+
+    f.specialType='airBladeWindup';
+    f.specialT=charge+.24;
+    f.attack=variant==='down'?'punch':'kick';
+    f.attackVariant=variant==='down'?'up':'down';
+    f.attackT=charge+.24;
+
+    comboEl.textContent=variant==='down'?'エアブレード 上→下…':'エアブレード 下→上…';
+
+    setTimeout(()=>{
+      if(gameOver || !f) return;
+
+      const dir=f.face;
+      const rad=startDeg*Math.PI/180;
+      water2Shots.push({
+        owner:f,
+        x:f.x+dir*62,
+        y:f.y+(variant==='down'?-20:24),
+        vx:dir*Math.cos(rad)*speed,
+        vy:Math.sin(rad)*speed,
+        r:airborne?22:20,
+        age:0,
+        maxAge:18,
+        t:1,
+        life:1,
+        damage:airborne?4.5:4.0,
+        name:'エアブレード',
+        color:'aqua',
+        reflected:0,
+        hit:false,
+        spin:0,
+        style:'airBlade',
+        poisonDuration:0,
+        curve,
+        arcFlip:variant==='down'?1:-1,
+        wobble:0,
+        baseVy:Math.sin(rad)*speed,
+        maxReflect:5,
+        trail:[]
+      });
+
+      comboEl.textContent=variant==='down'?'エアブレード 上→下!':'エアブレード 下→上!';
+      setTimeout(()=>{
+        if(comboEl.textContent==='エアブレード 上→下!' || comboEl.textContent==='エアブレード 下→上!'){
+          comboEl.textContent='';
+        }
+      },620);
+    },charge*1000);
+
     return true;
   }
 
@@ -8140,7 +8169,6 @@ function drawBackground(dt){
         // JUMP版ラファエル：大型の三日月状エアブレード。
         // 進行方向に合わせて回転し、白〜水色の発光と残像で見やすくする。
         ctx.save();
-        ctx.rotate(ang);
 
         ctx.globalCompositeOperation='lighter';
         ctx.shadowColor='#bff7ff';

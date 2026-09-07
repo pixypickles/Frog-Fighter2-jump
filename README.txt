@@ -143,3 +143,9 @@ v2.11 - Air Blade visibility fix
 - Air Blade is now a large crescent-shaped wind blade with white/cyan glow.
 - Added a short wind trail so the curved up/down trajectories are easier to see.
 - Uses a known visible projectile color token internally while retaining airBlade behavior.
+
+v2.12 - Air Blade spawn fix
+- Root cause found: specialAirBlade set specialT before calling specialWater2Shot, so the shared projectile function rejected the shot as "already in a special".
+- Air Blade now creates its projectile directly after a 0.30s windup.
+- Removed redundant second rotation in Air Blade rendering.
+- Existing large crescent wind-blade visual and curved trajectories are retained.
