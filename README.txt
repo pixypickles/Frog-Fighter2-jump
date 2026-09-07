@@ -1,3 +1,10 @@
+FROG FIGHTER 2 JUMP v0.9
+
+v0.9 changes:
+- Clean above-water title background with horizontal scenery
+- Portrait fighter cards tightened so move hints fit below names
+- Portrait four-button controls rearranged into a non-overlapping diamond
+
 FROG FIGHTER 2 JUMP Prototype v0.7
 
 v0.7 fixes:

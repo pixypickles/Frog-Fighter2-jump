@@ -4098,3 +4098,100 @@ body.portrait-play .pause-button{z-index:46 !important;}
       radial-gradient(circle at 75% 50%,var(--frog-iris) 0 8%,var(--frog-eye-area) 9% 19%,var(--frog-eye-bump) 20% 31%,transparent 32%) !important;
   }
 }
+
+
+/* ===== FROG FIGHTER 2 JUMP v0.9 ===== */
+/* Clean above-water title: no stretched cloud/leaf blobs. Keep the scenery horizontal. */
+#titleScreen{
+  overflow:hidden !important;
+  background:linear-gradient(180deg,
+    #79d8f5 0%,
+    #aee8f7 34%,
+    #e9f5e2 55%,
+    #c8dc8b 56%,
+    #82b95e 68%,
+    #4e9450 78%,
+    #2e754b 100%) !important;
+}
+#titleScreen::before{
+  content:"" !important;
+  position:absolute !important;
+  width:84px !important;
+  height:84px !important;
+  right:9vw !important;
+  top:8vh !important;
+  left:auto !important;
+  bottom:auto !important;
+  border-radius:50% !important;
+  background:#fff0a0 !important;
+  box-shadow:0 0 0 18px rgba(255,240,160,.18),0 0 46px rgba(255,240,160,.32) !important;
+  z-index:0 !important;
+  pointer-events:none !important;
+}
+#titleScreen::after{
+  content:"" !important;
+  position:absolute !important;
+  left:0 !important;
+  right:0 !important;
+  bottom:0 !important;
+  height:31vh !important;
+  z-index:0 !important;
+  pointer-events:none !important;
+  background:linear-gradient(180deg,
+    rgba(101,157,75,0) 0%,
+    rgba(101,157,75,.20) 8%,
+    #72aa5a 9% 22%,
+    #4c8f4e 23% 38%,
+    #397b4b 39% 100%) !important;
+  clip-path:polygon(0 28%,10% 19%,22% 24%,35% 13%,48% 23%,60% 16%,73% 26%,86% 14%,100% 23%,100% 100%,0 100%) !important;
+}
+#titleScreen > *{position:relative !important;z-index:2 !important;}
+#titleScreen .bubble{display:none !important;}
+
+/* Portrait roster: less dead space under the name, and enough room for the full move hint. */
+@media (orientation:portrait), (max-width:760px){
+  #selectScreen.screen.active .select-right-panel .fighter-card{
+    height:168px !important;
+    min-height:168px !important;
+    padding:6px 5px !important;
+    overflow:hidden !important;
+  }
+  #selectScreen.screen.active .select-right-panel .fighter-card .fighter-emoji{
+    top:49px !important;
+  }
+  #selectScreen.screen.active .select-right-panel .fighter-card > strong{
+    top:96px !important;
+    line-height:1.05 !important;
+  }
+  #selectScreen.screen.active .select-right-panel .fighter-card > .special-hint{
+    top:116px !important;
+    left:5px !important;
+    right:5px !important;
+    bottom:auto !important;
+    max-height:47px !important;
+    padding:4px 4px !important;
+    font-size:8.5px !important;
+    line-height:1.16 !important;
+    overflow:hidden !important;
+    box-sizing:border-box !important;
+  }
+
+  /* Four nearby buttons in a compact diamond, with a real gap between every circle. */
+  body.portrait-play .buttons{
+    right:max(10px,env(safe-area-inset-right)) !important;
+    bottom:max(10px,env(safe-area-inset-bottom)) !important;
+    width:184px !important;
+    height:218px !important;
+  }
+  body.portrait-play .action{
+    width:78px !important;
+    height:78px !important;
+    min-width:78px !important;
+    min-height:78px !important;
+    font-size:16px !important;
+  }
+  body.portrait-play .guard{left:53px !important;right:auto !important;top:0 !important;bottom:auto !important;}
+  body.portrait-play .tongue{left:0 !important;right:auto !important;top:70px !important;bottom:auto !important;}
+  body.portrait-play .kick{left:106px !important;right:auto !important;top:70px !important;bottom:auto !important;}
+  body.portrait-play .punch{left:53px !important;right:auto !important;top:140px !important;bottom:auto !important;}
+}
