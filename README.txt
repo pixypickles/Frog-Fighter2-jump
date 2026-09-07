@@ -95,3 +95,11 @@ v2.4
 - Root cause: portrait #controls was z-index 45 while result buttons were z-index 42.
 - Result buttons are now z-index 80 and explicitly pointer-interactive.
 - Existing game return logic is unchanged.
+
+
+v2.5 - vertical-battle character tuning: Mikael
+- Tongue throw changed to a downward slam with very little horizontal travel.
+- Burning Uppercut launch velocity increased from -520 to -745 for roughly double jump height.
+- Burning Shot speed reduced from 315 to 190.
+- Burning Kick now auto-aims its launch angle at the opponent (capped at ±55 degrees).
+- Burning Cyclone horizontal launch/maintenance speed greatly reduced.

@@ -3840,8 +3840,8 @@
     f.cycloneLastHitB=-9999;
     f.cycloneStartTime=performance.now();
 
-    // 高速回転しながら相手方向へ突進
-    f.vx+=f.face*555;
+    // JUMP版：回転の圧を残しつつ、横への突進量はかなり控えめ。
+    f.vx+=f.face*215;
     f.vy*=.18;
 
     comboEl.textContent='バーニングサイクロン!';
@@ -3885,8 +3885,9 @@
     // 一瞬しゃがんだ後に、画面上方向へ強く跳ぶ
     setTimeout(()=>{
       if(!f || gameOver) return;
-      f.vy=-520;
-      f.vx+=f.face*70;
+      // JUMP版：縦の主力。従来のおよそ2倍の到達高度を狙う。
+      f.vy=-745;
+      f.vx+=f.face*45;
 
       comboEl.textContent='バーニングアッパー!';
       setTimeout(()=>{
@@ -3908,12 +3909,27 @@
     f.attackVariant='mid';
     f.attackT=.62;
 
-    // 水中なので超高速ではなく、少し溜めてから強く前進
+    // JUMP版：発射時に敵の位置へ角度を自動補正する。
     setTimeout(()=>{
       if(!f || gameOver) return;
-      f.vx += f.face*470;
-      // 水中でもわずかに上向きへ。地上版より控えめ。
-      f.vy=Math.min(f.vy,-85);
+      const target=f.isPlayer?enemy:player;
+      let dir=f.face;
+      let angle=-0.12;
+
+      if(target){
+        const dx=target.x-f.x;
+        const dy=target.y-f.y;
+        if(Math.abs(dx)>4) dir=Math.sign(dx);
+        f.face=dir;
+
+        // 真上・真下へ行きすぎないよう ±55度で制限。
+        const raw=Math.atan2(dy,Math.max(45,Math.abs(dx)));
+        angle=Math.max(-0.96,Math.min(0.96,raw));
+      }
+
+      const speed=475;
+      f.vx=dir*Math.cos(angle)*speed;
+      f.vy=Math.sin(angle)*speed;
 
       comboEl.textContent='バーニングキック!';
       setTimeout(()=>{
@@ -5054,7 +5070,7 @@
       if(kind==='punch' && water2HeldDir(f,'up')){ clearCommand(); return specialUppercut(f); }
       if(kind==='kick' && water2HeldDir(f,'forward')){ clearCommand(); return specialDropKick(f); }
       if(kind==='punch' && water2HeldDir(f,'back')){
-        clearCommand(); return specialWater2Shot(f,{name:'バーニングショット',attack:'punch',color:'fire',style:'burning',speed:315,damage:4.4,r:15,charge:.40,maxReflect:5});
+        clearCommand(); return specialWater2Shot(f,{name:'バーニングショット',attack:'punch',color:'fire',style:'burning',speed:190,damage:4.4,r:15,charge:.40,maxReflect:5});
       }
     }
 
@@ -5289,7 +5305,8 @@
         f.attack='tongue';
         f.attackT=.28;
 
-        // 2回目の舌は、相手を自分の後方へ回転させながら投げ飛ばす。
+        // JUMP版：2回目の舌は横へ投げず、相手を下方向へ叩きつける。
+        // 横成分は少なめにして、床へ強く落とす「舌叩きつけ」にする。
         const throwDir = -f.face;
 
         // 連続舌投げ時に前回の回転状態を引き継がない
@@ -5298,16 +5315,15 @@
 
         target.throwState={
           owner:f,
-          spinSpeed: throwDir*15,
-          endT:.72,
+          spinSpeed: throwDir*12,
+          endT:.58,
           noWallDamage:false
         };
         target.hurtFace='both';
         target.hurtFaceT=.7;
 
-        // 少し上向きに放り、後方の壁へ叩きつけやすくする。
-        target.vx = throwDir*720;
-        target.vy = -115;
+        target.vx = throwDir*145;
+        target.vy = 760;
 
         target.stun=.55;
         f.tonguePullTarget=null;
@@ -6176,8 +6192,8 @@
       const other=f.isPlayer?enemy:player;
       const ang=burningCycloneAngle(f);
 
-      // 突進速度を維持
-      if(Math.abs(f.vx)<390) f.vx+=f.face*255*dt;
+      // JUMP版：横へ流れすぎないよう、最低速度も加速も小さくする。
+      if(Math.abs(f.vx)<150) f.vx+=f.face*95*dt;
 
       if(other){
         const feet=[
