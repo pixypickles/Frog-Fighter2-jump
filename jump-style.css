@@ -4195,3 +4195,130 @@ body.portrait-play .pause-button{z-index:46 !important;}
   body.portrait-play .kick{left:106px !important;right:auto !important;top:70px !important;bottom:auto !important;}
   body.portrait-play .punch{left:53px !important;right:auto !important;top:140px !important;bottom:auto !important;}
 }
+
+
+/* ===== FROG FIGHTER 2 JUMP v1.0 ===== */
+/* Brighter, almost-white sky. No stretched mountains, lotus blobs or underwater feel. */
+#titleScreen{
+  overflow:hidden !important;
+  background:linear-gradient(180deg,
+    #fbfeff 0%,
+    #eefbff 18%,
+    #d9f5ff 42%,
+    #c8effb 63%,
+    #bde5d7 72%,
+    #8fc9a0 82%,
+    #58a875 100%) !important;
+}
+#titleScreen::before{
+  content:"" !important;
+  position:absolute !important;
+  width:62px !important;
+  height:62px !important;
+  right:10vw !important;
+  top:9vh !important;
+  left:auto !important;
+  bottom:auto !important;
+  border-radius:50% !important;
+  background:rgba(255,244,174,.92) !important;
+  box-shadow:0 0 0 14px rgba(255,247,196,.18),0 0 34px rgba(255,245,185,.26) !important;
+  z-index:0 !important;
+  pointer-events:none !important;
+  clip-path:none !important;
+}
+#titleScreen::after{
+  content:"" !important;
+  position:absolute !important;
+  left:0 !important;
+  right:0 !important;
+  bottom:0 !important;
+  height:22vh !important;
+  z-index:0 !important;
+  pointer-events:none !important;
+  clip-path:none !important;
+  background:linear-gradient(180deg,
+    rgba(119,184,139,0) 0%,
+    rgba(119,184,139,.18) 18%,
+    #8fc7a0 19% 36%,
+    #6eb487 37% 58%,
+    #4c9a70 59% 100%) !important;
+}
+#titleScreen > *{position:relative !important;z-index:2 !important;}
+#titleScreen .bubble{display:none !important;}
+
+/* Portrait roster: keep the full face inside the card, then expand only the selected card for moves. */
+@media (orientation:portrait), (max-width:760px){
+  #selectScreen.screen.active .select-right-panel .fighter-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:10px !important;
+    align-items:start !important;
+  }
+  #selectScreen.screen.active .select-right-panel .fighter-card{
+    height:154px !important;
+    min-height:154px !important;
+    padding:6px 5px !important;
+    overflow:hidden !important;
+    transition:height .18s ease,min-height .18s ease !important;
+  }
+  #selectScreen.screen.active .select-right-panel .fighter-card .fighter-emoji{
+    top:60px !important;
+    left:50% !important;
+    right:auto !important;
+    transform:translate(-50%,-50%) !important;
+    margin:0 !important;
+  }
+  #selectScreen.screen.active .fighter-card:not([data-fighter="piranha"]):not([data-fighter="crayfish"]) .fighter-emoji::before{
+    top:-22px !important;
+  }
+  #selectScreen.screen.active .select-right-panel .fighter-card > strong{
+    top:119px !important;
+    left:3px !important;
+    right:3px !important;
+    bottom:auto !important;
+    width:auto !important;
+    font-size:13px !important;
+    line-height:1.05 !important;
+    text-align:center !important;
+    white-space:nowrap !important;
+  }
+  #selectScreen.screen.active .select-right-panel .fighter-card > .special-hint,
+  #selectScreen.screen.active .select-right-panel .fighter-card > .move-names{
+    display:none !important;
+  }
+  #selectScreen.screen.active .select-right-panel .fighter-card.selected{
+    height:214px !important;
+    min-height:214px !important;
+    overflow:hidden !important;
+  }
+  #selectScreen.screen.active .select-right-panel .fighter-card.selected > .special-hint,
+  #selectScreen.screen.active .select-right-panel .fighter-card.selected > .move-names{
+    display:block !important;
+    position:absolute !important;
+    left:6px !important;
+    right:6px !important;
+    top:148px !important;
+    bottom:auto !important;
+    width:auto !important;
+    max-height:58px !important;
+    margin:0 !important;
+    padding:6px 5px !important;
+    box-sizing:border-box !important;
+    border-radius:9px !important;
+    background:rgba(4,34,42,.95) !important;
+    color:#fff !important;
+    text-align:center !important;
+    font-size:9px !important;
+    line-height:1.2 !important;
+    white-space:normal !important;
+    overflow:hidden !important;
+    z-index:25 !important;
+  }
+}
+
+/* In portrait battle, move the title-return button below the player's HP gauge. */
+@media (orientation:portrait), (max-width:760px){
+  body.portrait-play #mixMapReturn{
+    top:max(56px,calc(env(safe-area-inset-top) + 56px)) !important;
+    left:max(10px,env(safe-area-inset-left)) !important;
+  }
+}

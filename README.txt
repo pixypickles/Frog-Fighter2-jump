@@ -1,6 +1,6 @@
-FROG FIGHTER 2 JUMP v0.9
+FROG FIGHTER 2 JUMP v1.0
 
-v0.9 changes:
+v1.0 changes:
 - Clean above-water title background with horizontal scenery
 - Portrait fighter cards tightened so move hints fit below names
 - Portrait four-button controls rearranged into a non-overlapping diamond
@@ -37,3 +37,6 @@ FROG FIGHTER 2 JUMP v0.8
 - タイトルを水中色から地上の空・日差し・緑の会場背景へ変更
 - キャラ選択のカエルの両目を顔の中央へ補正
 - 4段観客席を3列化・横密度アップして満員感を強化
+
+
+v1.0: title sky brightened; portrait fighter cards keep eyes inside the card and selected card expands for move list; battle title-return button moved below HP.
