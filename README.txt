@@ -118,3 +118,17 @@ v2.7 - Gabriel Aqua Shot revision
 - Redesigned as a thick high-pressure water shot rather than a slow water blob.
 - Speed: 430, radius: 24, damage: 4.2, short charge.
 - Aqua Tornado / Stream / Vortex unchanged from v2.6.
+
+v2.8 - Raphael wind-element vertical redesign
+- Pressure Cutter renamed Air Cutter; Forward+Punch/Kick fires two wind cutters.
+- Carp Pressure Cutter replaced by Air Blade with large wind-blade form and top-to-bottom / bottom-to-top curved trajectories.
+- High-speed Bubble Move renamed Air Boost; Up+Guard rises first, then crosses to the opposite upper side while wrapped in wind.
+- Raphael's Air Cutter / Air Blade are slightly stronger, faster and larger while airborne.
+- CPU Raphael updated to use the new wind moves.
+
+v2.9 - Raphael Air Hover
+- Air Boost replaced by Air Hover.
+- Up + Guard activates about 5 seconds of hovering.
+- Raphael receives a short upward lift on activation.
+- During hover: left/right moves horizontally, up rises, down descends; no input holds position.
+- Hover movement is bounded to the playable screen.

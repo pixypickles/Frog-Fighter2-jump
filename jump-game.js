@@ -357,12 +357,12 @@
       'アクアショット：前 ＋ パンチ'
     ],
     yellow:[
-      '水圧カッター（正面）：前 ＋ パンチ',
-      '水圧カッター（下15度）：前 ＋ キック',
-      'カープ水圧カッター（上から弧）：後ろ ＋ パンチ',
-      'カープ水圧カッター（下から弧）：後ろ ＋ キック',
+      'エアカッター（2連）：前 ＋ パンチ',
+      'エアカッター（2連・斜め下）：前 ＋ キック',
+      'エアブレード（上 → 下）：後ろ ＋ パンチ',
+      'エアブレード（下 → 上）：後ろ ＋ キック',
       'ヒーリングバブル：ガード ×2',
-      '高速バブル移動：後ろ → 下 ＋ ガード'
+      'エアホバー（約5秒）：上 ＋ ガード'
     ],
     orange:[
       'ホワイトカウンター：下 → 後ろ ＋ ガード',
@@ -2235,20 +2235,19 @@
       }
 
       if(this.type==='yellow' && this.specialType==='raphaelBubbleMove'){
-        // 全身を泡で包む。高速移動中は飛び道具無効。
+        // エアホバー：全身を白青い風の渦で包む。
         ctx.save();
         ctx.globalCompositeOperation='lighter';
-        ctx.globalAlpha=.32;
-        ctx.fillStyle='#d8fbff';
-        ctx.beginPath();
-        ctx.ellipse(0,22,53,67,0,0,Math.PI*2);
-        ctx.fill();
-        ctx.globalAlpha=.72;
-        ctx.strokeStyle='#efffff';
-        ctx.lineWidth=4;
-        ctx.beginPath();
-        ctx.ellipse(0,22,53,67,0,0,Math.PI*2);
-        ctx.stroke();
+        ctx.translate(0,20);
+        const wt=performance.now()/95;
+        for(let i=0;i<3;i++){
+          ctx.globalAlpha=.30+i*.10;
+          ctx.strokeStyle=i===1?'#ffffff':'#b9f4ff';
+          ctx.lineWidth=3+i;
+          ctx.beginPath();
+          ctx.ellipse(0,0,42+i*7,55+i*5,wt*.12+i*.8,-2.55,2.55);
+          ctx.stroke();
+        }
         ctx.restore();
       }
 
@@ -3100,7 +3099,7 @@
     const map={
       green:['上 ＋ パンチ：バーニングアッパー','前 ＋ キック：バーニングキック','後ろ ＋ パンチ：バーニングショット','下 → 後ろ ＋ キック：バーニングサイクロン'],
       blue:['上 ＋ パンチ：アクアトルネード','下 ＋ キック：アクアストリーム','後ろ ＋ パンチ：アクアボルテックス','前 ＋ パンチ：アクアショット'],
-      yellow:['前 ＋ パンチ：水圧カッター（正面）','前 ＋ キック：水圧カッター（下15度）','後ろ ＋ パンチ：カープ水圧カッター（上から弧）','後ろ ＋ キック：カープ水圧カッター（下から弧）','ガード ×2：ヒーリングバブル','後ろ → 下 ＋ ガード：高速バブル移動'],
+      yellow:['前 ＋ パンチ：エアカッター（2連）','前 ＋ キック：エアカッター（2連・斜め下）','後ろ ＋ パンチ：エアブレード（上 → 下）','後ろ ＋ キック：エアブレード（下 → 上）','ガード ×2：ヒーリングバブル','上 ＋ ガード：エアホバー（約5秒・方向入力で空中移動）'],
       orange:['下 → 後ろ ＋ ガード：ホワイトカウンター','後ろ → 前 ＋ ガード：ガーディアンタックル','ガード長押し：ホワイトオーラ','オーラ中 パンチ / キック：白い長リーチ攻撃','ガード ＋ パンチ：ホワイトショット'],
       black:['前 ＋ キック：ヘルクラッシュ（氷オーラの蹴り・特大ノックバック）','後ろ ＋ パンチ長押し → 離す：アビスチャージ（周囲を一瞬凍結）','前 ＋ パンチ：アイスショット','後ろ ＋ ガード：アイスウォール'],
       purple:['舌連打：舌ラッシュ','後ろ ＋ 舌：バブルショット','後ろ ＋ キック：バックスピンキック（追加入力で追加回転）'],
@@ -4208,32 +4207,70 @@
 
     f.specialType='pressureBlade';
     f.specialT=.42;
-    f.attack=source==='kick' ? 'kick' : (source==='punch' ? 'punch' : null);
+    f.attack=source==='kick' ? 'kick' : 'punch';
     f.attackT=.42;
 
-    const speed=350;
-    const yOffset=source==='punch' ? -10 : (source==='kick' ? 28 : 2);
-
-    // 水中では水圧カッターは1発だけ。
-    // パンチ版＝水平、キック版＝約15°下。
-    const deg=source==='kick' ? 15 : angleDeg;
+    // JUMP版ラファエル：風属性のエアカッターを2連射。
+    // 空中では少し速く・大きくして風使いとしての性能を上げる。
+    const airborne=f.y < jumpFloorY()-18;
+    const speed=airborne?425:380;
+    const deg=source==='kick' ? 18 : angleDeg;
     const rad=deg*Math.PI/180;
-    pressureBlades.push({
-      owner:f,
-      x:f.x+f.face*68,
-      y:f.y+yOffset,
-      vx:f.face*Math.cos(rad)*speed,
-      vy:Math.sin(rad)*speed,
-      t:1.25,
-      life:1.25,
-      hit:false,
-      size:1.0,
-      angle:rad,
-      reflected:0
+    const yOffset=source==='punch' ? -10 : 24;
+
+    [0,1].forEach((n)=>{
+      setTimeout(()=>{
+        if(gameOver || !f) return;
+        pressureBlades.push({
+          owner:f,
+          x:f.x+f.face*(64+n*5),
+          y:f.y+yOffset+(source==='kick'?n*4:-n*5),
+          vx:f.face*Math.cos(rad)*speed,
+          vy:Math.sin(rad)*speed,
+          t:1.18,
+          life:1.18,
+          hit:false,
+          size:airborne?1.12:1.0,
+          angle:rad,
+          reflected:0,
+          style:'airCutter'
+        });
+      },n*105);
     });
 
-    comboEl.textContent='水圧カッター!';
-    setTimeout(()=>{if(comboEl.textContent==='水圧カッター!')comboEl.textContent='';},900);
+    comboEl.textContent='エアカッター!';
+    setTimeout(()=>{if(comboEl.textContent==='エアカッター!')comboEl.textContent='';},760);
+    return true;
+  }
+
+  function specialAirBlade(f,variant='down'){
+    if(gameOver || f.stun>0 || f.guard || f.specialT>0) return false;
+    f.specialType='airBlade';
+    f.specialT=.48;
+    f.attack=variant==='down'?'punch':'kick';
+    f.attackT=.48;
+
+    const airborne=f.y < jumpFloorY()-18;
+    const speed=airborne?405:360;
+    const dir=f.face;
+
+    // 上→下 / 下→上が明確に分かる、大きな風の刃。
+    const startDeg=variant==='down' ? -42 : 42;
+    const curve=variant==='down' ? 185 : -185;
+    specialWater2Shot(f,{
+      name:'エアブレード',
+      attack:f.attack,
+      color:'air',
+      style:'airBlade',
+      speed,
+      angle:startDeg,
+      damage:airborne?4.5:4.0,
+      r:airborne?20:18,
+      charge:.30,
+      curve,
+      maxReflect:5
+    });
+    comboEl.textContent=variant==='down'?'エアブレード 上→下!':'エアブレード 下→上!';
     return true;
   }
 
@@ -4241,27 +4278,19 @@
     if(gameOver || f.stun>0 || f.throwState || f.specialT>0) return false;
 
     f.guard=false;
+    // Internal name is kept for existing projectile-immunity / wind-effect compatibility.
     f.specialType='raphaelBubbleMove';
-    f.specialT=.92;
+    f.specialT=5.0;
     f.attack=null;
     f.attackT=0;
+    f.raphaelHoverT=5.0;
     f.raphaelMoveElapsed=0;
-    f.raphaelMoveDuration=.82;
-    f.raphaelMoveStartX=f.x;
-    f.raphaelMoveStartY=f.y;
-
-    // 最初は斜め後ろ下へ、そこから大きく回り込んで前下へ。
-    const dir=f.face;
-    f.raphaelMoveControlX=f.x-dir*Math.min(180,innerWidth*.18);
-    f.raphaelMoveControlY=Math.min(innerHeight-70,f.y+Math.min(180,innerHeight*.30));
-    f.raphaelMoveEndX=dir>0 ? innerWidth-90 : 90;
-    f.raphaelMoveEndY=innerHeight-92;
     f.vx=0;
-    f.vy=0;
+    f.vy=-260; // activation gives a quick lift into the air
 
-    comboEl.textContent='高速バブル移動!';
+    comboEl.textContent='エアホバー!';
     setTimeout(()=>{
-      if(comboEl.textContent==='高速バブル移動!') comboEl.textContent='';
+      if(comboEl.textContent==='エアホバー!') comboEl.textContent='';
     },720);
     clearCommand();
     return true;
@@ -5166,16 +5195,12 @@
       if(kind==='kick' && hasCommand([back,'down'],850)){ clearCommand(); return specialCrayfishBottomSmash(f); }
     }
 
-    // フロッグファイター2 JUMP：ラファエル。4軌道の水圧カッターを方向＋攻撃で撃ち分け。
+    // JUMP版ラファエル：風属性。前は2連エアカッター、後ろは縦軌道のエアブレード。
     if(f.type==='yellow'){
       if(kind==='punch' && water2HeldDir(f,'forward')){ clearCommand(); return specialPressureBlade(f,0,'punch'); }
-      if(kind==='kick' && water2HeldDir(f,'forward')){ clearCommand(); return specialPressureBlade(f,15,'kick'); }
-      if(kind==='punch' && water2HeldDir(f,'back')){
-        clearCommand(); return specialWater2Shot(f,{name:'カープ水圧カッター',attack:'punch',color:'blade',style:'carpBlade',speed:285,angle:-30,damage:3.7,r:12,charge:.40,curve:105,maxReflect:5});
-      }
-      if(kind==='kick' && water2HeldDir(f,'back')){
-        clearCommand(); return specialWater2Shot(f,{name:'カープ水圧カッター',attack:'kick',color:'blade',style:'carpBlade',speed:285,angle:30,damage:3.7,r:12,charge:.40,curve:-105,maxReflect:5});
-      }
+      if(kind==='kick' && water2HeldDir(f,'forward')){ clearCommand(); return specialPressureBlade(f,18,'kick'); }
+      if(kind==='punch' && water2HeldDir(f,'back')){ clearCommand(); return specialAirBlade(f,'down'); }
+      if(kind==='kick' && water2HeldDir(f,'back')){ clearCommand(); return specialAirBlade(f,'up'); }
     }
 
     // フロッグファイター2 JUMP：ウリエル G＋P（直前のガードタップ＋P）でホワイトショット。
@@ -5675,7 +5700,7 @@
             }
           }
 
-          // ラファエル：上＋ガードで高速バブル移動 / エアブースト。
+          // ラファエル：上＋ガードで約5秒のエアホバー。
           if(player.type==='yellow' && !player.throwState && input.y<-.35){
             input.simpleGuardTapTimes=[];
             if(specialRaphaelBubbleMove(player)){
@@ -6002,13 +6027,13 @@
     enemy.guard=false;
 
     if(enemy.attackT<=0){
-      // ラファエルCPU：接近戦を避け、水圧カッター中心の距離戦。
+      // ラファエルCPU：接近戦を避け、エアカッター／エアブレード中心の距離戦。
       if(enemy.type==='yellow'){
         const idealMin=285, idealMax=430;
         const away=-Math.sign(dx||enemy.face||1);
 
         if(dist<idealMin){
-          // 近づかれたらまず距離を取る。かなり近い時は高速バブル移動も使う。
+          // 近づかれたらまず距離を取る。かなり近い時はエアホバーも使う。
           enemy.vx += away*enemy.speed*1.75*diff.move*dt;
           enemy.vy += -Math.sign(dy||1)*enemy.speed*.42*diff.move*dt;
           if(dist<155 && enemy.specialT<=0 && Math.random()<dt*.42){
@@ -6030,11 +6055,11 @@
             specialPressureBlade(enemy,0,'punch');return;
           }
           if(r<dt*.56*diff.special){
-            specialPressureBlade(enemy,15,'kick');return;
+            specialPressureBlade(enemy,18,'kick');return;
           }
           if(r<dt*.72*diff.special){
-            const upper=(player.y<enemy.y);
-            specialWater2Shot(enemy,{name:'カープ水圧カッター',attack:upper?'punch':'kick',color:'blade',style:'carpBlade',speed:285,angle:upper?-30:30,damage:3.7,r:12,charge:.40,curve:upper?105:-105,maxReflect:5});return;
+            const fromAbove=(player.y>enemy.y);
+            specialAirBlade(enemy,fromAbove?'down':'up');return;
           }
           if(enemy.hp<45 && r<dt*.78*diff.special){specialHealingBubble(enemy);return;}
         }
@@ -6297,24 +6322,41 @@
     }
 
     if(f.specialType==='raphaelBubbleMove'){
-      f.raphaelMoveElapsed=(f.raphaelMoveElapsed||0)+dt;
-      const dur=f.raphaelMoveDuration||.82;
-      const t=Math.max(0,Math.min(1,f.raphaelMoveElapsed/dur));
-      const u=1-t;
+      f.raphaelHoverT=Math.max(0,(f.raphaelHoverT||0)-dt);
 
-      // 2次ベジェ：斜め後ろ下へ膨らみ、前下へぐるっと回り込む
-      f.x=
-        u*u*f.raphaelMoveStartX+
-        2*u*t*f.raphaelMoveControlX+
-        t*t*f.raphaelMoveEndX;
-      f.y=
-        u*u*f.raphaelMoveStartY+
-        2*u*t*f.raphaelMoveControlY+
-        t*t*f.raphaelMoveEndY;
+      // 5秒間、重力に負けず空中を自由移動。
+      // プレイヤーはスティック/方向入力、CPUは相手方向へ緩く追従。
+      let hx=0, hy=0;
+      if(f.isPlayer){
+        hx=input.x||0;
+        hy=input.y||0;
+      }else{
+        const other=f===player?enemy:player;
+        if(other){
+          hx=Math.max(-1,Math.min(1,(other.x-f.x)/150));
+          hy=Math.max(-1,Math.min(1,(other.y-f.y)/150));
+        }
+      }
 
-      f.vx=0;
-      f.vy=0;
+      const hoverSpeed=245;
+      f.vx=hx*hoverSpeed;
+      f.vy=hy*hoverSpeed;
+
+      // 無入力ならその場に浮く。
+      if(Math.abs(hx)<.12) f.vx=0;
+      if(Math.abs(hy)<.12) f.vy=0;
+
+      f.x=Math.max(34,Math.min(innerWidth-34,f.x));
+      f.y=Math.max(72,Math.min(jumpFloorY()-34,f.y));
+
+      if(f.raphaelHoverT<=0){
+        f.specialT=0;
+        f.specialType=null;
+        f.vx*=.35;
+        f.vy=0;
+      }
     }
+  }
   }
 
   function isPoisonImmune(f){
