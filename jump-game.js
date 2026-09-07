@@ -206,12 +206,22 @@
     });
   }
 
-  document.getElementById('desktopStart').onclick = () => {
-    portraitPlayMode=!canUseLandscape();
-    document.body.classList.toggle('portrait-play',portraitPlayMode);
-    show('select');
-    setTimeout(()=>resize(),40);
-  };
+  const desktopStart=document.getElementById('desktopStart');
+  if(desktopStart){
+    desktopStart.onclick = () => {
+      portraitPlayMode=true;
+      document.body.classList.add('portrait-play');
+      show('select');
+      setTimeout(()=>resize(),40);
+    };
+  }
+
+  // v0.3: normal launches always begin at the title screen.
+  if(!mixPracticeMode && !(mixBattleMode && mixBattleContext)){
+    portraitPlayMode=false;
+    document.body.classList.remove('portrait-play');
+    show('title');
+  }
 
 
   // v6.43 軽量SE:

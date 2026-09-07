@@ -3706,3 +3706,66 @@ body.portrait-play #gameCanvas{position:relative;z-index:1;}
 body.portrait-play #hud{z-index:40 !important;}
 body.portrait-play #controls{z-index:45 !important;}
 body.portrait-play .pause-button{z-index:46 !important;}
+
+
+/* ===== v0.3 title-screen recovery ===== */
+#titleScreen.screen.active{
+  display:flex !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  position:fixed !important;
+  inset:0 !important;
+  z-index:100 !important;
+  min-height:100dvh !important;
+  padding:env(safe-area-inset-top) 16px env(safe-area-inset-bottom) !important;
+  box-sizing:border-box !important;
+  background:linear-gradient(180deg,#10bfd0 0%,#0798ae 48%,#066278 100%) !important;
+}
+#titleScreen .title-logo-image-wrap{
+  width:min(96vw,920px) !important;
+  max-height:52dvh !important;
+  margin:0 auto 4px !important;
+  overflow:visible !important;
+}
+#titleScreen .title-logo-image{
+  display:block !important;
+  width:100% !important;
+  height:auto !important;
+  max-height:52dvh !important;
+  object-fit:contain !important;
+  mix-blend-mode:screen !important;
+  background:transparent !important;
+  filter:drop-shadow(0 8px 8px rgba(0,0,0,.28)) !important;
+}
+#titleScreen .frog-logo-sub{
+  margin:0 0 16px !important;
+  color:#f4ffff !important;
+  letter-spacing:.22em !important;
+  text-shadow:0 2px 4px rgba(0,45,70,.7) !important;
+}
+#titleScreen .rotate-note{display:none !important;}
+#titleScreen .build-marker{display:none !important;}
+#titleScreen .portrait-start-note{
+  margin:12px 0 0 !important;
+  color:rgba(255,255,255,.85) !important;
+}
+#titleScreen .title-start-actions{
+  display:flex !important;
+  justify-content:center !important;
+  width:min(82vw,520px) !important;
+  margin:10px auto 0 !important;
+}
+#titleScreen #portraitStart{
+  display:block !important;
+  width:100% !important;
+  min-height:64px !important;
+  font-size:clamp(22px,5vw,30px) !important;
+}
+#desktopStart{display:none !important;}
+#portraitOverlay{display:none !important;}
+@media (orientation:portrait){
+  #titleScreen .title-logo-image-wrap{width:96vw !important;max-height:43dvh !important;}
+  #titleScreen .title-logo-image{max-height:43dvh !important;}
+  #titleScreen .frog-logo-sub{font-size:clamp(11px,3.3vw,17px) !important;margin-bottom:20px !important;}
+  #titleScreen .start-version{font-size:clamp(12px,3vw,16px) !important;}
+}
