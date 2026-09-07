@@ -24,3 +24,9 @@ v0.4 fixes:
 
 
 v0.7: above-water title background, two stair aisles + short entrance stairs, ring-side promenade, smaller lotus platform with surrounding deck, referee returned to ringside, logo embedded in HTML, portrait roster layout hard-locked.
+
+
+FROG FIGHTER 2 JUMP v0.8
+- タイトルを水中色から地上の空・日差し・緑の会場背景へ変更
+- キャラ選択のカエルの両目を顔の中央へ補正
+- 4段観客席を3列化・横密度アップして満員感を強化

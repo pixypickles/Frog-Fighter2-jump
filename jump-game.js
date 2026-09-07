@@ -6291,7 +6291,7 @@ function drawBackground(dt){
       ctx.fillStyle=tier%2?'rgba(16,76,69,.98)':'rgba(18,88,78,.98)';ctx.fill();
       ctx.strokeStyle='rgba(144,220,192,.72)';ctx.lineWidth=2;ctx.stroke();ctx.clip();
 
-      const rows=2,gap=Math.max(30,w/11.2);
+      const rows=3,gap=Math.max(22,w/14.5);
       const stairCenters=[w*.30,w*.70], stairHalf=Math.max(17,w*.028);
       for(let r=0;r<rows;r++){
         for(let x=inset+20+(r?gap*.48:0);x<w-inset-10;x+=gap){
@@ -6300,7 +6300,7 @@ function drawBackground(dt){
           const bob=Math.sin(t*3.1+x*.11+tier+r)*1.2;
           const colors=['#63d65a','#48b8e8','#edd04a','#ba6ce2','#f18b42'];
           const fc=colors[(Math.floor(x/gap)+tier+r)%colors.length];
-          const fy=y0+20+r*Math.max(20,tierGap*.28)+arch*4+bob;
+          const fy=y0+16+r*Math.max(15,tierGap*.205)+arch*4+bob;
           const sc=Math.max(.72,Math.min(.93,w/760));
           ctx.save();ctx.translate(x,fy);ctx.scale(sc,sc);
           ctx.fillStyle=fc;ctx.beginPath();ctx.ellipse(0,4,6.3,7.3,0,0,Math.PI*2);ctx.fill();

@@ -4011,4 +4011,90 @@ body.portrait-play .pause-button{z-index:46 !important;}
     z-index:19 !important;
   }
 }
-\n\n/* ===== FROG FIGHTER 2 JUMP v0.7 ===== */\n/* Above-water title: sunny sky, distant shore and lotus-green foreground. */\n#titleScreen{\n  background:\n    radial-gradient(circle at 82% 14%, rgba(255,244,165,.92) 0 5.5%, rgba(255,244,165,.25) 5.7% 10%, transparent 10.2%),\n    radial-gradient(ellipse at 18% 67%, rgba(81,170,76,.36) 0 12%, transparent 12.5%),\n    radial-gradient(ellipse at 79% 70%, rgba(73,160,69,.30) 0 15%, transparent 15.5%),\n    linear-gradient(180deg,#7fd7f4 0%,#c8eef0 48%,#e7e5b6 66%,#72bc69 79%,#3b8e55 100%) !important;\n}\n#titleScreen::after{\n  content:'';position:absolute;left:-8%;right:-8%;bottom:-7vh;height:20vh;pointer-events:none;z-index:0;\n  background:radial-gradient(ellipse at 50% 50%,rgba(48,139,63,.95) 0 47%,rgba(31,111,54,.96) 48% 62%,transparent 63%);\n}\n#titleScreen > *{position:relative;z-index:1;}\n#titleScreen .bubble{display:none !important;}\n\n/* Final portrait roster lock: face, then name, then move text. */\n@media (orientation:portrait), (max-width:760px){\n  #selectScreen.screen.active .select-right-panel .fighter-grid{grid-template-columns:repeat(3,minmax(0,1fr)) !important;gap:10px !important;}\n  #selectScreen.screen.active .select-right-panel .fighter-card{height:182px !important;min-height:182px !important;padding:8px 5px !important;overflow:hidden !important;}\n  #selectScreen.screen.active .select-right-panel .fighter-card .fighter-emoji{left:50% !important;right:auto !important;top:53px !important;bottom:auto !important;transform:translate(-50%,-50%) !important;margin:0 !important;}\n  #selectScreen.screen.active .select-right-panel .fighter-card > strong{left:3px !important;right:3px !important;top:106px !important;bottom:auto !important;width:auto !important;transform:none !important;margin:0 !important;text-align:center !important;font-size:13px !important;white-space:nowrap !important;}\n  #selectScreen.screen.active .select-right-panel .fighter-card > .special-hint{left:5px !important;right:5px !important;top:130px !important;bottom:auto !important;width:auto !important;margin:0 !important;text-align:center !important;font-size:8px !important;line-height:1.18 !important;}\n}\n
+
+
+/* ===== FROG FIGHTER 2 JUMP v0.7 ===== */
+/* Above-water title: sunny sky, distant shore and lotus-green foreground. */
+#titleScreen{
+  background:
+    radial-gradient(circle at 82% 14%, rgba(255,244,165,.92) 0 5.5%, rgba(255,244,165,.25) 5.7% 10%, transparent 10.2%),
+    radial-gradient(ellipse at 18% 67%, rgba(81,170,76,.36) 0 12%, transparent 12.5%),
+    radial-gradient(ellipse at 79% 70%, rgba(73,160,69,.30) 0 15%, transparent 15.5%),
+    linear-gradient(180deg,#7fd7f4 0%,#c8eef0 48%,#e7e5b6 66%,#72bc69 79%,#3b8e55 100%) !important;
+}
+#titleScreen::after{
+  content:'';position:absolute;left:-8%;right:-8%;bottom:-7vh;height:20vh;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse at 50% 50%,rgba(48,139,63,.95) 0 47%,rgba(31,111,54,.96) 48% 62%,transparent 63%);
+}
+#titleScreen > *{position:relative;z-index:1;}
+#titleScreen .bubble{display:none !important;}
+
+/* Final portrait roster lock: face, then name, then move text. */
+@media (orientation:portrait), (max-width:760px){
+  #selectScreen.screen.active .select-right-panel .fighter-grid{grid-template-columns:repeat(3,minmax(0,1fr)) !important;gap:10px !important;}
+  #selectScreen.screen.active .select-right-panel .fighter-card{height:182px !important;min-height:182px !important;padding:8px 5px !important;overflow:hidden !important;}
+  #selectScreen.screen.active .select-right-panel .fighter-card .fighter-emoji{left:50% !important;right:auto !important;top:53px !important;bottom:auto !important;transform:translate(-50%,-50%) !important;margin:0 !important;}
+  #selectScreen.screen.active .select-right-panel .fighter-card > strong{left:3px !important;right:3px !important;top:106px !important;bottom:auto !important;width:auto !important;transform:none !important;margin:0 !important;text-align:center !important;font-size:13px !important;white-space:nowrap !important;}
+  #selectScreen.screen.active .select-right-panel .fighter-card > .special-hint{left:5px !important;right:5px !important;top:130px !important;bottom:auto !important;width:auto !important;margin:0 !important;text-align:center !important;font-size:8px !important;line-height:1.18 !important;}
+}
+
+
+/* ===== FROG FIGHTER 2 JUMP v0.8 ===== */
+/* Title is completely above water: open sky, sunlit horizon and grassy lotus-park foreground. */
+#titleScreen{
+  overflow:hidden !important;
+  background:
+    linear-gradient(180deg,
+      #9ee8ff 0%,
+      #c8f2ff 34%,
+      #fff8d9 58%,
+      #d8df8d 59%,
+      #92c85e 72%,
+      #4c9c50 100%) !important;
+}
+#titleScreen::before{
+  content:"" !important;
+  position:absolute !important;
+  inset:0 !important;
+  z-index:0 !important;
+  pointer-events:none !important;
+  background:
+    radial-gradient(ellipse at 16% 18%,rgba(255,255,255,.92) 0 5%,transparent 5.4%),
+    radial-gradient(ellipse at 23% 18%,rgba(255,255,255,.86) 0 7%,transparent 7.4%),
+    radial-gradient(ellipse at 76% 25%,rgba(255,255,255,.82) 0 6%,transparent 6.4%),
+    radial-gradient(ellipse at 84% 25%,rgba(255,255,255,.88) 0 4.8%,transparent 5.2%),
+    radial-gradient(circle at 84% 10%,rgba(255,239,137,.98) 0 4%,rgba(255,239,137,.24) 4.2% 8%,transparent 8.2%),
+    radial-gradient(ellipse at 5% 64%,rgba(74,139,59,.72) 0 17%,transparent 17.4%),
+    radial-gradient(ellipse at 32% 66%,rgba(81,151,62,.68) 0 22%,transparent 22.4%),
+    radial-gradient(ellipse at 72% 65%,rgba(71,139,56,.64) 0 23%,transparent 23.4%),
+    radial-gradient(ellipse at 101% 64%,rgba(57,124,55,.72) 0 20%,transparent 20.4%);
+}
+#titleScreen::after{
+  content:"" !important;
+  position:absolute !important;
+  left:-10% !important; right:-10% !important; bottom:-5vh !important;
+  height:24vh !important; z-index:0 !important; pointer-events:none !important;
+  background:
+    radial-gradient(ellipse at 12% 68%,#4f9e48 0 12%,transparent 12.5%),
+    radial-gradient(ellipse at 34% 62%,#60ae51 0 16%,transparent 16.5%),
+    radial-gradient(ellipse at 62% 70%,#4c9b47 0 17%,transparent 17.5%),
+    radial-gradient(ellipse at 87% 60%,#5eae50 0 15%,transparent 15.5%),
+    linear-gradient(180deg,rgba(76,153,70,0) 0 22%,#4f9f4d 23% 100%) !important;
+}
+#titleScreen > *{position:relative !important;z-index:2 !important;}
+#titleScreen .bubble{display:none !important;}
+
+/* Portrait roster: correct the eye group itself. Earlier mobile rules made the eye canvas narrower than the face, shifting both eyes left. */
+@media (orientation:portrait), (max-width:760px){
+  #selectScreen.screen.active .fighter-card:not([data-fighter="piranha"]):not([data-fighter="crayfish"]) .fighter-emoji::before{
+    left:0 !important;
+    right:0 !important;
+    width:100% !important;
+    top:-25px !important;
+    margin:0 !important;
+    transform:none !important;
+    background:
+      radial-gradient(circle at 25% 50%,var(--frog-iris) 0 8%,var(--frog-eye-area) 9% 19%,var(--frog-eye-bump) 20% 31%,transparent 32%),
+      radial-gradient(circle at 75% 50%,var(--frog-iris) 0 8%,var(--frog-eye-area) 9% 19%,var(--frog-eye-bump) 20% 31%,transparent 32%) !important;
+  }
+}
