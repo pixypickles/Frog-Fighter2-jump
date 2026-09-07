@@ -3711,7 +3711,12 @@
     const other=f.isPlayer?enemy:player;
     if(!other) return false;
 
-    const dir=f.face;
+    let dir=f.face;
+    const aimDx=other.x-f.x;
+    const aimDy=other.y-f.y;
+    if(Math.abs(aimDx)>4) dir=Math.sign(aimDx);
+    f.face=dir;
+
     f.specialType='hellCrash';
     f.specialT=.95;
     f.attack='kick';
@@ -3723,8 +3728,13 @@
       if(comboEl.textContent==='ヘルクラッシュ!') comboEl.textContent='';
     },800);
 
-    // 短く鋭い体当たり
-    f.vx += dir*355;
+    // JUMP版：発動時の相手位置へ上下角度を自動補正。
+    // 完全追尾ではなく、最大約45度までの直線突進。
+    const rawAngle=Math.atan2(aimDy,Math.max(55,Math.abs(aimDx)));
+    const aimAngle=Math.max(-Math.PI/4,Math.min(Math.PI/4,rawAngle));
+    const crashSpeed=365;
+    f.vx=dir*Math.cos(aimAngle)*crashSpeed;
+    f.vy=Math.sin(aimAngle)*crashSpeed;
 
     const started=performance.now();
     const timer=setInterval(()=>{
@@ -5267,7 +5277,7 @@
     if(f.type==='black'){
       if(kind==='kick' && water2HeldDir(f,'forward')){ clearCommand(); f.attackT=0; f.attack=null; return specialHellCrash(f); }
       if(kind==='punch' && water2HeldDir(f,'forward')){
-        clearCommand(); return specialWater2Shot(f,{name:'アイスショット',attack:'punch',color:'ice',style:'iceOrb',speed:255,damage:5.2,r:17,charge:.44,maxReflect:5});
+        clearCommand(); return specialWater2Shot(f,{name:'アイスショット',attack:'punch',color:'ice',style:'iceOrb',speed:225,damage:5.2,r:24,charge:.44,maxReflect:5});
       }
     }
 

@@ -205,3 +205,8 @@ v2.22
 v2.23
 - Sariel Blood Moon formation/survival time shortened by about 17%: moon life 3.0s -> 2.5s, special lock 3.25s -> 2.75s.
 - Added four subtle gold wall-anchor balls to each extreme side of the arena as visual cues for Back + Tongue wall cling.
+
+v2.24
+- Lucifer Ice Shot enlarged from radius 17 to 24 (~1.41x), speed reduced from 255 to 225.
+- Ice Shot remains faster than Remiel's Frost Shot (210), preserving character distinction.
+- Hell Crash now auto-corrects its initial vertical launch angle toward the opponent, capped at about ±45 degrees; it is not continuous homing.
