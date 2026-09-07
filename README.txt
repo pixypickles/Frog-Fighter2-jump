@@ -46,3 +46,6 @@ v1.2 SAFE FIX: restored the full v1.0 package (HTML/CSS/JS/README), then applied
 
 
 v1.3: portrait fighter cards no longer scale while selected, preventing eye/head clipping; selected fighter now expands to a 286px card with a large readable move list.
+
+
+v1.4: structural portrait roster fix. Fighter faces/names/move panels now use normal vertical flow rather than stacked absolute positioning. Root dark-teal fallback removed. Title is pale sky with lotus leaves at the bottom.
