@@ -216,3 +216,7 @@ v2.25
 - Bubble Shot enlarged (r27), slowed (145), and gains upward buoyancy in the latter half of its flight.
 - Removed Back+Tongue Bubble Shot so Back+Tongue remains available for the universal wall cling.
 - Added Down+Kick Guillotine Kick: horizontal kick pose with a fast straight-down dive and downward knockback.
+
+v2.26
+- Lilith Guillotine Kick now keeps its attack hitbox active for the entire downward dive.
+- Added swept vertical collision between the previous and current frame positions so the fast dive cannot skip through an opponent.
