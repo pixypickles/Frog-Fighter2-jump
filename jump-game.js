@@ -6357,7 +6357,6 @@
       }
     }
   }
-  }
 
   function isPoisonImmune(f){
     return !!f && (f.type==='beelzebub' || f.type==='samael');

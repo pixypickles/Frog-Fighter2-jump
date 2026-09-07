@@ -132,3 +132,8 @@ v2.9 - Raphael Air Hover
 - Raphael receives a short upward lift on activation.
 - During hover: left/right moves horizontally, up rises, down descends; no input holds position.
 - Hover movement is bounded to the playable screen.
+
+v2.10 - startup fix
+- Fixed a JavaScript syntax error introduced while replacing Raphael's Air Boost movement with Air Hover.
+- The extra closing brace prevented jump-game.js from loading, so the title Start button had no handler.
+- Air Hover behavior from v2.9 is retained.
