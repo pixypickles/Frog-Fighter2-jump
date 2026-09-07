@@ -5131,7 +5131,19 @@
       if(kind==='kick' && water2HeldDir(f,'down')){ clearCommand(); return specialAquaStream(f); }
       if(kind==='punch' && water2HeldDir(f,'back')){ clearCommand(); return specialAquaVortex(f); }
       if(kind==='punch' && water2HeldDir(f,'forward')){
-        clearCommand(); return specialAquaDropShot(f);
+        // JUMP版：前＋パンチらしく、正面へ太い高圧水弾を高速射出。
+        clearCommand(); return specialWater2Shot(f,{
+          name:'アクアショット',
+          attack:'punch',
+          color:'aqua',
+          style:'aquaPressure',
+          speed:430,
+          damage:4.2,
+          r:24,
+          charge:.30,
+          wobble:.04,
+          maxReflect:5
+        });
       }
     }
 
@@ -6926,6 +6938,7 @@ function drawBackground(dt){
         q.spin=(q.spin||0)+dt*(q.style==='aquaSpin'?10:4);
         if(q.curve){ q.vy += q.curve*dt; }
         if(q.style==='iceChargeOrb'){ q.trail=q.trail||[]; q.trail.push({x:q.x,y:q.y,t:.75}); if(q.trail.length>22)q.trail.shift(); q.trail.forEach(v=>v.t-=dt); q.trail=q.trail.filter(v=>v.t>0); }
+        if(q.style==='aquaPressure'){ q.trail=q.trail||[]; q.trail.push({x:q.x,y:q.y,t:.28}); if(q.trail.length>10)q.trail.shift(); q.trail.forEach(v=>v.t-=dt); q.trail=q.trail.filter(v=>v.t>0); }
 
         // JUMP版アクアショット：上へ消え、相手付近へ落下して戻る。
         if(q.style==='aquaDrop' && q.dropPhase==='rising' && q.y<-85){

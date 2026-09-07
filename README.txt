@@ -111,3 +111,10 @@ v2.6 - Gabriel vertical tuning
 - Aqua Vortex unchanged.
 - Aqua Shot redesigned: launches upward, disappears above the screen once, then drops vertically near the opponent.
 - Reflected Aqua Shot stops its scripted drop behavior and becomes a normal reflected projectile.
+
+
+v2.7 - Gabriel Aqua Shot revision
+- Aqua Shot returns to a forward projectile to match Forward + Punch.
+- Redesigned as a thick high-pressure water shot rather than a slow water blob.
+- Speed: 430, radius: 24, damage: 4.2, short charge.
+- Aqua Tornado / Stream / Vortex unchanged from v2.6.
