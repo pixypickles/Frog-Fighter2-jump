@@ -4746,7 +4746,7 @@
     f.guard=true;f.guardStartT=.28;f.specialType='aquaParry';f.specialT=just?.30:.38;f.remielParryT=just?.18:.15;comboEl.textContent=just?'ジャスト・アクアパリィ!':'アクアパリィ…';return true;
   }
   function specialRemielFrostShot(f){
-    if(!specialWater2Shot(f,{name:'フロストショット',attack:'punch',color:'ice',style:'iceOrb',speed:270,damage:4.8,r:15,charge:.40,maxReflect:5})) return false;
+    if(!specialWater2Shot(f,{name:'フロストショット',attack:'punch',color:'ice',style:'iceOrb',speed:210,damage:4.8,r:22,charge:.40,maxReflect:5})) return false;
     const mir=remielMirages.find(m=>m.owner===f&&m.t>0),target=f.isPlayer?enemy:player;
     if(mir&&target){const sx=f.x+f.face*42,sy=f.y+mir.offsetY-12,dx=target.x-sx,dy=target.y-sy,d=Math.hypot(dx,dy)||1,sp=265;remielFakeShots.push({owner:f,x:sx,y:sy,vx:dx/d*sp,vy:dy/d*sp,r:14,t:1.15,life:1.15});}
     return true;

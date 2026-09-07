@@ -170,3 +170,6 @@ v2.15
 v2.16
 - Uriel Guardian Tackle: Forward + Guard.
 - Uriel White Counter: Back + Guard.
+
+v2.17
+- Remiel Frost Shot: projectile radius 15 -> 22 (about 1.47x), speed 270 -> 210 (about 78%).
