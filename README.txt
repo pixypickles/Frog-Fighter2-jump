@@ -82,3 +82,9 @@ v1.9
 - Fighter cards now remain three equal columns with centered faces and names directly underneath.
 - Selected fighters never resize or move; selection is border-only.
 - The independent move panel remains full-width and is the only element allowed to span all three columns.
+
+
+v2.0
+- Title screen only: increased subtitle contrast with dark teal lettering and a subtle pale edge.
+- Darkened the version badge so its white lettering is easier to read.
+- Character selection layout from v1.9 was intentionally left unchanged.
