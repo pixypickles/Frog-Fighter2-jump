@@ -166,3 +166,7 @@ v2.15
 - Character select order: Samael and Satanael swapped, placing Satanael next to Seraphiel.
 - Uriel White Counter input bug fixed: it now uses Down -> Back + Guard as shown in the move list.
 - Removed the accidental Guard x2 activation for White Counter.
+
+v2.16
+- Uriel Guardian Tackle: Forward + Guard.
+- Uriel White Counter: Back + Guard.
