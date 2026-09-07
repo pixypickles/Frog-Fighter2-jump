@@ -359,8 +359,8 @@
     yellow:[
       'エアカッター（2連）：前 ＋ パンチ',
       'エアカッター（2連・斜め下）：前 ＋ キック',
-      'エアブレード（上 → 下）：後ろ ＋ パンチ',
-      'エアブレード（下 → 上）：後ろ ＋ キック',
+      'エアーギロチン（真上 → 真下）：後ろ ＋ パンチ',
+      'エアブレード（真下 → 真上）：後ろ ＋ キック',
       'ヒーリングバブル：ガード ×2',
       'エアホバー（約5秒）：上 ＋ ガード'
     ],
@@ -3099,7 +3099,7 @@
     const map={
       green:['上 ＋ パンチ：バーニングアッパー','前 ＋ キック：バーニングキック','後ろ ＋ パンチ：バーニングショット','下 → 後ろ ＋ キック：バーニングサイクロン'],
       blue:['上 ＋ パンチ：アクアトルネード','下 ＋ キック：アクアストリーム','後ろ ＋ パンチ：アクアボルテックス','前 ＋ パンチ：アクアショット'],
-      yellow:['前 ＋ パンチ：エアカッター（2連）','前 ＋ キック：エアカッター（2連・斜め下）','後ろ ＋ パンチ：エアブレード（上 → 下）','後ろ ＋ キック：エアブレード（下 → 上）','ガード ×2：ヒーリングバブル','上 ＋ ガード：エアホバー（約5秒・方向入力で空中移動）'],
+      yellow:['前 ＋ パンチ：エアカッター（2連）','前 ＋ キック：エアカッター（2連・斜め下）','後ろ ＋ パンチ：エアーギロチン（真上 → 真下）','後ろ ＋ キック：エアブレード（真下 → 真上）','ガード ×2：ヒーリングバブル','上 ＋ ガード：エアホバー（約5秒・方向入力で空中移動）'],
       orange:['下 → 後ろ ＋ ガード：ホワイトカウンター','後ろ → 前 ＋ ガード：ガーディアンタックル','ガード長押し：ホワイトオーラ','オーラ中 パンチ / キック：白い長リーチ攻撃','ガード ＋ パンチ：ホワイトショット'],
       black:['前 ＋ キック：ヘルクラッシュ（氷オーラの蹴り・特大ノックバック）','後ろ ＋ パンチ長押し → 離す：アビスチャージ（周囲を一瞬凍結）','前 ＋ パンチ：アイスショット','後ろ ＋ ガード：アイスウォール'],
       purple:['舌連打：舌ラッシュ','後ろ ＋ 舌：バブルショット','後ろ ＋ キック：バックスピンキック（追加入力で追加回転）'],
@@ -4246,58 +4246,59 @@
   function specialAirBlade(f,variant='down'){
     if(gameOver || f.stun>0 || f.guard || f.specialT>0 || f.attackT>0) return false;
 
+    const target=f.isPlayer?enemy:player;
     const airborne=f.y < jumpFloorY()-18;
-    const speed=airborne?405:360;
-    const startDeg=variant==='down' ? -42 : 42;
-    const curve=variant==='down' ? 185 : -185;
-    const charge=.30;
+    const charge=.34;
 
     f.specialType='airBladeWindup';
-    f.specialT=charge+.24;
+    f.specialT=charge+.26;
     f.attack=variant==='down'?'punch':'kick';
     f.attackVariant=variant==='down'?'up':'down';
-    f.attackT=charge+.24;
+    f.attackT=charge+.26;
 
-    comboEl.textContent=variant==='down'?'エアブレード 上→下…':'エアブレード 下→上…';
+    const moveName=variant==='down'?'エアーギロチン':'エアブレード';
+    comboEl.textContent=moveName+'…';
 
     setTimeout(()=>{
       if(gameOver || !f) return;
 
-      const dir=f.face;
-      const rad=startDeg*Math.PI/180;
+      // 相手の現在位置を狙うが、軌道そのものは完全な垂直。
+      const tx=Math.max(36,Math.min(innerWidth-36,target?target.x:(f.x+f.face*100)));
+      const floor=jumpFloorY();
+      const downward=variant==='down';
+
       water2Shots.push({
         owner:f,
-        x:f.x+dir*62,
-        y:f.y+(variant==='down'?-20:24),
-        vx:dir*Math.cos(rad)*speed,
-        vy:Math.sin(rad)*speed,
-        r:airborne?22:20,
+        x:tx,
+        y:downward?-72:floor+72,
+        vx:0,
+        vy:downward?(airborne?610:560):-(airborne?610:560),
+        r:airborne?24:22,
         age:0,
-        maxAge:18,
+        maxAge:3.2,
         t:1,
         life:1,
-        damage:airborne?4.5:4.0,
-        name:'エアブレード',
+        damage:airborne?4.7:4.2,
+        name:moveName,
         color:'aqua',
         reflected:0,
         hit:false,
         spin:0,
-        style:'airBlade',
+        style:'airGuillotine',
         poisonDuration:0,
-        curve,
-        arcFlip:variant==='down'?1:-1,
+        curve:0,
         wobble:0,
-        baseVy:Math.sin(rad)*speed,
         maxReflect:5,
+        bladeDown:downward,
         trail:[]
       });
 
-      comboEl.textContent=variant==='down'?'エアブレード 上→下!':'エアブレード 下→上!';
+      comboEl.textContent=downward?'エアーギロチン!':'エアブレード 真下→真上!';
       setTimeout(()=>{
-        if(comboEl.textContent==='エアブレード 上→下!' || comboEl.textContent==='エアブレード 下→上!'){
+        if(comboEl.textContent.includes('エアーギロチン') || comboEl.textContent.includes('エアブレード 真下→真上')){
           comboEl.textContent='';
         }
-      },620);
+      },650);
     },charge*1000);
 
     return true;
@@ -7009,7 +7010,7 @@ function drawBackground(dt){
         if(q.curve){ q.vy += q.curve*dt; }
         if(q.style==='iceChargeOrb'){ q.trail=q.trail||[]; q.trail.push({x:q.x,y:q.y,t:.75}); if(q.trail.length>22)q.trail.shift(); q.trail.forEach(v=>v.t-=dt); q.trail=q.trail.filter(v=>v.t>0); }
         if(q.style==='aquaPressure'){ q.trail=q.trail||[]; q.trail.push({x:q.x,y:q.y,t:.28}); if(q.trail.length>10)q.trail.shift(); q.trail.forEach(v=>v.t-=dt); q.trail=q.trail.filter(v=>v.t>0); }
-        if(q.style==='airBlade'){ q.trail=q.trail||[]; q.trail.push({x:q.x,y:q.y,t:.32}); if(q.trail.length>12)q.trail.shift(); q.trail.forEach(v=>v.t-=dt); q.trail=q.trail.filter(v=>v.t>0); }
+        if(q.style==='airGuillotine'){ q.trail=q.trail||[]; q.trail.push({x:q.x,y:q.y,t:.32}); if(q.trail.length>12)q.trail.shift(); q.trail.forEach(v=>v.t-=dt); q.trail=q.trail.filter(v=>v.t>0); }
 
         // JUMP版アクアショット：上へ消え、相手付近へ落下して戻る。
         if(q.style==='aquaDrop' && q.dropPhase==='rising' && q.y<-85){
@@ -8165,49 +8166,63 @@ function drawBackground(dt){
         ctx.shadowColor='#8ef1ff';ctx.shadowBlur=14;
         ctx.fillStyle='rgba(115,229,255,.40)';ctx.beginPath();ctx.ellipse(0,0,20,13,0,0,Math.PI*2);ctx.fill();
         ctx.strokeStyle='#e4ffff';ctx.lineWidth=4;ctx.beginPath();ctx.arc(0,0,18,-1.1,1.1);ctx.stroke();
-      }else if(q.style==='airBlade'){
-        // JUMP版ラファエル：大型の三日月状エアブレード。
-        // 進行方向に合わせて回転し、白〜水色の発光と残像で見やすくする。
+      }else if(q.style==='airGuillotine'){
+        // ラファエル：真上/真下から垂直に走る、ギロチン刃型の風。
+        // 外形は幅広い台形の刃＋鋭い斜め刃先。
         ctx.save();
-
         ctx.globalCompositeOperation='lighter';
         ctx.shadowColor='#bff7ff';
-        ctx.shadowBlur=18;
+        ctx.shadowBlur=20;
 
-        // 外側の風圧
-        ctx.globalAlpha=.28;
-        ctx.strokeStyle='#8eeaff';
-        ctx.lineWidth=18;
-        ctx.lineCap='round';
+        // 進行方向は外側ですでに回転済み。刃先を前方(+X)へ向ける。
+        ctx.globalAlpha=.26;
+        ctx.fillStyle='#7fe7ff';
         ctx.beginPath();
-        ctx.arc(0,0,34,-1.18,1.18);
-        ctx.stroke();
+        ctx.moveTo(-34,-30);
+        ctx.lineTo(16,-30);
+        ctx.lineTo(38,0);
+        ctx.lineTo(16,30);
+        ctx.lineTo(-34,30);
+        ctx.lineTo(-16,0);
+        ctx.closePath();
+        ctx.fill();
 
-        // 主刃
-        ctx.globalAlpha=.90;
-        ctx.strokeStyle='#efffff';
-        ctx.lineWidth=7;
-        ctx.beginPath();
-        ctx.arc(0,0,32,-1.16,1.16);
-        ctx.stroke();
-
-        // 内側の青い芯
-        ctx.globalAlpha=.72;
-        ctx.strokeStyle='#7ad8ff';
+        ctx.globalAlpha=.94;
+        ctx.fillStyle='#efffff';
+        ctx.strokeStyle='#75d9f5';
         ctx.lineWidth=3;
         ctx.beginPath();
-        ctx.arc(-2,0,27,-1.12,1.12);
+        ctx.moveTo(-27,-22);
+        ctx.lineTo(12,-22);
+        ctx.lineTo(31,0);
+        ctx.lineTo(12,22);
+        ctx.lineTo(-27,22);
+        ctx.lineTo(-10,0);
+        ctx.closePath();
+        ctx.fill();
         ctx.stroke();
 
-        // 尾を引く風
-        ctx.globalAlpha=.22;
+        // 刃の芯
+        ctx.globalAlpha=.75;
+        ctx.strokeStyle='#65cbe9';
+        ctx.lineWidth=3;
+        ctx.beginPath();
+        ctx.moveTo(-17,-15);
+        ctx.lineTo(18,0);
+        ctx.lineTo(-17,15);
+        ctx.stroke();
+
+        // 後方へ流れる風
+        ctx.globalAlpha=.32;
         ctx.strokeStyle='#dffcff';
         ctx.lineWidth=5;
-        ctx.beginPath();
-        ctx.moveTo(-42,-8);
-        ctx.quadraticCurveTo(-60,0,-44,11);
-        ctx.stroke();
-
+        ctx.lineCap='round';
+        for(let i=-1;i<=1;i++){
+          ctx.beginPath();
+          ctx.moveTo(-32,i*12);
+          ctx.lineTo(-58,i*15);
+          ctx.stroke();
+        }
         ctx.restore();
 
       }else if(q.style==='carpBlade'){

@@ -149,3 +149,9 @@ v2.12 - Air Blade spawn fix
 - Air Blade now creates its projectile directly after a 0.30s windup.
 - Removed redundant second rotation in Air Blade rendering.
 - Existing large crescent wind-blade visual and curved trajectories are retained.
+
+v2.13 - Raphael vertical blade correction
+- Back + Punch renamed Air Guillotine: spawns directly above the opponent and travels straight down.
+- Back + Kick Air Blade: spawns directly below the opponent and travels straight up.
+- Both attacks use a broad guillotine-blade wind shape instead of a crescent projectile.
+- Airborne Raphael gets a modest speed/size/damage bonus.
