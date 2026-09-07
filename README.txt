@@ -52,3 +52,10 @@ v1.4: structural portrait roster fix. Fighter faces/names/move panels now use no
 
 
 v1.5: title changed to pale sky with lotus leaves only at bottom. Selected fighter now spans the full roster grid row and shows a full-width move sheet below the portrait, preventing clipping by the next fighter row.
+ 
+
+v1.6
+- Removed the old inline mobile roster layout that forced 168px height and overflow:hidden.
+- Selected fighter now expands naturally and the complete move list remains visible.
+- Unselected fighter cards remain compact in a 3-column grid.
+- Title background is forced to a very pale white-blue sky; lotus leaves stay only along the bottom.

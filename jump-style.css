@@ -4748,3 +4748,120 @@ body.portrait-play .pause-button{z-index:46 !important;}
     box-sizing:border-box !important;
   }
 }
+
+
+/* ===== v1.6 corrective override =====
+   1) genuinely pale title sky
+   2) compact roster cards
+   3) selected move sheet is fully readable and never clipped
+*/
+
+/* TITLE */
+#titleScreen.screen{
+  background:
+    linear-gradient(180deg,
+      #fbfeff 0%,
+      #f5fcff 25%,
+      #eaf9ff 55%,
+      #def5fb 100%) !important;
+}
+#titleScreen.screen::before{
+  right:8vw !important;
+  top:7vh !important;
+  width:58px !important;
+  height:58px !important;
+  background:#fff1a8 !important;
+  box-shadow:0 0 0 12px rgba(255,255,255,.52),0 0 26px rgba(255,237,153,.18) !important;
+}
+#titleScreen.screen::after{
+  left:-4% !important;
+  right:-4% !important;
+  top:auto !important;
+  bottom:-4vh !important;
+  height:16vh !important;
+  background:
+    radial-gradient(ellipse 18% 42% at 7% 86%, #83c879 0 68%, transparent 70%),
+    radial-gradient(ellipse 20% 45% at 29% 92%, #91cf82 0 68%, transparent 70%),
+    radial-gradient(ellipse 20% 44% at 69% 91%, #7fc475 0 68%, transparent 70%),
+    radial-gradient(ellipse 17% 40% at 95% 87%, #91cf82 0 68%, transparent 70%) !important;
+  opacity:.68 !important;
+}
+/* neutralize decorative title bubbles so they don't re-darken the sky */
+#titleScreen .bubble{opacity:.08 !important;}
+
+/* ROSTER */
+@media (orientation:portrait), (max-width:760px){
+  #selectScreen.screen.active .fighter-grid{
+    display:grid !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:8px !important;
+    align-items:start !important;
+  }
+  #selectScreen.screen.active .fighter-card{
+    position:relative !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    min-height:168px !important;
+    height:168px !important;
+    padding:8px 5px 10px !important;
+    overflow:visible !important;
+  }
+  #selectScreen.screen.active .fighter-card > .fighter-emoji{
+    position:relative !important;
+    left:auto !important; right:auto !important; top:auto !important; bottom:auto !important;
+    transform:none !important;
+    margin:0 auto !important;
+    flex:0 0 auto !important;
+  }
+  #selectScreen.screen.active .fighter-card > strong{
+    position:relative !important;
+    left:auto !important; right:auto !important; top:auto !important;
+    width:100% !important;
+    margin:8px 0 0 !important;
+    text-align:center !important;
+    white-space:nowrap !important;
+    font-size:13px !important;
+  }
+  #selectScreen.screen.active .fighter-card > .special-hint,
+  #selectScreen.screen.active .fighter-card > .move-names{
+    display:none !important;
+  }
+
+  #selectScreen.screen.active .fighter-card.selected{
+    grid-column:1 / -1 !important;
+    width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    padding:10px 10px 12px !important;
+    overflow:visible !important;
+    background:rgba(255,255,255,.16) !important;
+  }
+  #selectScreen.screen.active .fighter-card.selected > .fighter-emoji{
+    margin:0 auto !important;
+  }
+  #selectScreen.screen.active .fighter-card.selected > strong{
+    margin-top:7px !important;
+    font-size:14px !important;
+  }
+  #selectScreen.screen.active .fighter-card.selected > .special-hint,
+  #selectScreen.screen.active .fighter-card.selected > .move-names{
+    display:block !important;
+    position:relative !important;
+    left:auto !important; right:auto !important; top:auto !important; bottom:auto !important;
+    width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    overflow:visible !important;
+    margin:9px 0 0 !important;
+    padding:11px 10px 12px !important;
+    box-sizing:border-box !important;
+    border-radius:12px !important;
+    text-align:center !important;
+    white-space:normal !important;
+    font-size:11px !important;
+    line-height:1.65 !important;
+  }
+}
