@@ -88,3 +88,10 @@ v2.0
 - Title screen only: increased subtitle contrast with dark teal lettering and a subtle pale edge.
 - Darkened the version badge so its white lettering is easier to read.
 - Character selection layout from v1.9 was intentionally left unchanged.
+
+
+v2.4
+- Fixed result-screen "選択画面に戻る" touch/click handling.
+- Root cause: portrait #controls was z-index 45 while result buttons were z-index 42.
+- Result buttons are now z-index 80 and explicitly pointer-interactive.
+- Existing game return logic is unchanged.

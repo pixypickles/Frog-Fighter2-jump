@@ -5121,3 +5121,18 @@ body.portrait-play .pause-button{z-index:46 !important;}
   text-shadow:0 1px 2px rgba(16,52,61,.55) !important;
   opacity:1 !important;
 }
+
+
+/* ===== v2.4 RESULT BUTTON HIT-LAYER FIX =====
+   Portrait game controls are z-index:45, so the lower return button at z-index:42
+   was visually present but touch/click events were intercepted by #controls.
+*/
+#gameScreen #restartButton.restart-btn,
+#gameScreen #titleReturnButton.title-return-btn{
+  z-index:80 !important;
+  pointer-events:auto !important;
+  touch-action:manipulation !important;
+}
+#gameScreen #titleReturnButton.title-return-btn{
+  position:absolute !important;
+}
