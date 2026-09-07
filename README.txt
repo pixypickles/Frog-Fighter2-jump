@@ -210,3 +210,9 @@ v2.24
 - Lucifer Ice Shot enlarged from radius 17 to 24 (~1.41x), speed reduced from 255 to 225.
 - Ice Shot remains faster than Remiel's Frost Shot (210), preserving character distinction.
 - Hell Crash now auto-corrects its initial vertical launch angle toward the opponent, capped at about ±45 degrees; it is not continuous homing.
+
+v2.25
+- Lilith Bubble Shot command changed: Back+Punch fires forward; Down+Punch fires diagonally downward.
+- Bubble Shot enlarged (r27), slowed (145), and gains upward buoyancy in the latter half of its flight.
+- Removed Back+Tongue Bubble Shot so Back+Tongue remains available for the universal wall cling.
+- Added Down+Kick Guillotine Kick: horizontal kick pose with a fast straight-down dive and downward knockback.

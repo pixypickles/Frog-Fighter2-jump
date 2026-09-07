@@ -379,7 +379,8 @@
     ],
     purple:[
       '舌ラッシュ：舌連打',
-      'バブルショット：後ろ ＋ 舌',
+      'バブルショット：後ろ ＋ パンチ / 下 ＋ パンチ',
+      'ギロチンキック：下 ＋ キック',
       'バックスピンキック：後ろ ＋ キック（追加入力で追加回転）'
     ],
     beelzebub:[
@@ -2264,6 +2265,13 @@
         }
       }
 
+      if(this.type==='purple' && this.specialType==='lilithGuillotineKick'){
+        ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.55;
+        ctx.strokeStyle='#d7b8ff';ctx.lineWidth=4;ctx.lineCap='round';
+        for(let i=-1;i<=1;i++){ctx.beginPath();ctx.moveTo(-28+i*18,-22);ctx.lineTo(-28+i*18,-78);ctx.stroke();}
+        ctx.restore();
+      }
+
       if(this.type==='green' && this.specialType==='burningCyclone'){
         // 高速回転中は両足それぞれに赤いオーラ
         drawBurningAura(-17,52,18,13,-.15);
@@ -3130,7 +3138,7 @@
       yellow:['前 ＋ パンチ：エアカッター（2連）','前 ＋ キック：エアカッター（2連・斜め下）','後ろ ＋ パンチ：エアーギロチン（真上 → 真下）','後ろ ＋ キック：エアブレード（真下 → 真上）','ガード ×2：ヒーリングバブル','上 ＋ ガード：エアホバー（約5秒・方向入力で空中移動）'],
       orange:['後ろ ＋ ガード：ホワイトカウンター','前 ＋ ガード：ガーディアンタックル','ガード長押し：ホワイトオーラ','オーラ中 パンチ / キック：白い長リーチ攻撃','ガード ＋ パンチ：ホワイトショット'],
       black:['前 ＋ キック：ヘルクラッシュ（氷オーラの蹴り・特大ノックバック）','後ろ ＋ パンチ長押し → 離す：アビスチャージ（周囲を一瞬凍結）','前 ＋ パンチ：アイスショット','後ろ ＋ ガード：アイスウォール'],
-      purple:['舌連打：舌ラッシュ','後ろ ＋ 舌：バブルショット','後ろ ＋ キック：バックスピンキック（追加入力で追加回転）'],
+      purple:['舌連打：舌ラッシュ','後ろ ＋ パンチ：バブルショット（前）','下 ＋ パンチ：バブルショット（斜め下）','下 ＋ キック：ギロチンキック（真下へ急降下）','後ろ ＋ キック：バックスピンキック（追加入力で追加回転）'],
       beelzebub:['下 → 後ろ ＋ ガード：ヴェノム・ウォーター','上 ＋ パンチ：アビスショック（上弧）','下 ＋ キック：アビスショック（下弧）','前 ＋ パンチ：ベノムショット'],
       sariel:['上 ＋ パンチ：ルナ・スラッシュ（上弧）','下 ＋ パンチ：ルナ・スラッシュ（下弧）','前 ＋ ガード：イーブルアイ','後ろ ＋ ガード：ブラッドムーン','上 ＋ キック：ムーンサルトキック'],
       kokabiel:['前 ＋ パンチ：グラビティボール','後ろ ＋ ガード：グラビティゾーン','下 ＋ パンチ：メテオレイン','下 ＋ キック：グラビティダイブ'],
@@ -3888,6 +3896,18 @@
       if(comboEl.textContent==='バーニングサイクロン!') comboEl.textContent='';
     },820);
     clearCommand();
+    return true;
+  }
+
+  function specialLilithGuillotineKick(f){
+    if(gameOver || !f || f.type!=='purple' || f.stun>0 || f.guard || f.throwState || f.specialT>0 || f.attackT>0) return false;
+    f.specialType='lilithGuillotineKick';f.specialT=.72;
+    f.attack='kick';f.attackVariant='mid';f.attackT=.72;
+    f.lilithGuillotineHit=false;
+    // 横キックの足を出したまま真下へ急降下。
+    f.vx*=.16;f.vy=690;
+    comboEl.textContent='ギロチンキック!';
+    setTimeout(()=>{if(comboEl.textContent==='ギロチンキック!')comboEl.textContent='';},650);
     return true;
   }
 
@@ -5046,7 +5066,9 @@
         arcFlip: opts.arcFlip || ((opts.curve||0) < 0 ? -1 : 1),
         wobble:opts.wobble||0,
         baseVy:Math.sin(angle)*speed,
-        maxReflect:opts.maxReflect||5
+        maxReflect:opts.maxReflect||5,
+        riseAfter:opts.riseAfter||0,
+        riseAccel:opts.riseAccel||0
       };
       water2Shots.push(shot);
       comboEl.textContent=name+'!';
@@ -5306,9 +5328,12 @@
       const justGuarded=performance.now()-(input.lastSimpleGuardTapTime||0)<=650;
       if(justGuarded){ input.lastSimpleGuardTapTime=0; clearCommand(); return specialWater2Shot(f,{name:'ホワイトショット',attack:'punch',color:'white',style:'whiteOrb',speed:250,damage:3.7,r:17,charge:.38,maxReflect:5}); }
     }
-    // リリス：後ろ＋舌で遅いバブルショット。
-    if(f.type==='purple' && kind==='tongue' && hasCommand([back],560)){
-      clearCommand(); return specialWater2Shot(f,{name:'バブルショット',attack:'tongue',color:'bubble',style:'bubble',speed:175,damage:3.0,r:20,charge:.34,wobble:.18,maxReflect:4});
+    // リリス JUMP版：大きく遅い泡。後半は浮力で上へ持ち上がる。
+    if(f.type==='purple' && kind==='punch' && water2HeldDir(f,'back')){
+      clearCommand(); return specialWater2Shot(f,{name:'バブルショット',attack:'punch',color:'bubble',style:'bubble',speed:145,damage:3.2,r:27,charge:.36,wobble:.18,maxReflect:4,riseAfter:.72,riseAccel:150});
+    }
+    if(f.type==='purple' && kind==='punch' && water2HeldDir(f,'down')){
+      clearCommand(); return specialWater2Shot(f,{name:'バブルショット',attack:'punch',color:'bubble',style:'bubble',speed:145,angle:30,damage:3.2,r:27,charge:.36,wobble:.18,maxReflect:4,riseAfter:.72,riseAccel:150});
     }
 
     if(f.type==='beelzebub'){
@@ -5369,9 +5394,22 @@
       if(specialRibbonWhip(f)){ playSfx('special'); return; }
     }
 
-    // リリスさん：後ろ＋キック。技中のキック追加入力で回転を追加。
+    // リリスさん：下＋キックで真下へギロチンキック。
     if(f.type==='purple' && kind==='kick'){
-      if(f.specialType==='lilithBackSpin'){
+      const downHeld=input.y>.35;
+      if(downHeld && specialLilithGuillotineKick(f)){ playSfx('special'); return; }
+      if(f.specialType==='lilithGuillotineKick' && !f.lilithGuillotineHit){
+      const other=f.isPlayer?enemy:player;
+      if(other && Math.abs(other.x-f.x)<72 && other.y>f.y-8 && other.y-f.y<115){
+        f.lilithGuillotineHit=true;
+        damageHit(f,other,7.4*f.damageMul,95*f.face,285);
+        other.vy=Math.max(other.vy,330);
+        spawnImpact(other.x,other.y,'hit');
+        f.vy=-165; // ヒット時だけ少し跳ね返る
+      }
+    }
+
+    if(f.specialType==='lilithBackSpin'){
         if(specialLilithBackSpin(f,true)){ playSfx('special'); return; }
       }
       const backHeld=(f.face>0 && input.x<-.35)||(f.face<0 && input.x>.35);
@@ -7153,6 +7191,7 @@ function drawBackground(dt){
         q.age=(q.age||0)+dt;
         q.spin=(q.spin||0)+dt*(q.style==='aquaSpin'?10:4);
         if(q.curve){ q.vy += q.curve*dt; }
+        if(q.style==='bubble' && q.riseAfter>0 && q.age>q.riseAfter){ q.vy-=q.riseAccel*dt; }
         if(q.style==='iceChargeOrb'){ q.trail=q.trail||[]; q.trail.push({x:q.x,y:q.y,t:.75}); if(q.trail.length>22)q.trail.shift(); q.trail.forEach(v=>v.t-=dt); q.trail=q.trail.filter(v=>v.t>0); }
         if(q.style==='aquaPressure'){ q.trail=q.trail||[]; q.trail.push({x:q.x,y:q.y,t:.28}); if(q.trail.length>10)q.trail.shift(); q.trail.forEach(v=>v.t-=dt); q.trail=q.trail.filter(v=>v.t>0); }
         if(q.style==='airGuillotine'){ q.trail=q.trail||[]; q.trail.push({x:q.x,y:q.y,t:.32}); if(q.trail.length>12)q.trail.shift(); q.trail.forEach(v=>v.t-=dt); q.trail=q.trail.filter(v=>v.t>0); }
