@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
   <meta name="theme-color" content="#eefaff" />
-  <title>フロッグファイター2 JUMP Prototype v2.1</title>
+  <title>フロッグファイター2 JUMP Prototype v2.3</title>
   <link rel="stylesheet" href="jump-style.css?v=2.1" />
 
 
@@ -248,7 +248,7 @@
       <p class="frog-logo-sub">LOTUS STADIUM JUMP BATTLE</p>
       <p class="rotate-note">蓮の葉競技場・縦ジャンプバトル</p>
       <div class="build-marker">BUILD JUMP 0.4</div>
-      <div class="start-version">FROG FIGHTER 2 JUMP　PROTOTYPE v2.2</div>
+      <div class="start-version">FROG FIGHTER 2 JUMP　PROTOTYPE v2.3</div>
       <div class="title-start-actions">
         <button id="portraitStart" class="soft-btn portrait-start-btn">はじめる</button>
         
@@ -593,5 +593,54 @@
 
 
 <a id="mixMapReturn" href="index.html" aria-label="MIXマップへ戻る">タイトルへ</a>
+
+<script id="jump23-result-return-fix">
+(function(){
+  function returnToSelectScreen(e){
+    if(e){
+      e.preventDefault();
+      e.stopPropagation();
+      if(e.stopImmediatePropagation) e.stopImmediatePropagation();
+    }
+
+    const title = document.getElementById('titleScreen');
+    const select = document.getElementById('selectScreen');
+    const game = document.getElementById('gameScreen');
+    const restart = document.getElementById('restartButton');
+    const back = document.getElementById('titleReturnButton');
+    const pauseOverlay = document.getElementById('pauseOverlay');
+    const practiceHelp = document.getElementById('practiceHelp');
+    const storyNarrative = document.getElementById('storyNarrative');
+
+    if(title) title.classList.remove('active');
+    if(game) game.classList.remove('active');
+    if(select) select.classList.add('active');
+
+    if(restart) restart.hidden = true;
+    if(back) back.hidden = true;
+    if(pauseOverlay) pauseOverlay.hidden = true;
+    if(practiceHelp) practiceHelp.hidden = true;
+    if(storyNarrative) storyNarrative.hidden = true;
+
+    /* Return the portrait selector to a normal scroll position. */
+    try{
+      const scroller = select && (select.querySelector('.fighter-scroll-area') || select);
+      if(scroller) scroller.scrollTop = 0;
+      window.scrollTo(0,0);
+    }catch(_){}
+
+    /* Make sure controls from the game screen cannot remain over the selector. */
+    document.body.classList.remove('game-active','playing','paused');
+  }
+
+  const back = document.getElementById('titleReturnButton');
+  if(back){
+    /* capture phase makes this reliable even if an older game handler swallows the click */
+    back.addEventListener('click', returnToSelectScreen, true);
+    back.addEventListener('touchend', returnToSelectScreen, {capture:true, passive:false});
+  }
+})();
+</script>
+
 </body>
 </html>
