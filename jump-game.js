@@ -979,6 +979,11 @@
       // 壁受け身
       this.wallTechT=0;
 
+      // JUMP版共通：壁際ガードで短時間だけ壁に張り付ける。
+      this.wallClingT=0;
+      this.wallClingCooldown=0;
+      this.wallClingSide=0;
+
       // 水中ダッシュ
       this.dashT=0;
       this.dashCooldown=0;
@@ -1075,6 +1080,8 @@
       if (this.flash>0) this.flash-=dt;
       if (this.hurtFaceT>0) this.hurtFaceT-=dt;
       if (this.guardStartT>0) this.guardStartT-=dt;
+      if(this.wallClingCooldown>0)this.wallClingCooldown=Math.max(0,this.wallClingCooldown-dt);
+      if(this.wallClingT>0)this.wallClingT=Math.max(0,this.wallClingT-dt);
       if (this.waveCooldown>0) this.waveCooldown-=dt;
       if (this.guardBreakT>0) this.guardBreakT-=dt;
       if (this.wallTechT>0) this.wallTechT-=dt;
@@ -1112,11 +1119,38 @@
         }
       }
 
-      // JUMP版：水中浮遊ではなく重力＋蓮の葉の自動バウンド。
-      this.vy += JUMP_GRAVITY * dt;
-      if(this.specialType==='urielTackle') this.vx *= Math.pow(.90,dt);
-      else if(this.dashT>0) this.vx *= Math.pow(.82,dt);
-      else this.vx *= Math.pow(JUMP_DRAG,dt);
+      // JUMP版共通：壁際でガードすると短時間だけ空中停止。
+      const floorNow=jumpFloorY();
+      const nearLeft=this.x<=58;
+      const nearRight=this.x>=innerWidth-58;
+      const airborne=this.y<floorNow-28;
+      const canCling=this.guard && airborne && !this.throwState && this.stun<=0 &&
+        this.attackT<=0 && this.specialT<=0 && this.wallClingCooldown<=0;
+
+      if(this.wallClingT<=0 && canCling && (nearLeft||nearRight)){
+        this.wallClingT=.58;
+        this.wallClingSide=nearLeft?-1:1;
+        this.x=nearLeft?47:innerWidth-47;
+        this.vx=0;this.vy=0;
+      }
+
+      // ガードを離す／時間切れで解除。連続張り付き防止に短いクールダウン。
+      if(this.wallClingT>0 && (!this.guard || !airborne)){
+        this.wallClingT=0;
+        this.wallClingCooldown=.72;
+      }
+
+      if(this.wallClingT>0){
+        this.x=this.wallClingSide<0?47:innerWidth-47;
+        this.vx=0;
+        this.vy=0;
+      }else{
+        // 水中浮遊ではなく重力＋蓮の葉の自動バウンド。
+        this.vy += JUMP_GRAVITY * dt;
+        if(this.specialType==='urielTackle') this.vx *= Math.pow(.90,dt);
+        else if(this.dashT>0) this.vx *= Math.pow(.82,dt);
+        else this.vx *= Math.pow(JUMP_DRAG,dt);
+      }
 
       // 舌で引かれている側は、舌の持ち主へゆっくり吸い寄せられる
       const puller = this.isPlayer ? enemy : player;
@@ -1309,6 +1343,11 @@
         }
       }
 
+      if(this.wallClingT<=0 && this.wallClingSide!==0){
+        this.wallClingCooldown=Math.max(this.wallClingCooldown,.72);
+        this.wallClingSide=0;
+      }
+
       this.x += this.vx * dt;
       this.y += this.vy * dt;
       const minY=78, maxY=innerHeight-65;
@@ -1392,6 +1431,18 @@
     draw() {
       ctx.save();
       ctx.translate(this.x,this.y);
+      if(this.wallClingT>0){
+        ctx.save();
+        ctx.globalCompositeOperation='lighter';
+        ctx.globalAlpha=.55;
+        ctx.strokeStyle='#d9fbff';
+        ctx.lineWidth=3;
+        ctx.beginPath();
+        const sx=this.wallClingSide<0?-34:34;
+        ctx.arc(sx,22,14,-1.2,1.2);
+        ctx.stroke();
+        ctx.restore();
+      }
       if(this.type==='remiel'&&this.specialType==='mirageKick'&&this.specialT>0&&this.remielKickStartX!=null){
         const elapsed=Math.max(0,.72-this.specialT),step=Math.min(4,Math.floor(elapsed/.14));
         const jumps=[0,58,122,190,255],visualX=this.remielKickStartX+this.face*jumps[step];
@@ -4644,7 +4695,8 @@
   function specialGravityBall(f){
     if(gameOver||!f||f.type!=='kokabiel'||f.stun>0||f.guard||f.specialT>0||f.attackT>0)return false;
     f.specialType='gravityBall';f.specialT=.54;f.attack='punch';f.attackT=.54;
-    gravityBalls.push({owner:f,x:f.x+f.face*48,y:f.y-8,vx:f.face*185,vy:0,r:20,t:4,damage:4.4,reflects:0,maxReflect:4,pull:210});
+    // JUMP版：横へ吸うより「下へ落とす」重力弾。
+    gravityBalls.push({owner:f,x:f.x+f.face*48,y:f.y-8,vx:f.face*170,vy:0,r:22,t:4,damage:4.4,reflects:0,maxReflect:4,pull:250,downPull:980});
     comboEl.textContent='グラビティボール…';return true;
   }
   function specialGravityZone(f){
@@ -4654,15 +4706,21 @@
     const x=t?Math.max(80,Math.min(innerWidth-80,t.x-f.face*85)):f.x+f.face*150;
     const y=t?t.y:f.y;
     gravityZones=gravityZones.filter(z=>z.owner!==f);
-    gravityZones.push({owner:f,x,y,r:22,maxR:132,t:3.2,life:3.2,arm:.42});
+    // JUMP版：ゾーン内では強い下向き重力。横吸引は補助程度。
+    gravityZones.push({owner:f,x,y,r:22,maxR:120,t:3.0,life:3.0,arm:.36,downPull:1500});
     comboEl.textContent='グラビティゾーン…';return true;
   }
   function specialMeteorRain(f){
     if(gameOver||!f||f.type!=='kokabiel'||f.stun>0||f.guard||f.specialT>0||f.attackT>0)return false;
     const t=f.isPlayer?enemy:player;if(!t)return false;
     f.specialType='meteorRain';f.specialT=.85;f.attack='punch';f.attackT=.42;
-    const base=t.x,offs=[-90,-38,35,82,0];
-    offs.forEach((ox,i)=>meteorDrops.push({owner:f,x:Math.max(55,Math.min(innerWidth-55,base+ox)),y:-45-i*18,vy:265+i*18,r:18+(i%2)*3,delay:.18+i*.13,t:2.4,active:false,damage:4}));
+    // JUMP版：ほぼ全画面を覆わないよう、相手周辺の狭い範囲に3発。
+    const base=t.x,offs=[-34,0,34];
+    offs.forEach((ox,i)=>meteorDrops.push({
+      owner:f,x:Math.max(55,Math.min(innerWidth-55,base+ox)),
+      y:-55-i*22,vy:315+i*20,r:22+(i===1?3:0),
+      delay:.16+i*.15,t:2.25,active:false,damage:4.4
+    }));
     comboEl.textContent='メテオレイン…';return true;
   }
 
@@ -6806,10 +6864,15 @@ function drawBackground(dt){
         q.t-=dt;q.x+=q.vx*dt;q.y+=q.vy*dt;
         const target=q.owner.isPlayer?enemy:player;if(!target||q.t<=0)return;
         const dx=q.x-target.x,dy=q.y-target.y,d=Math.hypot(dx,dy)||1;
-        if(d<230){const f=(1-d/230)*q.pull+28;target.vx+=dx/d*f*dt;target.vy+=dy/d*f*.72*dt;}
+        if(d<245){
+          const f=(1-d/245)*q.pull+24;
+          // 横方向は弱く引き寄せ、主効果は強い下向き重力。
+          target.vx+=dx/d*f*.22*dt;
+          target.vy+=(q.downPull||980)*(0.42+0.58*(1-d/245))*dt;
+        }
         if(Math.abs(q.x-target.x)<target.radius+q.r+8&&Math.abs(q.y-target.y)<target.radius+q.r+8){
           if(target.guard){q.owner=target;q.vx=-q.vx*1.05;q.reflects++;q.x=target.x+Math.sign(q.vx)*56;spawnImpact(target.x,target.y,'guard');if(q.reflects>=q.maxReflect)q.t=0;}
-          else{damageHit(q.owner,target,q.damage,Math.sign(q.vx)*100,-24);spawnImpact(q.x,q.y,'hit');q.t=0;}
+          else{damageHit(q.owner,target,q.damage,Math.sign(q.vx)*70,145);target.vy=Math.max(target.vy,250);spawnImpact(q.x,q.y,'hit');q.t=0;}
         }
       });
       gravityBalls=gravityBalls.filter(q=>q.t>0&&q.x>-100&&q.x<innerWidth+100);
@@ -6817,7 +6880,11 @@ function drawBackground(dt){
         z.t-=dt;z.arm=Math.max(0,z.arm-dt);
         const target=z.owner.isPlayer?enemy:player;if(!target||z.t<=0)return;
         const dx=z.x-target.x,dy=z.y-target.y,d=Math.hypot(dx,dy)||1;
-        if(z.arm<=0&&d<z.maxR){const f=(1-d/z.maxR)*520+95;target.vx+=dx/d*f*dt;target.vy+=dy/d*f*.78*dt;}
+        if(z.arm<=0&&d<z.maxR){
+          const strength=(1-d/z.maxR);
+          target.vx+=dx/d*(110+240*strength)*.20*dt;
+          target.vy+=(z.downPull||1500)*(0.48+0.52*strength)*dt;
+        }
       });
       gravityZones=gravityZones.filter(z=>z.t>0);
       meteorDrops.forEach(m=>{

@@ -183,3 +183,10 @@ v2.19
 - Remiel mirage Frost Shot now matches the real Frost Shot size (r22) and speed (210), so the decoy is not exposed by projectile size.
 - Mirage Frost Shot now has a real hitbox and deals half damage (2.4 vs 4.8).
 - Mirage Frost Shot can also be reflected by guard, preserving the game's projectile counterplay.
+
+v2.20
+- Kokabiel Gravity Ball: weak horizontal pull, strong downward gravity; hit also slams downward.
+- Gravity Zone: substantially stronger downward gravity, slightly smaller radius.
+- Meteor Rain: reduced from five wide meteors to three larger meteors concentrated around the opponent.
+- Universal wall cling: while airborne and near a side wall, holding Guard freezes the fighter on the wall for about 0.58 sec.
+- Wall cling has about 0.72 sec re-use cooldown and releases immediately when Guard is released.
