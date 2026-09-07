@@ -4748,7 +4748,11 @@
   function specialRemielFrostShot(f){
     if(!specialWater2Shot(f,{name:'フロストショット',attack:'punch',color:'ice',style:'iceOrb',speed:210,damage:4.8,r:22,charge:.40,maxReflect:5})) return false;
     const mir=remielMirages.find(m=>m.owner===f&&m.t>0),target=f.isPlayer?enemy:player;
-    if(mir&&target){const sx=f.x+f.face*42,sy=f.y+mir.offsetY-12,dx=target.x-sx,dy=target.y-sy,d=Math.hypot(dx,dy)||1,sp=265;remielFakeShots.push({owner:f,x:sx,y:sy,vx:dx/d*sp,vy:dy/d*sp,r:14,t:1.15,life:1.15});}
+    if(mir&&target){
+      const sx=f.x+f.face*42,sy=f.y+mir.offsetY-12,dx=target.x-sx,dy=target.y-sy,d=Math.hypot(dx,dy)||1,sp=210;
+      // 分身弾も本体と同じ大きさ・速度。見た目では判別できず、命中時のみ半ダメージ。
+      remielFakeShots.push({owner:f,x:sx,y:sy,vx:dx/d*sp,vy:dy/d*sp,r:22,t:1.55,life:1.55,damage:2.4,reflects:0,hit:false});
+    }
     return true;
   }
   function specialMirageKick(f){
@@ -6894,7 +6898,23 @@ function drawBackground(dt){
         }
         const foe=m.owner.isPlayer?enemy:player;if(foe&&foe.attackT>0&&Math.abs(foe.x-m.owner.x)<105&&Math.abs(foe.y-((m.age||0)<.28 ? (m.originY+(m.ghostTargetY-m.originY)*Math.max(0,Math.min(1,(m.age||0)/.28))) : (m.owner.y+m.offsetY)))<72){m.t=0;spawnImpact(m.owner.x,(m.age||0)<.28 ? (m.originY+(m.ghostTargetY-m.originY)*Math.max(0,Math.min(1,(m.age||0)/.28))) : m.owner.y+m.offsetY,'guard');}for(const q of water2Shots){if(q.owner!==m.owner&&Math.abs(q.x-m.owner.x)<48&&Math.abs(q.y-((m.age||0)<.28 ? (m.originY+(m.ghostTargetY-m.originY)*Math.max(0,Math.min(1,(m.age||0)/.28))) : (m.owner.y+m.offsetY)))<58){m.t=0;q.t=0;spawnImpact(q.x,q.y,'guard');break;}}});
       remielMirages=remielMirages.filter(m=>m.t>0);
-      remielFakeShots.forEach(q=>{q.t-=dt;q.x+=q.vx*dt;q.y+=q.vy*dt;});
+      remielFakeShots.forEach(q=>{
+        q.t-=dt;q.x+=q.vx*dt;q.y+=q.vy*dt;
+        const target=q.owner&&q.owner.isPlayer?enemy:player;
+        if(target&&q.t>0&&!q.hit&&Math.abs(q.x-target.x)<(q.r+30)&&Math.abs(q.y-target.y)<(q.r+42)){
+          if(target.guard){
+            // 分身フロストショットも通常弾同様、ガードで反射可能。
+            q.owner=target;q.vx=-q.vx*1.06;q.vy=-q.vy*.25;
+            q.reflects=(q.reflects||0)+1;
+            q.x=target.x+Math.sign(q.vx||1)*(target.radius+q.r+8);
+            spawnImpact(target.x,target.y,'guard');
+            if(q.reflects>=5)q.t=0;
+          }else{
+            damageHit(q.owner,target,(q.damage||2.4)*(q.owner.damageMul||1),Math.sign(q.vx||1)*135,-24);
+            spawnImpact(q.x,q.y,'hit');q.hit=true;q.t=0;
+          }
+        }
+      });
       remielFakeShots=remielFakeShots.filter(q=>q.t>0&&q.x>-50&&q.x<innerWidth+50&&q.y>-50&&q.y<innerHeight+50);
 
       // セラフィエル：セラフィックレイ。予告0.32秒後に短時間だけ攻撃判定。
@@ -7865,7 +7885,7 @@ function drawBackground(dt){
     });
     jihalBursts.forEach(b=>{ctx.save();ctx.translate(b.x,b.y);ctx.globalCompositeOperation='lighter';ctx.globalAlpha=Math.max(0,b.t/b.life);ctx.strokeStyle='#fff09a';ctx.shadowColor='#ffe85b';ctx.shadowBlur=15;ctx.lineWidth=4;ctx.beginPath();ctx.arc(0,0,b.r,0,Math.PI*2);ctx.stroke();for(let i=0;i<8;i++){const a=i*Math.PI/4;ctx.beginPath();ctx.moveTo(Math.cos(a)*b.r*.45,Math.sin(a)*b.r*.45);ctx.lineTo(Math.cos(a)*b.r,Math.sin(a)*b.r);ctx.stroke();}ctx.restore();});
 
-    remielFakeShots.forEach(q=>{ctx.save();ctx.translate(q.x,q.y);ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.32*Math.min(1,q.t/.18);ctx.shadowColor='#bdefff';ctx.shadowBlur=16;ctx.fillStyle='#d9f8ff';ctx.beginPath();ctx.arc(0,0,q.r,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#9ddbea';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,q.r+2,0,Math.PI*2);ctx.stroke();ctx.restore();});
+    remielFakeShots.forEach(q=>{ctx.save();ctx.translate(q.x,q.y);ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.90;ctx.shadowColor='#bdefff';ctx.shadowBlur=18;const g=ctx.createRadialGradient(-6,-7,2,0,0,q.r);g.addColorStop(0,'#ffffff');g.addColorStop(.38,'#d9f8ff');g.addColorStop(1,'#77cfe6');ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,q.r,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#dffcff';ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,0,q.r+2,0,Math.PI*2);ctx.stroke();ctx.restore();});
 
     seraphielRays.forEach(r=>{
       const elapsed=r.life-r.t;

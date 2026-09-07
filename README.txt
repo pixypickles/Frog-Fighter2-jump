@@ -178,3 +178,8 @@ v2.18
 - Jihal Lightning Dash damage -20%: 9.5 -> 7.6.
 - Thunder Charge damage -10% across charge levels.
 - Bolt Shot redesigned as a long horizontal lightning spear with a wider horizontal hitbox.
+
+v2.19
+- Remiel mirage Frost Shot now matches the real Frost Shot size (r22) and speed (210), so the decoy is not exposed by projectile size.
+- Mirage Frost Shot now has a real hitbox and deals half damage (2.4 vs 4.8).
+- Mirage Frost Shot can also be reflected by guard, preserving the game's projectile counterplay.
