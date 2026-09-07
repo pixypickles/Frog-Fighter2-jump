@@ -4322,3 +4322,66 @@ body.portrait-play .pause-button{z-index:46 !important;}
     left:max(10px,env(safe-area-inset-left)) !important;
   }
 }
+
+
+/* ===== FROG FIGHTER 2 JUMP v1.1 =====
+   Root-cause cleanup: title uses only a pale sky; portrait cards use fixed face geometry.
+*/
+#titleScreen{
+  background:linear-gradient(180deg,#ffffff 0%,#f7fdff 18%,#eaf9ff 48%,#d8f3fb 72%,#c9edf5 100%) !important;
+}
+#titleScreen::before{
+  width:58px !important;height:58px !important;
+  right:9vw !important;top:9vh !important;
+  background:#fff3a9 !important;
+  box-shadow:0 0 0 16px rgba(255,255,255,.28),0 0 42px rgba(255,244,170,.25) !important;
+}
+#titleScreen::after{display:none !important;}
+
+@media (orientation:portrait), (max-width:760px){
+  #selectScreen.screen.active .select-right-panel .fighter-card{
+    height:166px !important;
+    min-height:166px !important;
+    overflow:hidden !important;
+  }
+  #selectScreen.screen.active .select-right-panel .fighter-card:not([data-fighter="piranha"]):not([data-fighter="crayfish"]) .fighter-emoji{
+    width:86px !important;
+    height:54px !important;
+    top:57px !important;
+    left:50% !important;
+    transform:translate(-50%,-50%) !important;
+  }
+  #selectScreen.screen.active .fighter-card:not([data-fighter="piranha"]):not([data-fighter="crayfish"]) .fighter-emoji::before{
+    top:-25px !important;
+  }
+  #selectScreen.screen.active .select-right-panel .fighter-card > strong{
+    top:112px !important;
+  }
+
+  /* A tapped fighter expands downward and reveals the move list. */
+  #selectScreen.screen.active .select-right-panel .fighter-card.selected,
+  #selectScreen.screen.active .select-right-panel .fighter-card.moves-open{
+    height:224px !important;
+    min-height:224px !important;
+    border-color:#fff !important;
+  }
+  #selectScreen.screen.active .select-right-panel .fighter-card.selected > .special-hint,
+  #selectScreen.screen.active .select-right-panel .fighter-card.selected > .move-names,
+  #selectScreen.screen.active .select-right-panel .fighter-card.moves-open > .special-hint,
+  #selectScreen.screen.active .select-right-panel .fighter-card.moves-open > .move-names{
+    display:block !important;
+    position:absolute !important;
+    top:139px !important;
+    left:7px !important;right:7px !important;
+    max-height:76px !important;
+    padding:7px 6px !important;
+    background:rgba(4,34,42,.90) !important;
+    border-radius:10px !important;
+    color:#fff !important;
+    font-size:9px !important;
+    line-height:1.28 !important;
+    white-space:normal !important;
+    overflow:hidden !important;
+    z-index:30 !important;
+  }
+}
