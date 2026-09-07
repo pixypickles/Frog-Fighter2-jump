@@ -1088,6 +1088,11 @@
       if (this.wallTechT>0) this.wallTechT-=dt;
       if (this.dashT>0) this.dashT-=dt;
       if (this.dashCooldown>0) this.dashCooldown-=dt;
+      if(this.gravityDragT>0){
+        this.gravityDragT=Math.max(0,this.gravityDragT-dt);
+        // グラビティボール命中後：グラビティキック同様、しばらく下へ引かれる。
+        this.vy+=1050*dt;
+      }
       if (this.specialT>0){
         this.specialT-=dt;
         if(this.specialT<=0){
@@ -4676,9 +4681,9 @@
     f.guard=false;f.specialType='gravityZone';f.specialT=.58;
     const t=f.isPlayer?enemy:player;
     const x=t?Math.max(80,Math.min(innerWidth-80,t.x-f.face*85)):f.x+f.face*150;
-    const y=t?t.y:f.y;
+    // JUMP版：重力ゾーンは常に蓮の葉に近い下方へ発生。
+    const y=Math.max(innerHeight*.68,jumpFloorY()-72);
     gravityZones=gravityZones.filter(z=>z.owner!==f);
-    // JUMP版：ゾーン内では強い下向き重力。横吸引は補助程度。
     gravityZones.push({owner:f,x,y,r:22,maxR:120,t:3.0,life:3.0,arm:.36,downPull:1500});
     comboEl.textContent='グラビティゾーン…';return true;
   }
@@ -4788,7 +4793,18 @@
   function specialMirageKick(f){
     if(gameOver||!f||f.type!=='remiel'||f.stun>0||f.guard||f.specialT>0||f.attackT>0)return false;
     f.specialType='mirageKick';f.specialT=.72;f.attack='kick';f.attackT=.72;f.remielKickStartX=f.x;f.vx=f.face*360;
-    const other=f.isPlayer?enemy:player,dir=f.face;setTimeout(()=>{if(other&&Math.abs(other.x-f.x)<132&&Math.abs(other.y-f.y)<82){damageHit(f,other,9.8*f.damageMul,315*dir,-50);spawnImpact(other.x,other.y,'hit');}},180);comboEl.textContent='ミラージュキック!';return true;
+    const other=f.isPlayer?enemy:player,dir=f.face;
+    const mir=remielMirages.find(m=>m.owner===f&&m.t>0);
+    setTimeout(()=>{
+      if(other&&Math.abs(other.x-f.x)<132&&Math.abs(other.y-f.y)<82){damageHit(f,other,9.8*f.damageMul,315*dir,-50);spawnImpact(other.x,other.y,'hit');}
+      if(mir&&mir.t>0&&other){
+        const gy=f.y+mir.offsetY;
+        if(Math.abs(other.x-f.x)<132&&Math.abs(other.y-gy)<82){
+          damageHit(f,other,4.9*f.damageMul,175*dir,-28);
+          spawnImpact(other.x,other.y,'hit');mir.t=0;
+        }
+      }
+    },180);comboEl.textContent='ミラージュキック!';return true;
   }
 
   function specialSeraphicUpper(f){
@@ -5552,7 +5568,18 @@
 
   function damageHit(attacker,target,dmg,kx,ky,bypassCounter=false){
     if(target&&target.type==='remiel'&&attacker&&attacker!==target&&!bypassCounter){
-      if(target.remielCounterT>0){target.remielCounterT=0;target.specialT=.32;damageHit(target,attacker,7.2*target.damageMul,-Math.sign(target.x-attacker.x||1)*230,-75,true);spawnImpact(target.x,target.y,'guard');comboEl.textContent='ミラージュカウンター!';return;}
+      if(target.remielCounterT>0){
+        target.remielCounterT=0;target.specialT=.32;
+        const counterDir=-Math.sign(target.x-attacker.x||1);
+        damageHit(target,attacker,7.2*target.damageMul,counterDir*230,-75,true);
+        const mir=remielMirages.find(m=>m.owner===target&&m.t>0);
+        if(mir){
+          // 分身側のミラージュカウンターは本体の50%ダメージ。
+          damageHit(target,attacker,3.6*target.damageMul,counterDir*120,-38,true);
+          mir.t=0;
+        }
+        spawnImpact(target.x,target.y,'guard');comboEl.textContent='ミラージュカウンター!';return;
+      }
       if(target.remielParryT>0){target.remielParryT=0;target.specialT=.24;attacker.vx=-Math.sign(target.x-attacker.x||1)*255;attacker.vy=-55;attacker.stun=Math.max(attacker.stun||0,.34);spawnImpact(target.x,target.y,'guard');comboEl.textContent='アクアパリィ!';return;}
       if(target.guard&&target.guardStartT>.18){attacker.vx=-Math.sign(target.x-attacker.x||1)*220;attacker.stun=Math.max(attacker.stun||0,.24);spawnImpact(target.x,target.y,'guard');comboEl.textContent='ジャスト・アクアパリィ!';return;}
     }
@@ -6868,7 +6895,7 @@ function drawBackground(dt){
         }
         if(Math.abs(q.x-target.x)<target.radius+q.r+8&&Math.abs(q.y-target.y)<target.radius+q.r+8){
           if(target.guard){q.owner=target;q.vx=-q.vx*1.05;q.reflects++;q.x=target.x+Math.sign(q.vx)*56;spawnImpact(target.x,target.y,'guard');if(q.reflects>=q.maxReflect)q.t=0;}
-          else{damageHit(q.owner,target,q.damage,Math.sign(q.vx)*70,145);target.vy=Math.max(target.vy,250);spawnImpact(q.x,q.y,'hit');q.t=0;}
+          else{damageHit(q.owner,target,q.damage,Math.sign(q.vx)*70,145);target.vy=Math.max(target.vy,250);target.gravityDragT=Math.max(target.gravityDragT||0,1.35);spawnImpact(q.x,q.y,'hit');q.t=0;}
         }
       });
       gravityBalls=gravityBalls.filter(q=>q.t>0&&q.x>-100&&q.x<innerWidth+100);

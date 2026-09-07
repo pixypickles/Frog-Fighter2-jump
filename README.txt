@@ -195,3 +195,9 @@ v2.21
 - JUMP tongue ~28% longer with vertical aim assist.
 - Wall cling: Back + Tongue; remains while Tongue is held, releases on button-up; 0.30s reuse delay.
 - Remiel mirage copies punch/kick/tongue. Small damage; mirage tongue never grabs. Mirage vanishes after copied melee/tongue connects.
+
+v2.22
+- Gravity Zone now always appears low near the lotus arena floor.
+- Gravity Ball hit applies 1.35 sec lingering strong downward gravity.
+- Remiel mirage can also connect Mirage Kick for 50% damage (4.9), then disappears.
+- Remiel mirage can also connect Mirage Counter for 50% damage (3.6), then disappears.
