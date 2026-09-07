@@ -42,4 +42,4 @@ FROG FIGHTER 2 JUMP v0.8
 v1.0: title sky brightened; portrait fighter cards keep eyes inside the card and selected card expands for move list; battle title-return button moved below HP.
 
 
-v1.1: title sky rebuilt as pale sky only; portrait frog face geometry fixed; tapped fighter expands to show moves.
+v1.2 SAFE FIX: restored the full v1.0 package (HTML/CSS/JS/README), then applied only targeted CSS fixes. No extra startup JavaScript was added.
