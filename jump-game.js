@@ -6257,130 +6257,128 @@
 function drawBackground(dt){
     const w=innerWidth,h=innerHeight,t=performance.now()/1000;
     const themes=[
-      ['#79d7f2','#e9fff3','#88c975'],['#ffd391','#fff2c9','#92ad65'],
-      ['#b7c9da','#edf0e6','#708579'],['#453451','#b97980','#454055']
+      ['#75cfee','#f8f1c9','#7bc66a'],['#ffd6a3','#fff5d7','#92b96b'],
+      ['#b8cad9','#f0efe0','#768d78'],['#51415e','#b9898a','#4e4b56']
     ];
     const th=themes[Math.max(0,Math.min(3,stageTheme||0))];
-    const sky=ctx.createLinearGradient(0,0,0,h);sky.addColorStop(0,th[0]);sky.addColorStop(.58,th[1]);sky.addColorStop(1,th[2]);
+    const sky=ctx.createLinearGradient(0,0,0,h);sky.addColorStop(0,th[0]);sky.addColorStop(.52,th[1]);sky.addColorStop(1,th[2]);
     ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
 
     const floor=jumpFloorY();
-    const top=Math.max(168,h*.225);
-    const bottom=Math.min(floor-105,h*.705);
-    const side=Math.max(18,w*.035);
-    const outerR=Math.min(62,w*.09);
+    const top=Math.max(178,h*.235);
+    const bottom=Math.min(floor-170,h*.655);
+    const side=Math.max(22,w*.045);
+    const standW=w-side*2;
     const tierGap=(bottom-top)/4;
 
+    // Stadium shell: clearly separate grandstand from ring-side area.
     ctx.save();
-    // Main stadium shell: rounded, slightly flared toward the arena.
-    ctx.fillStyle='rgba(35,58,56,.94)';
-    ctx.strokeStyle='rgba(238,226,166,.82)';ctx.lineWidth=5;
-    ctx.beginPath();
-    ctx.moveTo(side,top+outerR);
-    ctx.quadraticCurveTo(side,top,side+outerR,top);
-    ctx.lineTo(w-side-outerR,top);
-    ctx.quadraticCurveTo(w-side,top,w-side,top+outerR);
-    ctx.lineTo(w-side,bottom-10);
-    ctx.quadraticCurveTo(w-side,bottom+28,w*.80,bottom+60);
-    ctx.lineTo(w*.61,floor+10);
-    ctx.lineTo(w*.39,floor+10);
-    ctx.lineTo(w*.20,bottom+60);
-    ctx.quadraticCurveTo(side,bottom+28,side,bottom-10);
-    ctx.closePath();ctx.fill();ctx.stroke();
+    ctx.fillStyle='rgba(39,58,54,.96)';
+    ctx.strokeStyle='rgba(231,205,122,.94)';ctx.lineWidth=6;
+    ctx.beginPath();ctx.roundRect(side,top,standW,bottom-top+30,Math.min(52,w*.075));ctx.fill();ctx.stroke();
+    ctx.strokeStyle='rgba(133,215,180,.78)';ctx.lineWidth=3;
+    ctx.beginPath();ctx.roundRect(side+13,top+14,standW-26,bottom-top+2,Math.min(40,w*.06));ctx.stroke();
 
-    // Decorative inner rim.
-    ctx.strokeStyle='rgba(125,211,174,.9)';ctx.lineWidth=2.5;
-    ctx.beginPath();ctx.roundRect(side+10,top+12,w-side*2-20,bottom-top-2,Math.max(24,outerR-14));ctx.stroke();
-
-    // Four curved seating tiers. Spectators are clipped to each tier.
+    // Four tiers with clipped frog audience.
     for(let tier=0;tier<4;tier++){
-      const y0=top+20+tier*tierGap;
+      const y0=top+22+tier*tierGap;
       const y1=top+(tier+1)*tierGap-8;
-      const inset=side+18+tier*2;
+      const inset=side+22;
       ctx.save();
       ctx.beginPath();
-      ctx.moveTo(inset,y0+8);
-      ctx.quadraticCurveTo(w*.5,y0-7,w-inset,y0+8);
-      ctx.lineTo(w-inset,y1-7);
-      ctx.quadraticCurveTo(w*.5,y1+8,inset,y1-7);
-      ctx.closePath();
-      ctx.fillStyle=tier%2?'rgba(16,74,69,.95)':'rgba(19,84,76,.96)';ctx.fill();
-      ctx.strokeStyle='rgba(151,220,194,.65)';ctx.lineWidth=2;ctx.stroke();
-      ctx.clip();
+      ctx.moveTo(inset,y0+5);ctx.quadraticCurveTo(w*.5,y0-8,w-inset,y0+5);
+      ctx.lineTo(w-inset,y1-6);ctx.quadraticCurveTo(w*.5,y1+7,inset,y1-6);ctx.closePath();
+      ctx.fillStyle=tier%2?'rgba(16,76,69,.98)':'rgba(18,88,78,.98)';ctx.fill();
+      ctx.strokeStyle='rgba(144,220,192,.72)';ctx.lineWidth=2;ctx.stroke();ctx.clip();
 
-      const rows=2;
-      const gap=Math.max(27,w/12.4);
-      const aisleHalf=Math.max(23,w*.047);
+      const rows=2,gap=Math.max(30,w/11.2);
+      const stairCenters=[w*.30,w*.70], stairHalf=Math.max(17,w*.028);
       for(let r=0;r<rows;r++){
-        for(let x=inset+18+(r?gap*.45:0);x<w-inset-12;x+=gap){
-          if(Math.abs(x-w*.5)<aisleHalf) continue; // central aisle
+        for(let x=inset+20+(r?gap*.48:0);x<w-inset-10;x+=gap){
+          if(stairCenters.some(c=>Math.abs(x-c)<stairHalf)) continue;
           const arch=Math.pow((x-w*.5)/(w*.5),2);
-          const bob=Math.sin(t*3+x*.12+tier+r)*1.3;
-          const fc=['#6dd75d','#4db9e8','#efd24e','#b86ee3','#f28b42'][(Math.floor(x/gap)+tier+r)%5];
-          const fy=y0+21+r*Math.max(20,tierGap*.27)+arch*5+bob;
-          const sc=Math.max(.70,Math.min(.95,w/760));
+          const bob=Math.sin(t*3.1+x*.11+tier+r)*1.2;
+          const colors=['#63d65a','#48b8e8','#edd04a','#ba6ce2','#f18b42'];
+          const fc=colors[(Math.floor(x/gap)+tier+r)%colors.length];
+          const fy=y0+20+r*Math.max(20,tierGap*.28)+arch*4+bob;
+          const sc=Math.max(.72,Math.min(.93,w/760));
           ctx.save();ctx.translate(x,fy);ctx.scale(sc,sc);
-          ctx.fillStyle=fc;ctx.beginPath();ctx.ellipse(0,4,6.4,7.5,0,0,Math.PI*2);ctx.fill();
-          ctx.beginPath();ctx.arc(-3.8,-2.6,3.3,0,Math.PI*2);ctx.arc(3.8,-2.6,3.3,0,Math.PI*2);ctx.fill();
-          ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-3.8,-2.6,1.85,0,Math.PI*2);ctx.arc(3.8,-2.6,1.85,0,Math.PI*2);ctx.fill();
-          ctx.fillStyle='#18302a';ctx.beginPath();ctx.arc(-3.4,-2.6,.72,0,Math.PI*2);ctx.arc(4.2,-2.6,.72,0,Math.PI*2);ctx.fill();
+          ctx.fillStyle=fc;ctx.beginPath();ctx.ellipse(0,4,6.3,7.3,0,0,Math.PI*2);ctx.fill();
+          ctx.beginPath();ctx.arc(-3.8,-2.5,3.3,0,Math.PI*2);ctx.arc(3.8,-2.5,3.3,0,Math.PI*2);ctx.fill();
+          ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-3.8,-2.5,1.85,0,Math.PI*2);ctx.arc(3.8,-2.5,1.85,0,Math.PI*2);ctx.fill();
+          ctx.fillStyle='#17302a';ctx.beginPath();ctx.arc(-3.4,-2.5,.72,0,Math.PI*2);ctx.arc(4.2,-2.5,.72,0,Math.PI*2);ctx.fill();
           ctx.restore();
         }
       }
       ctx.restore();
 
-      // Horizontal concourse between tiers.
+      // Horizontal concourse between seating blocks.
       if(tier<3){
-        const ay=y1+4;
-        ctx.fillStyle='rgba(222,211,156,.88)';
-        ctx.beginPath();ctx.moveTo(side+16,ay-3);ctx.quadraticCurveTo(w*.5,ay+5,w-side-16,ay-3);ctx.lineTo(w-side-16,ay+5);ctx.quadraticCurveTo(w*.5,ay+13,side+16,ay+5);ctx.closePath();ctx.fill();
+        const ay=y1+5;ctx.fillStyle='rgba(223,207,145,.96)';
+        ctx.beginPath();ctx.moveTo(side+18,ay-4);ctx.quadraticCurveTo(w*.5,ay+4,w-side-18,ay-4);ctx.lineTo(w-side-18,ay+6);ctx.quadraticCurveTo(w*.5,ay+14,side+18,ay+6);ctx.closePath();ctx.fill();
       }
     }
 
-    // Central aisle / player entrance, like a boxing arena passage.
-    const aisleTop=top+18, aisleBottom=bottom+51;
-    ctx.fillStyle='rgba(225,212,157,.93)';
-    ctx.beginPath();ctx.moveTo(w*.455,aisleTop);ctx.lineTo(w*.545,aisleTop);ctx.lineTo(w*.585,aisleBottom);ctx.lineTo(w*.415,aisleBottom);ctx.closePath();ctx.fill();
-    ctx.fillStyle='rgba(63,109,82,.95)';
-    ctx.beginPath();ctx.moveTo(w*.472,aisleTop);ctx.lineTo(w*.528,aisleTop);ctx.lineTo(w*.548,aisleBottom);ctx.lineTo(w*.452,aisleBottom);ctx.closePath();ctx.fill();
-    ctx.strokeStyle='rgba(255,242,187,.9)';ctx.lineWidth=2;ctx.stroke();
+    // Two staircase aisles through the grandstand, not one giant runway.
+    [w*.30,w*.70].forEach((cx,idx)=>{
+      const topW=Math.max(30,w*.052), botW=Math.max(46,w*.074);
+      ctx.fillStyle='rgba(206,190,130,.98)';
+      ctx.beginPath();ctx.moveTo(cx-topW/2,top+18);ctx.lineTo(cx+topW/2,top+18);ctx.lineTo(cx+botW/2,bottom+12);ctx.lineTo(cx-botW/2,bottom+12);ctx.closePath();ctx.fill();
+      ctx.fillStyle='rgba(82,117,79,.98)';
+      ctx.beginPath();ctx.moveTo(cx-topW/2+5,top+18);ctx.lineTo(cx+topW/2-5,top+18);ctx.lineTo(cx+botW/2-7,bottom+12);ctx.lineTo(cx-botW/2+7,bottom+12);ctx.closePath();ctx.fill();
+      // visible stair treads
+      ctx.strokeStyle='rgba(246,231,175,.88)';ctx.lineWidth=1.4;
+      for(let s=1;s<11;s++){
+        const q=s/11, y=top+18+(bottom-top-6)*q;
+        const ww=topW+(botW-topW)*q;
+        ctx.beginPath();ctx.moveTo(cx-ww/2+5,y);ctx.lineTo(cx+ww/2-5,y);ctx.stroke();
+      }
+    });
 
-    // Entrance runway from stands to the lotus platform.
-    ctx.fillStyle='rgba(218,202,139,.95)';
-    ctx.beginPath();ctx.moveTo(w*.415,bottom+48);ctx.lineTo(w*.585,bottom+48);ctx.lineTo(w*.655,floor+38);ctx.lineTo(w*.345,floor+38);ctx.closePath();ctx.fill();
-    ctx.fillStyle='rgba(70,131,85,.96)';
-    ctx.beginPath();ctx.moveTo(w*.445,bottom+48);ctx.lineTo(w*.555,bottom+48);ctx.lineTo(w*.60,floor+38);ctx.lineTo(w*.40,floor+38);ctx.closePath();ctx.fill();
+    // Short central entrance staircase stops at ring-side, creating readable distance.
+    const stairTop=bottom+25, stairBottom=floor-92;
+    const steps=6;
+    for(let i=0;i<steps;i++){
+      const q=i/(steps-1), y0=stairTop+(stairBottom-stairTop)*q;
+      const ww=w*(.105+.055*q), hh=Math.max(8,(stairBottom-stairTop)/steps+2);
+      ctx.fillStyle=i%2?'rgba(85,132,82,.98)':'rgba(101,146,91,.98)';
+      ctx.strokeStyle='rgba(231,211,145,.96)';ctx.lineWidth=2;
+      ctx.beginPath();ctx.roundRect(w*.5-ww/2,y0,ww,hh,4);ctx.fill();ctx.stroke();
+    }
 
-    // Rim lamps.
-    for(let i=0;i<4;i++){const x=(i+.5)*w/4;ctx.fillStyle='rgba(255,246,178,.95)';ctx.beginPath();ctx.arc(x,top-18,7,0,Math.PI*2);ctx.fill();}
-    ctx.font='900 13px system-ui';ctx.textAlign='center';ctx.fillStyle='rgba(255,248,205,.95)';ctx.fillText('FROG FIGHTER Ⅱ  •  LOTUS STADIUM',w/2,bottom+29);
+    // Lamps and stadium name.
+    for(let i=0;i<4;i++){const x=(i+.5)*w/4;ctx.fillStyle='rgba(255,244,170,.96)';ctx.beginPath();ctx.arc(x,top-20,7,0,Math.PI*2);ctx.fill();}
+    ctx.font='900 13px system-ui';ctx.textAlign='center';ctx.fillStyle='rgba(255,247,204,.96)';ctx.fillText('FROG FIGHTER Ⅱ  •  LOTUS STADIUM',w/2,bottom+18);
     ctx.restore();
 
-    // Ground / pond surface is only below the arena, not an underwater backdrop.
-    const groundY=floor+46;
-    const gg=ctx.createLinearGradient(0,groundY-25,0,h);gg.addColorStop(0,'rgba(92,177,128,.88)');gg.addColorStop(1,'rgba(29,112,103,.98)');
-    ctx.fillStyle=gg;ctx.fillRect(0,groundY-24,w,h-groundY+24);
+    // Ring-side promenade / open space between stands and lotus platform.
+    const apronTop=floor-92;
+    const ag=ctx.createLinearGradient(0,apronTop,0,h);ag.addColorStop(0,'rgba(112,180,108,.92)');ag.addColorStop(1,'rgba(37,123,95,.98)');
+    ctx.fillStyle=ag;ctx.fillRect(0,apronTop,w,h-apronTop);
+    ctx.strokeStyle='rgba(238,218,145,.82)';ctx.lineWidth=3;
+    ctx.beginPath();ctx.moveTo(0,apronTop+14);ctx.lineTo(w,apronTop+14);ctx.stroke();
 
-    // Luxurious competition lotus platform: double gold-green rim + inner leaf.
-    ctx.save();ctx.translate(w*.5,floor+53);
-    ctx.fillStyle='rgba(226,204,113,.96)';ctx.beginPath();ctx.ellipse(0,2,w*.635,68,0,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#3e9146';ctx.strokeStyle='#dff18a';ctx.lineWidth=5;ctx.beginPath();ctx.ellipse(0,0,w*.615,61,0,0,Math.PI*2);ctx.fill();ctx.stroke();
-    ctx.strokeStyle='rgba(255,233,139,.9)';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(0,0,w*.585,54,0,0,Math.PI*2);ctx.stroke();
-    ctx.fillStyle='rgba(126,199,83,.48)';ctx.beginPath();ctx.ellipse(-8,-7,w*.48,43,0,0,Math.PI*2);ctx.fill();
-    ctx.strokeStyle='rgba(38,111,48,.7)';ctx.lineWidth=2;for(let a=-2.8;a<=2.8;a+=.42){ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(Math.cos(a)*w*.49,Math.sin(a)*45);ctx.stroke();}
-    ctx.fillStyle='rgba(40,135,160,.9)';ctx.beginPath();ctx.moveTo(0,-2);ctx.lineTo(35,-48);ctx.lineTo(9,-7);ctx.closePath();ctx.fill();
+    // Broad oval ring-side deck gives the leaf breathing room.
+    ctx.save();ctx.translate(w*.5,floor+49);
+    ctx.fillStyle='rgba(212,193,126,.97)';ctx.beginPath();ctx.ellipse(0,2,w*.485,73,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='rgba(71,139,83,.98)';ctx.strokeStyle='rgba(255,233,153,.96)';ctx.lineWidth=4;ctx.beginPath();ctx.ellipse(0,0,w*.463,65,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+    // competition lotus leaf sits inside the deck, leaving a visible perimeter walkway
+    ctx.fillStyle='#37a83f';ctx.strokeStyle='#dff08a';ctx.lineWidth=4;ctx.beginPath();ctx.ellipse(0,0,w*.405,52,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+    ctx.fillStyle='rgba(124,205,83,.45)';ctx.beginPath();ctx.ellipse(-6,-7,w*.315,36,0,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='rgba(35,105,45,.7)';ctx.lineWidth=1.8;for(let a=-2.8;a<=2.8;a+=.44){ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(Math.cos(a)*w*.34,Math.sin(a)*39);ctx.stroke();}
+    ctx.fillStyle='rgba(48,138,159,.9)';ctx.beginPath();ctx.moveTo(0,-2);ctx.lineTo(28,-42);ctx.lineTo(8,-6);ctx.closePath();ctx.fill();
     ctx.restore();
 
-    if((stageTheme||0)>=2){for(let i=0;i<26;i++){const x=(i*83+t*18)%w,y=(i*47+t*34)%(h*.72);ctx.save();ctx.translate(x,y);ctx.rotate(t+i);ctx.fillStyle=['#fff2a3','#e77b91','#8ee7ff'][i%3];ctx.fillRect(-2,-5,4,10);ctx.restore();}}
+    if((stageTheme||0)>=2){for(let i=0;i<22;i++){const x=(i*83+t*18)%w,y=(i*47+t*34)%(h*.66);ctx.save();ctx.translate(x,y);ctx.rotate(t+i);ctx.fillStyle=['#fff2a3','#e77b91','#8ee7ff'][i%3];ctx.fillRect(-2,-5,4,10);ctx.restore();}}
   }
 
   function drawLotusReferee(dt){
     const w=innerWidth,h=innerHeight,floor=jumpFloorY();
     refereeFrog.t=(refereeFrog.t||0)+(dt||.016);
     // JUMP版ではレフリーは競技用の大蓮葉の外側で見守る。
-    refereeFrog.x=w*.84;
+    refereeFrog.x=w*.79;
     refereeFrog.dir=-1;
-    const x=w*.84,y=floor-72+Math.sin(refereeFrog.t*4)*1.5;
+    const x=w*.79,y=floor-42+Math.sin(refereeFrog.t*4)*1.5;
     const s=Math.max(.72,Math.min(1.05,w/760));
     ctx.save();ctx.translate(x,y);ctx.scale(refereeFrog.dir*s,s);ctx.globalAlpha=.95;
     // yellow referee frog

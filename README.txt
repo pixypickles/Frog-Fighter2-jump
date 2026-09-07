@@ -1,6 +1,6 @@
-FROG FIGHTER 2 JUMP Prototype v0.6
+FROG FIGHTER 2 JUMP Prototype v0.7
 
-v0.6 fixes:
+v0.7 fixes:
 - Above-water title styling; removed bubbles.
 - Portrait roster locks fighter face to center with name directly below.
 - Rounded four-tier stadium with clipped spectators.
@@ -21,3 +21,6 @@ v0.4 fixes:
 - Four spectator tiers moved lower in the vertical stadium.
 - Referee moved off the main lotus-leaf fighting surface.
 - CPU vertical damping removed so rival automatic jump height matches the player.
+
+
+v0.7: above-water title background, two stair aisles + short entrance stairs, ring-side promenade, smaller lotus platform with surrounding deck, referee returned to ringside, logo embedded in HTML, portrait roster layout hard-locked.
