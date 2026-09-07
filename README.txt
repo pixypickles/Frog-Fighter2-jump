@@ -43,3 +43,6 @@ v1.0: title sky brightened; portrait fighter cards keep eyes inside the card and
 
 
 v1.2 SAFE FIX: restored the full v1.0 package (HTML/CSS/JS/README), then applied only targeted CSS fixes. No extra startup JavaScript was added.
+
+
+v1.3: portrait fighter cards no longer scale while selected, preventing eye/head clipping; selected fighter now expands to a 286px card with a large readable move list.

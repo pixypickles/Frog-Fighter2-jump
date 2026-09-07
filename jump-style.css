@@ -4379,3 +4379,91 @@ body.portrait-play .pause-button{z-index:46 !important;}
     line-height:1.25 !important;
   }
 }
+
+
+/* ===== FROG FIGHTER 2 JUMP v1.3 =====
+   Fix portrait roster clipping and restore a properly expanded move panel.
+*/
+@media (orientation:portrait), (max-width:760px){
+
+  /* The selected-card scale was what pushed the eyes outside the card while overflow was hidden. */
+  #selectScreen .fighter-card,
+  #selectScreen .fighter-card:hover,
+  #selectScreen .fighter-card:focus-visible,
+  #selectScreen .fighter-card.selected{
+    transform:none !important;
+  }
+
+  /* Give every portrait a little more headroom. */
+  #selectScreen .fighter-card{
+    height:166px !important;
+    min-height:166px !important;
+    padding-top:12px !important;
+    overflow:hidden !important;
+  }
+
+  #selectScreen .fighter-card .fighter-emoji{
+    top:67px !important;
+    left:50% !important;
+    transform:translate(-50%,-50%) !important;
+  }
+
+  #selectScreen .fighter-card:not([data-fighter="piranha"]):not([data-fighter="crayfish"]) .fighter-emoji::before{
+    top:-24px !important;
+  }
+
+  #selectScreen .fighter-card > strong{
+    top:126px !important;
+  }
+
+  /* Closed cards stay compact. */
+  #selectScreen .fighter-card:not(.selected) .special-hint,
+  #selectScreen .fighter-card:not(.selected) .move-names{
+    display:none !important;
+  }
+
+  /* Selected card expands DOWNWARD like the original roster. */
+  #selectScreen .fighter-card.selected{
+    height:286px !important;
+    min-height:286px !important;
+    overflow:hidden !important;
+    padding-bottom:12px !important;
+  }
+
+  /* Large readable move list instead of a tiny black window. */
+  #selectScreen .fighter-card.selected .special-hint,
+  #selectScreen .fighter-card.selected .move-names{
+    display:block !important;
+    position:absolute !important;
+    left:8px !important;
+    right:8px !important;
+    top:154px !important;
+    bottom:10px !important;
+    width:auto !important;
+    height:auto !important;
+    max-height:none !important;
+    margin:0 !important;
+    padding:10px 9px !important;
+    overflow:auto !important;
+    box-sizing:border-box !important;
+    border-radius:12px !important;
+    background:rgba(4,34,42,.94) !important;
+    color:#fff !important;
+    text-align:left !important;
+    font-size:11px !important;
+    line-height:1.45 !important;
+    opacity:1 !important;
+    white-space:normal !important;
+    z-index:30 !important;
+  }
+
+  #selectScreen .fighter-card.selected .command-list{
+    display:block !important;
+    font-size:11px !important;
+    line-height:1.45 !important;
+  }
+
+  #selectScreen .fighter-card.selected .command-list b{
+    display:inline !important;
+  }
+}
