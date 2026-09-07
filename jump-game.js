@@ -6264,40 +6264,74 @@ function drawBackground(dt){
     const sky=ctx.createLinearGradient(0,0,0,h);sky.addColorStop(0,th[0]);sky.addColorStop(.58,th[1]);sky.addColorStop(1,th[2]);
     ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
 
-    // 四段の観客席。縦長画面で上へ跳ぶほど違う段が目に入る。
-    const tierH=Math.max(72,h*.105), top=Math.max(118,h*.205);
+    // v0.5: 蓮の葉競技場の「器」として客席を一体化。
+    // 四角い板を4枚置くのではなく、丸いスタジアムの内壁に沿って4段が連なる。
+    const floor=jumpFloorY();
+    const top=Math.max(150,h*.22);
+    const bottom=Math.min(floor-122,h*.70);
+    const tierGap=(bottom-top)/4;
+    const side=Math.max(14,w*.025);
+    const outerR=Math.min(54,w*.08);
+
+    // stadium shell / side frame connects the stands visually to the lotus arena.
+    ctx.save();
+    ctx.fillStyle='rgba(21,43,49,.78)';
+    ctx.beginPath();
+    ctx.moveTo(side,top+outerR);
+    ctx.quadraticCurveTo(side,top,side+outerR,top);
+    ctx.lineTo(w-side-outerR,top);
+    ctx.quadraticCurveTo(w-side,top,w-side,top+outerR);
+    ctx.lineTo(w-side,bottom-18);
+    ctx.quadraticCurveTo(w-side,bottom+18,w*.86,bottom+42);
+    ctx.quadraticCurveTo(w*.72,bottom+72,w*.62,floor+8);
+    ctx.lineTo(w*.38,floor+8);
+    ctx.quadraticCurveTo(w*.28,bottom+72,w*.14,bottom+42);
+    ctx.quadraticCurveTo(side,bottom+18,side,bottom-18);
+    ctx.closePath();ctx.fill();
+    ctx.strokeStyle='rgba(219,239,201,.55)';ctx.lineWidth=3;ctx.stroke();
+
+    // four curved seating bands.
     for(let tier=0;tier<4;tier++){
-      const y=top+tier*tierH;
-      ctx.fillStyle=tier%2?'rgba(20,46,52,.78)':'rgba(28,62,65,.82)';ctx.fillRect(0,y,w,tierH-5);
-      ctx.fillStyle='rgba(235,224,155,.58)';ctx.fillRect(0,y, w,3);
-      const rows=2, gap=Math.max(22,w/14);
-      for(let r=0;r<rows;r++)for(let x=12+(tier%2)*8;x<w;x+=gap){
-        const bob=Math.sin(t*3+x*.13+tier)*1.8;
+      const y0=top+tier*tierGap+6;
+      const y1=top+(tier+1)*tierGap-6;
+      const inset=side+8+tier*2;
+      ctx.fillStyle=tier%2?'rgba(23,55,60,.92)':'rgba(30,67,69,.94)';
+      ctx.beginPath();
+      ctx.moveTo(inset,y0+10);
+      ctx.quadraticCurveTo(w*.5,y0-9,w-inset,y0+10);
+      ctx.lineTo(w-inset,y1-8);
+      ctx.quadraticCurveTo(w*.5,y1+9,inset,y1-8);
+      ctx.closePath();ctx.fill();
+      ctx.strokeStyle='rgba(180,232,225,.65)';ctx.lineWidth=2.4;ctx.stroke();
+
+      const rows=2, gap=Math.max(24,w/13.5);
+      for(let r=0;r<rows;r++)for(let x=inset+10+(tier%2)*7;x<w-inset-4;x+=gap){
+        const arch=Math.pow((x-w*.5)/(w*.5),2);
+        const bob=Math.sin(t*3+x*.13+tier)*1.5;
         const fc=['#79d65c','#52aee8','#e7cf52','#b46be0','#ef8d45'][(Math.floor(x/gap)+tier+r)%5];
-        const fy=y+23+r*25+bob, sc=Math.max(.72,Math.min(1.0,w/720));
+        const fy=y0+23+r*Math.max(22,tierGap*.28)+arch*6+bob, sc=Math.max(.72,Math.min(1.0,w/720));
         ctx.save();ctx.translate(x,fy);ctx.scale(sc,sc);
         ctx.fillStyle=fc;
         ctx.beginPath();ctx.ellipse(0,4,6.2,7.2,0,0,Math.PI*2);ctx.fill();
         ctx.beginPath();ctx.arc(-3.8,-2.5,3.2,0,Math.PI*2);ctx.arc(3.8,-2.5,3.2,0,Math.PI*2);ctx.fill();
-        ctx.fillStyle='rgba(255,255,255,.92)';ctx.beginPath();ctx.arc(-3.8,-2.5,1.8,0,Math.PI*2);ctx.arc(3.8,-2.5,1.8,0,Math.PI*2);ctx.fill();
-        ctx.fillStyle='rgba(20,38,30,.9)';ctx.beginPath();ctx.arc(-3.4,-2.5,.75,0,Math.PI*2);ctx.arc(4.2,-2.5,.75,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle='rgba(255,255,255,.94)';ctx.beginPath();ctx.arc(-3.8,-2.5,1.8,0,Math.PI*2);ctx.arc(3.8,-2.5,1.8,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle='rgba(20,38,30,.92)';ctx.beginPath();ctx.arc(-3.4,-2.5,.75,0,Math.PI*2);ctx.arc(4.2,-2.5,.75,0,Math.PI*2);ctx.fill();
         if((Math.floor(x/gap)+tier+r)%5===0){ctx.strokeStyle=fc;ctx.lineWidth=2;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-4,5);ctx.lineTo(-8,-2);ctx.moveTo(4,5);ctx.lineTo(8,-3);ctx.stroke();}
         ctx.restore();
       }
     }
-    // 柱・照明・大会旗
-    ctx.fillStyle='rgba(28,38,45,.75)';ctx.fillRect(0,top-12,12,4*tierH+20);ctx.fillRect(w-12,top-12,12,4*tierH+20);
-    for(let i=0;i<4;i++){const x=(i+.5)*w/4;ctx.fillStyle='rgba(255,250,196,.75)';ctx.beginPath();ctx.arc(x,top-18,7,0,Math.PI*2);ctx.fill();}
-    ctx.font='900 13px system-ui';ctx.textAlign='center';ctx.fillStyle='rgba(255,255,225,.88)';ctx.fillText('FROG FIGHTER Ⅱ  •  LOTUS STADIUM',w/2,top+4*tierH+17);
+    // lights mounted on the stadium rim.
+    for(let i=0;i<4;i++){const x=(i+.5)*w/4;ctx.fillStyle='rgba(255,250,196,.8)';ctx.beginPath();ctx.arc(x,top-18,7,0,Math.PI*2);ctx.fill();}
+    ctx.font='900 13px system-ui';ctx.textAlign='center';ctx.fillStyle='rgba(255,255,225,.9)';ctx.fillText('FROG FIGHTER Ⅱ  •  LOTUS STADIUM',w/2,bottom+30);
+    ctx.restore();
 
-    // 池と巨大な競技用蓮の葉
-    const floor=jumpFloorY(), waterY=floor+48;
+    // pond and giant competition lotus leaf.
+    const waterY=floor+48;
     const wg=ctx.createLinearGradient(0,waterY-35,0,h);wg.addColorStop(0,'rgba(86,194,211,.93)');wg.addColorStop(1,'rgba(20,87,128,.99)');ctx.fillStyle=wg;ctx.fillRect(0,waterY-32,w,h-waterY+32);
     ctx.save();ctx.translate(w*.5,floor+53);ctx.fillStyle='#4c9f49';ctx.strokeStyle='#b7ed78';ctx.lineWidth=5;ctx.beginPath();ctx.ellipse(0,0,w*.62,61,0,0,Math.PI*2);ctx.fill();ctx.stroke();
     ctx.fillStyle='rgba(126,199,83,.48)';ctx.beginPath();ctx.ellipse(-8,-7,w*.48,43,0,0,Math.PI*2);ctx.fill();
     ctx.strokeStyle='rgba(38,111,48,.7)';ctx.lineWidth=2;for(let a=-2.8;a<=2.8;a+=.42){ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(Math.cos(a)*w*.49,Math.sin(a)*45);ctx.stroke();}
     ctx.fillStyle='rgba(40,135,160,.95)';ctx.beginPath();ctx.moveTo(0,-2);ctx.lineTo(35,-48);ctx.lineTo(9,-7);ctx.closePath();ctx.fill();ctx.restore();
-    // 決勝は紙吹雪
     if((stageTheme||0)>=2){for(let i=0;i<26;i++){const x=(i*83+t*18)%w,y=(i*47+t*34)%(h*.72);ctx.save();ctx.translate(x,y);ctx.rotate(t+i);ctx.fillStyle=['#fff2a3','#e77b91','#8ee7ff'][i%3];ctx.fillRect(-2,-5,4,10);ctx.restore();}}
   }
 
@@ -6305,9 +6339,9 @@ function drawBackground(dt){
     const w=innerWidth,h=innerHeight,floor=jumpFloorY();
     refereeFrog.t=(refereeFrog.t||0)+(dt||.016);
     // JUMP版ではレフリーは競技用の大蓮葉の外側で見守る。
-    refereeFrog.x=w*.82;
+    refereeFrog.x=w*.84;
     refereeFrog.dir=-1;
-    const x=w*.82,y=floor-38+Math.sin(refereeFrog.t*4)*1.5;
+    const x=w*.84,y=floor-72+Math.sin(refereeFrog.t*4)*1.5;
     const s=Math.max(.72,Math.min(1.05,w/760));
     ctx.save();ctx.translate(x,y);ctx.scale(refereeFrog.dir*s,s);ctx.globalAlpha=.95;
     // yellow referee frog
