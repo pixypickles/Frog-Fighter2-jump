@@ -4865,3 +4865,20 @@ body.portrait-play .pause-button{z-index:46 !important;}
     line-height:1.65 !important;
   }
 }
+
+
+/* v1.8 legacy-rule guard */
+@media (orientation:portrait), (max-width:760px){
+  #selectScreen.screen.active .fighter-grid > .fighter-card.selected{
+    transform:none !important;
+    width:100% !important;
+    height:174px !important;
+    min-height:174px !important;
+    max-height:174px !important;
+    overflow:hidden !important;
+  }
+  #selectScreen.screen.active .fighter-grid > .fighter-card.selected > .special-hint,
+  #selectScreen.screen.active .fighter-grid > .fighter-card.selected > .move-names{
+    display:none !important;
+  }
+}

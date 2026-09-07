@@ -66,3 +66,11 @@ v1.7
 - Lotus leaves are real bottom scenery elements, not full-screen pseudo gradients.
 - Fighter cards stay in a fixed 3-column compact grid.
 - Move list is a separate full-width panel inserted directly below the selected fighter's row, so names remain visible and long move lists are never clipped.
+
+
+v1.8
+- Title sky changed from nearly-white to a clearly visible pale blue.
+- Character cards remain fixed 3-column cards even when selected.
+- Selected-card legacy scaling/expansion is neutralized.
+- Move list is rendered only in the independent full-width panel.
+- Move panel now uses explicit command data, including Flauros commands.

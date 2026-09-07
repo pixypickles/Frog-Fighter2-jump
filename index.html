@@ -4,87 +4,183 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
   <meta name="theme-color" content="#eefaff" />
-  <title>フロッグファイター2 JUMP Prototype v1.7</title>
-  <link rel="stylesheet" href="jump-style.css?v=1.7" />
+  <title>フロッグファイター2 JUMP Prototype v1.8</title>
+  <link rel="stylesheet" href="jump-style.css?v=1.8" />
 
-<style id="jump17-final-style">
-/* v1.7 final presentation layer */
+
+<style id="jump18-final-style">
+/* v1.8 final presentation layer */
+
+/* ----- TITLE ----- */
 #titleScreen.screen.active{
   isolation:isolate !important;
-  background:#f4fcff !important;
+  background:#ccefff !important;
 }
 #titleScreen .title-sky-layer{
-  position:absolute !important; inset:0 !important; z-index:0 !important;
-  display:block !important; overflow:hidden !important; pointer-events:none !important;
-  background:linear-gradient(180deg,#ffffff 0%,#f8fdff 25%,#eefaff 58%,#e4f7fb 100%) !important;
+  position:absolute !important;
+  inset:0 !important;
+  z-index:0 !important;
+  display:block !important;
+  overflow:hidden !important;
+  pointer-events:none !important;
+  background:linear-gradient(180deg,#bfeaff 0%,#d8f3ff 48%,#edfaff 100%) !important;
 }
 #titleScreen .title-sun{
-  position:absolute; width:72px; height:72px; right:8vw; top:8vh; border-radius:50%;
-  background:#fff0a8; box-shadow:0 0 0 14px rgba(255,255,255,.55),0 0 30px rgba(255,235,145,.24);
+  position:absolute !important;
+  width:68px !important;
+  height:68px !important;
+  right:8vw !important;
+  top:8vh !important;
+  border-radius:50% !important;
+  background:#ffe994 !important;
+  box-shadow:0 0 0 12px rgba(255,255,255,.38),0 0 26px rgba(255,231,130,.20) !important;
 }
 #titleScreen .title-lotus{
-  position:absolute; bottom:-30px; width:210px; height:92px; border-radius:52% 48% 50% 50%;
-  background:linear-gradient(180deg,#8fd17f,#62b668); border:5px solid rgba(74,151,76,.42);
-  opacity:.92; transform-origin:center;
+  position:absolute !important;
+  bottom:-34px !important;
+  width:205px !important;
+  height:88px !important;
+  border-radius:52% 48% 50% 50% !important;
+  background:linear-gradient(180deg,#83cf78,#55ad61) !important;
+  border:4px solid rgba(55,139,67,.42) !important;
+  opacity:.88 !important;
 }
 #titleScreen .title-lotus::after{
-  content:""; position:absolute; left:49%; top:-8%; width:24%; height:38%;
-  background:#e8f8fb; clip-path:polygon(50% 100%,0 0,100% 0); opacity:.85;
+  content:"" !important;
+  position:absolute !important;
+  left:45% !important;
+  top:-4px !important;
+  width:24% !important;
+  height:30% !important;
+  background:#e9faff !important;
+  clip-path:polygon(50% 100%,0 0,100% 0) !important;
 }
-#titleScreen .tl1{left:-55px; transform:rotate(4deg) scale(.92)}
-#titleScreen .tl2{left:35%; bottom:-48px; transform:rotate(-3deg) scale(1.12)}
-#titleScreen .tl3{right:-58px; transform:rotate(5deg) scale(.9)}
+#titleScreen .tl1{left:-58px !important;transform:rotate(4deg) scale(.92) !important}
+#titleScreen .tl2{left:35% !important;bottom:-46px !important;transform:rotate(-3deg) scale(1.08) !important}
+#titleScreen .tl3{right:-62px !important;transform:rotate(5deg) scale(.9) !important}
 #titleScreen > :not(.title-sky-layer){position:relative !important;z-index:2 !important}
 #titleScreen::before,#titleScreen::after{display:none !important;content:none !important}
+#titleScreen .bubble{display:none !important}
 
+/* ----- PORTRAIT ROSTER ----- */
 @media (orientation:portrait), (max-width:760px){
   #selectScreen.screen.active .fighter-grid{
-    display:grid !important; grid-template-columns:repeat(3,minmax(0,1fr)) !important;
-    gap:9px !important; align-items:start !important; overflow:visible !important;
+    display:grid !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:9px !important;
+    width:100% !important;
+    max-width:100% !important;
+    padding:8px 12px 22px !important;
+    box-sizing:border-box !important;
+    align-items:start !important;
+    overflow:visible !important;
   }
+
+  /* every character card stays the same size, even when selected */
   #selectScreen.screen.active .fighter-card,
-  #selectScreen.screen.active .fighter-card.selected{
-    grid-column:auto !important; position:relative !important; display:flex !important;
-    flex-direction:column !important; align-items:center !important; justify-content:flex-start !important;
-    width:100% !important; height:174px !important; min-height:174px !important; max-height:174px !important;
-    padding:8px 5px 8px !important; overflow:hidden !important; transform:none !important;
-    background:rgba(255,255,255,.12) !important;
+  #selectScreen.screen.active .fighter-card.selected,
+  #selectScreen.screen.active .fighter-card:hover,
+  #selectScreen.screen.active .fighter-card:focus{
+    grid-column:auto !important;
+    position:relative !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    min-width:0 !important;
+    width:100% !important;
+    height:174px !important;
+    min-height:174px !important;
+    max-height:174px !important;
+    padding:8px 4px 8px !important;
+    box-sizing:border-box !important;
+    overflow:hidden !important;
+    transform:none !important;
+    background:rgba(255,255,255,.10) !important;
   }
   #selectScreen.screen.active .fighter-card.selected{
-    border-color:#fff !important; background:rgba(255,255,255,.23) !important;
+    outline:3px solid rgba(255,255,255,.92) !important;
+    outline-offset:-3px !important;
+    border-color:transparent !important;
+    background:rgba(255,255,255,.18) !important;
   }
+
   #selectScreen.screen.active .fighter-card > .fighter-emoji{
-    position:relative !important; left:auto !important; right:auto !important; top:auto !important; bottom:auto !important;
-    transform:none !important; margin:31px auto 7px !important; flex:0 0 54px !important; width:86px !important; height:54px !important;
+    position:relative !important;
+    left:auto !important; right:auto !important; top:auto !important; bottom:auto !important;
+    transform:none !important;
+    width:82px !important;
+    height:52px !important;
+    flex:0 0 52px !important;
+    margin:32px auto 7px !important;
   }
   #selectScreen.screen.active .fighter-card:not([data-fighter="piranha"]):not([data-fighter="crayfish"]) > .fighter-emoji::before{
-    left:0 !important; right:0 !important; top:-25px !important; width:86px !important; height:45px !important; transform:none !important;
+    left:0 !important; right:0 !important; top:-24px !important;
+    width:82px !important; height:43px !important;
+    transform:none !important;
   }
   #selectScreen.screen.active .fighter-card > strong{
-    position:relative !important; left:auto !important; right:auto !important; top:auto !important; bottom:auto !important;
-    display:block !important; width:100% !important; margin:8px 0 0 !important; padding:0 !important; transform:none !important;
-    text-align:center !important; white-space:nowrap !important; overflow:visible !important; font-size:13px !important; line-height:1.2 !important;
+    position:relative !important;
+    left:auto !important; right:auto !important; top:auto !important; bottom:auto !important;
+    display:block !important;
+    width:100% !important;
+    margin:8px 0 0 !important;
+    padding:0 !important;
+    transform:none !important;
+    text-align:center !important;
+    white-space:nowrap !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+    font-size:12px !important;
+    line-height:1.2 !important;
   }
-  #selectScreen.screen.active .fighter-card > .special-hint,
-  #selectScreen.screen.active .fighter-card > .move-names{display:none !important}
 
+  /* internal old move boxes never render */
+  #selectScreen.screen.active .fighter-card > .special-hint,
+  #selectScreen.screen.active .fighter-card > .move-names{
+    display:none !important;
+  }
+
+  /* independent full-width move panel */
   #selectScreen.screen.active .fighter-move-panel{
-    grid-column:1 / -1 !important; display:block !important; width:100% !important; height:auto !important; min-height:0 !important;
-    margin:1px 0 5px !important; padding:12px 12px 13px !important; box-sizing:border-box !important;
-    border:3px solid rgba(255,255,255,.92); border-radius:18px;
-    background:rgba(5,55,66,.92); box-shadow:0 5px 0 rgba(0,0,0,.13);
-    overflow:visible !important; color:#fff; text-align:left;
+    grid-column:1 / -1 !important;
+    display:block !important;
+    width:100% !important;
+    min-width:0 !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    margin:2px 0 7px !important;
+    padding:13px 14px 15px !important;
+    box-sizing:border-box !important;
+    border:3px solid rgba(255,255,255,.92) !important;
+    border-radius:18px !important;
+    background:#073e49 !important;
+    box-shadow:0 5px 0 rgba(0,0,0,.12) !important;
+    overflow:visible !important;
+    color:#fff !important;
   }
   #selectScreen.screen.active .fighter-move-name{
-    margin:0 0 8px; text-align:center; font-size:16px; font-weight:1000;
+    margin:0 0 9px !important;
+    text-align:center !important;
+    font-size:17px !important;
+    font-weight:1000 !important;
   }
   #selectScreen.screen.active .fighter-move-commands{
-    font-size:12px; line-height:1.65; white-space:normal; overflow:visible !important;
+    font-size:12px !important;
+    line-height:1.65 !important;
+    white-space:normal !important;
+    overflow:visible !important;
   }
-  #selectScreen.screen.active .fighter-move-commands .command-list{display:block !important}
-  #selectScreen.screen.active .fighter-move-commands b{color:#fff1a8}
+  #selectScreen.screen.active .fighter-move-line{
+    margin:3px 0 !important;
+  }
+  #selectScreen.screen.active .fighter-move-line b{
+    color:#fff0a0 !important;
+  }
 }
 </style>
+
 
 </head>
 <body>
@@ -103,7 +199,7 @@
       <p class="frog-logo-sub">LOTUS STADIUM JUMP BATTLE</p>
       <p class="rotate-note">蓮の葉競技場・縦ジャンプバトル</p>
       <div class="build-marker">BUILD JUMP 0.4</div>
-      <div class="start-version">FROG FIGHTER 2 JUMP　PROTOTYPE v1.7</div>
+      <div class="start-version">FROG FIGHTER 2 JUMP　PROTOTYPE v1.8</div>
       <div class="title-start-actions">
         <button id="portraitStart" class="soft-btn portrait-start-btn">はじめる</button>
         
@@ -368,10 +464,11 @@
       <span class="portrait-version">FROG FIGHTER 2 JUMP　v0.9</span>
     </div>
   </div>
-  <script src="jump-game.js?v=1.7"></script>
+  <script src="jump-game.js?v=1.8"></script>
 
 
-<script id="jump17-move-panel">
+
+<script id="jump18-move-panel">
 (function(){
   const grid=document.querySelector('#selectScreen .fighter-grid');
   const panel=document.getElementById('fighterMovePanel');
@@ -379,29 +476,72 @@
   const cmdEl=document.getElementById('fighterMoveCommands');
   if(!grid||!panel||!nameEl||!cmdEl)return;
 
-  function cards(){return Array.from(grid.querySelectorAll(':scope > .fighter-card'));}
+  const COMMANDS={
+    green:['バーニングアッパー：上 ＋ パンチ','バーニングキック：前 ＋ キック','バーニングショット：後ろ ＋ パンチ','バーニングサイクロン：下 → 後ろ ＋ キック'],
+    blue:['アクアトルネード：上 ＋ パンチ','アクアストリーム：下 ＋ キック','アクアボルテックス：後ろ ＋ パンチ','アクアショット：前 ＋ パンチ'],
+    yellow:['水圧カッター（正面）：前 ＋ パンチ','水圧カッター（下15度）：前 ＋ キック','カープ水圧カッター（上から弧）：後ろ ＋ パンチ','カープ水圧カッター（下から弧）：後ろ ＋ キック','ヒーリングバブル：ガード ×2','高速バブル移動：後ろ → 下 ＋ ガード'],
+    orange:['ホワイトカウンター：下 → 後ろ ＋ ガード','ガーディアンタックル：後ろ → 前 ＋ ガード','ホワイトオーラ：ガード長押し','白い長リーチ攻撃：オーラ中 パンチ / キック','ホワイトショット：ガード ＋ パンチ'],
+    black:['ヘルクラッシュ：前 ＋ キック','アビスチャージ：後ろ ＋ パンチ長押し → 離す','アイスショット：前 ＋ パンチ','アイスウォール：後ろ ＋ ガード'],
+    purple:['舌ラッシュ：舌連打','バブルショット：後ろ ＋ 舌','バックスピンキック：後ろ ＋ キック'],
+    beelzebub:['ヴェノム・ウォーター：下 → 後ろ ＋ ガード','アビスショック（上弧）：上 ＋ パンチ','アビスショック（下弧）：下 ＋ キック','ベノムショット：前 ＋ パンチ'],
+    sariel:['ルナ・スラッシュ（上弧）：上 ＋ パンチ','ルナ・スラッシュ（下弧）：下 ＋ パンチ','イーブルアイ：前 ＋ ガード','ブラッドムーン：後ろ ＋ ガード','ムーンサルトキック：上 ＋ キック'],
+    kokabiel:['グラビティボール：前 ＋ パンチ','グラビティゾーン：後ろ ＋ ガード','メテオレイン：下 ＋ パンチ','グラビティダイブ：下 ＋ キック'],
+    jihal:['ボルトショット：前 ＋ パンチ','ライトニングダッシュ：前 ＋ キック','サンダーチャージ：後ろ ＋ キック長押し → 離す','スパークバースト：下 ＋ パンチ'],
+    remiel:['ミラージュ（上）：上 ＋ ガード','ミラージュ（下）：下 ＋ ガード','ミラージュカウンター：後ろ ＋ ガード','アクアパリィ：前 ＋ ガード','フロストショット：前 ＋ パンチ','ミラージュキック：前 ＋ キック'],
+    seraphiel:['セラフィックアッパー：上 ＋ パンチ','セラフィックキック：前 ＋ キック','セラフィックショット：後ろ ＋ パンチ','セラフィックサイクロン：下 → 後ろ ＋ キック','セラフィックレイ：下 → 前 ＋ パンチ'],
+    flauros:['ヘルフレイム：上 ＋ パンチ','フレイムクロー：前 ＋ パンチ','レオパードラッシュ：前 ＋ キック','インフェルノクロー：上 ＋ キック'],
+    satanael:['ディザスターフレア：後ろ ＋ パンチ','ダークレイ：前 ＋ パンチ','ダークプレッシャー：下 ＋ ガード','インフェルノウェーブ：下 ＋ キック'],
+    samael:['ポイズンゲート：方向 ＋ パンチ','ヴェノムタン：舌','デッドリー・アクア：前 → 下 → 後ろ ＋ キック'],
+    kawazu:['水圧ラッシュ：パンチ連打','ミラージュキック：前 ＋ キック','スピンキックカッター：後ろ ＋ キック'],
+    piranha:['高速突進噛みつき：前 ＋ パンチ','急降下背びれ：下 ＋ パンチ','急降下テール：下 ＋ キック'],
+    crayfish:['クローラッシュ：前 ＋ パンチ','ボトムスマッシュ：下 ＋ パンチ','クロー・カウンター：後ろ ＋ ガード']
+  };
+
+  function cards(){
+    return Array.from(grid.querySelectorAll(':scope > .fighter-card'));
+  }
   function showMoves(card){
     if(!card)return;
     const list=cards();
     const idx=list.indexOf(card);
     if(idx<0)return;
+
+    /* keep cards unchanged; only selection outline changes */
+    list.forEach(c=>c.classList.toggle('selected',c===card));
+
     const rowEnd=Math.min(Math.floor(idx/3)*3+2,list.length-1);
     list[rowEnd].after(panel);
+
+    const type=card.dataset.fighter || '';
     const nm=card.querySelector('strong');
-    const mv=card.querySelector('.move-names');
     nameEl.textContent=nm?nm.textContent:'';
-    cmdEl.innerHTML=mv?mv.innerHTML:'';
+
+    const commands=COMMANDS[type] || [];
+    if(commands.length){
+      cmdEl.innerHTML=commands.map(function(line){
+        const parts=line.split('：');
+        const move=parts.shift()||'';
+        const command=parts.join('：');
+        return '<div class="fighter-move-line"><b>'+move+'</b>：'+command+'</div>';
+      }).join('');
+    }else{
+      const mv=card.querySelector('.move-names');
+      cmdEl.textContent=mv?mv.textContent:'コマンド情報なし';
+    }
     panel.hidden=false;
   }
 
   grid.addEventListener('click',function(e){
     const card=e.target.closest('.fighter-card');
     if(!card)return;
-    setTimeout(()=>showMoves(card),0);
+    showMoves(card);
   });
-  setTimeout(()=>showMoves(grid.querySelector('.fighter-card.selected')||grid.querySelector('.fighter-card')),0);
+  setTimeout(function(){
+    showMoves(grid.querySelector('.fighter-card.selected')||grid.querySelector('.fighter-card'));
+  },0);
 })();
 </script>
+
 
 <a id="mixMapReturn" href="index.html" aria-label="MIXマップへ戻る">タイトルへ</a>
 </body>
