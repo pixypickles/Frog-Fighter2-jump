@@ -179,22 +179,8 @@
     setTimeout(()=>resize(),40);
   }
 
-  window.addEventListener('orientationchange', () => {
-    // 従来どおり、タイトル画面で横持ちにしたら自動開始。
-    if (screens.title.classList.contains('active') && canUseLandscape()) {
-      portraitPlayMode=false;
-      document.body.classList.remove('portrait-play');
-      setTimeout(() => show('select'), 180);
-    }
-  });
-  window.addEventListener('resize', () => {
-    resize();
-    if (screens.title.classList.contains('active') && canUseLandscape() && window.innerWidth < 1000) {
-      portraitPlayMode=false;
-      document.body.classList.remove('portrait-play');
-      show('select');
-    }
-  });
+  window.addEventListener('orientationchange', () => { setTimeout(()=>resize(),80); });
+  window.addEventListener('resize', () => { resize(); });
 
   const portraitStart=document.getElementById('portraitStart');
   const portraitOverlayStart=document.getElementById('portraitOverlayStart');
@@ -227,7 +213,6 @@
     setTimeout(()=>resize(),40);
   };
 
-  if (canUseLandscape() && window.innerWidth < 900) show('select');
 
   // v6.43 軽量SE:
   // 外部音源なし。短いOscillatorのみ。同時発音4、種類ごとのクールタイム付き。
@@ -6278,9 +6263,16 @@ function drawBackground(dt){
       const rows=2, gap=Math.max(22,w/14);
       for(let r=0;r<rows;r++)for(let x=12+(tier%2)*8;x<w;x+=gap){
         const bob=Math.sin(t*3+x*.13+tier)*1.8;
-        ctx.fillStyle=['#79d65c','#52aee8','#e7cf52','#b46be0','#ef8d45'][(Math.floor(x/gap)+tier+r)%5];
-        ctx.beginPath();ctx.arc(x,y+22+r*25+bob,5.5,0,Math.PI*2);ctx.fill();
-        ctx.fillStyle='rgba(255,255,255,.8)';ctx.beginPath();ctx.arc(x-2,y+20+r*25+bob,1.3,0,Math.PI*2);ctx.arc(x+2,y+20+r*25+bob,1.3,0,Math.PI*2);ctx.fill();
+        const fc=['#79d65c','#52aee8','#e7cf52','#b46be0','#ef8d45'][(Math.floor(x/gap)+tier+r)%5];
+        const fy=y+23+r*25+bob, sc=Math.max(.72,Math.min(1.0,w/720));
+        ctx.save();ctx.translate(x,fy);ctx.scale(sc,sc);
+        ctx.fillStyle=fc;
+        ctx.beginPath();ctx.ellipse(0,4,6.2,7.2,0,0,Math.PI*2);ctx.fill();
+        ctx.beginPath();ctx.arc(-3.8,-2.5,3.2,0,Math.PI*2);ctx.arc(3.8,-2.5,3.2,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle='rgba(255,255,255,.92)';ctx.beginPath();ctx.arc(-3.8,-2.5,1.8,0,Math.PI*2);ctx.arc(3.8,-2.5,1.8,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle='rgba(20,38,30,.9)';ctx.beginPath();ctx.arc(-3.4,-2.5,.75,0,Math.PI*2);ctx.arc(4.2,-2.5,.75,0,Math.PI*2);ctx.fill();
+        if((Math.floor(x/gap)+tier+r)%5===0){ctx.strokeStyle=fc;ctx.lineWidth=2;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-4,5);ctx.lineTo(-8,-2);ctx.moveTo(4,5);ctx.lineTo(8,-3);ctx.stroke();}
+        ctx.restore();
       }
     }
     // 柱・照明・大会旗
@@ -6297,6 +6289,29 @@ function drawBackground(dt){
     ctx.fillStyle='rgba(40,135,160,.95)';ctx.beginPath();ctx.moveTo(0,-2);ctx.lineTo(35,-48);ctx.lineTo(9,-7);ctx.closePath();ctx.fill();ctx.restore();
     // 決勝は紙吹雪
     if((stageTheme||0)>=2){for(let i=0;i<26;i++){const x=(i*83+t*18)%w,y=(i*47+t*34)%(h*.72);ctx.save();ctx.translate(x,y);ctx.rotate(t+i);ctx.fillStyle=['#fff2a3','#e77b91','#8ee7ff'][i%3];ctx.fillRect(-2,-5,4,10);ctx.restore();}}
+  }
+
+  function drawLotusReferee(dt){
+    const w=innerWidth,h=innerHeight,floor=jumpFloorY();
+    refereeFrog.t=(refereeFrog.t||0)+(dt||.016);
+    if(!refereeFrog.x)refereeFrog.x=w*.5;
+    refereeFrog.x += refereeFrog.dir*Math.max(18,w*.028)*(dt||.016);
+    const minRef=w*.36,maxRef=w*.64;
+    if(refereeFrog.x<minRef){refereeFrog.x=minRef;refereeFrog.dir=1;}
+    if(refereeFrog.x>maxRef){refereeFrog.x=maxRef;refereeFrog.dir=-1;}
+    const x=refereeFrog.x,y=floor+12+Math.sin(refereeFrog.t*4)*1.5;
+    const s=Math.max(.72,Math.min(1.05,w/760));
+    ctx.save();ctx.translate(x,y);ctx.scale(refereeFrog.dir*s,s);ctx.globalAlpha=.95;
+    // yellow referee frog
+    ctx.fillStyle='#efd133';ctx.beginPath();ctx.ellipse(0,9,13,16,0,0,Math.PI*2);ctx.fill();
+    ctx.beginPath();ctx.arc(-7,-4,7,0,Math.PI*2);ctx.arc(7,-4,7,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-7,-4,4.1,0,Math.PI*2);ctx.arc(7,-4,4.1,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#17201d';ctx.beginPath();ctx.arc(-6.2,-4,1.7,0,Math.PI*2);ctx.arc(7.8,-4,1.7,0,Math.PI*2);ctx.fill();
+    // striped referee shirt
+    ctx.save();ctx.beginPath();ctx.ellipse(0,11,8.4,10.8,0,0,Math.PI*2);ctx.clip();ctx.fillStyle='#f8f8f4';ctx.fillRect(-9,1,18,22);ctx.fillStyle='#222';for(let sx=-8;sx<9;sx+=5)ctx.fillRect(sx,1,2.5,22);ctx.restore();
+    ctx.fillStyle='#222';ctx.beginPath();ctx.moveTo(-5,3);ctx.lineTo(0,8);ctx.lineTo(5,3);ctx.lineTo(0,5);ctx.closePath();ctx.fill();
+    ctx.strokeStyle='#efd133';ctx.lineWidth=4;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(9,8);ctx.lineTo(16,1);ctx.lineTo(18,-7);ctx.stroke();
+    ctx.restore();
   }
 
   function loop(now){
@@ -7184,7 +7199,7 @@ function drawBackground(dt){
     }
 
     drawBackground(dt);
-    drawAquariumArena();
+    drawLotusReferee(dt);
     ctx.globalAlpha=1;
     ctx.globalCompositeOperation='source-over';
 

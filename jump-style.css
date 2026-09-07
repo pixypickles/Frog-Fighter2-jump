@@ -3696,3 +3696,13 @@ body{background:#071b22;}
   .practice-entry-wrap{grid-column:1/-1;}
   #gameCanvas{width:100vw!important;height:100vh!important;}
 }
+
+
+/* v0.2: JUMP is portrait-first. Do not cover the title with an orientation overlay. */
+#portraitOverlay{display:none !important;}
+.title-logo-image-wrap,.portrait-logo-image-wrap{background:transparent !important;box-shadow:none !important;}
+.title-logo-image,.portrait-logo-image{background:transparent !important;}
+body.portrait-play #gameCanvas{position:relative;z-index:1;}
+body.portrait-play #hud{z-index:40 !important;}
+body.portrait-play #controls{z-index:45 !important;}
+body.portrait-play .pause-button{z-index:46 !important;}
