@@ -3577,8 +3577,9 @@
     const startX=f.x+dir*35;
     const startY=f.y-6;
     const length=Math.max(innerWidth,innerHeight)*1.05;
-    const dx=dir*.966;
-    const dy=-.259;
+    // JUMP版：上方向への制圧力を強め、約35度の斜め上へ。
+    const dx=dir*.819;
+    const dy=-.574;
 
     aquaTornadoes.push({
       owner:f,
@@ -3803,8 +3804,9 @@
     const startX=f.x+dir*28;
     const startY=f.y+42;
     const length=Math.max(innerWidth,innerHeight)*1.05;
-    const dx=dir*.990;
-    const dy=.139;
+    // JUMP版：下方向への角度を大きくし、約32度の斜め下へ。
+    const dx=dir*.848;
+    const dy=.530;
 
     aquaTornadoes.push({
       owner:f,
@@ -4837,6 +4839,55 @@
     return true;
   }
 
+
+  function specialAquaDropShot(f){
+    if(gameOver || !f || f.stun>0 || f.guard || f.specialT>0 || f.attackT>0) return false;
+
+    const target=f.isPlayer?enemy:player;
+    f.specialType='aquaDropShotWindup';
+    f.specialT=.56;
+    f.attack='punch';
+    f.attackVariant='up';
+    f.attackT=.56;
+    comboEl.textContent='アクアショット…';
+
+    setTimeout(()=>{
+      if(gameOver || !f) return;
+      const q={
+        owner:f,
+        x:f.x,
+        y:f.y-36,
+        vx:f.face*38,
+        vy:-520,
+        r:15,
+        age:0,
+        maxAge:8,
+        t:1,
+        life:1,
+        damage:4.1,
+        name:'アクアショット',
+        color:'aqua',
+        reflected:0,
+        hit:false,
+        spin:0,
+        style:'aquaDrop',
+        poisonDuration:0,
+        curve:0,
+        arcFlip:1,
+        wobble:.05,
+        baseVy:-520,
+        maxReflect:5,
+        dropPhase:'rising',
+        dropTargetX:target?target.x:f.x+f.face*120
+      };
+      water2Shots.push(q);
+      comboEl.textContent='アクアショット!';
+      setTimeout(()=>{if(comboEl.textContent==='アクアショット!')comboEl.textContent='';},520);
+    },360);
+
+    return true;
+  }
+
   function specialWater2Shot(f,opts={}){
     if(gameOver || !f || f.stun>0 || f.guard || f.specialT>0 || f.attackT>0) return false;
     const dir=f.face;
@@ -5080,7 +5131,7 @@
       if(kind==='kick' && water2HeldDir(f,'down')){ clearCommand(); return specialAquaStream(f); }
       if(kind==='punch' && water2HeldDir(f,'back')){ clearCommand(); return specialAquaVortex(f); }
       if(kind==='punch' && water2HeldDir(f,'forward')){
-        clearCommand(); return specialWater2Shot(f,{name:'アクアショット',attack:'punch',color:'aqua',style:'aquaSpin',speed:285,damage:3.8,r:14,charge:.36,wobble:.10,maxReflect:5});
+        clearCommand(); return specialAquaDropShot(f);
       }
     }
 
@@ -6875,6 +6926,19 @@ function drawBackground(dt){
         q.spin=(q.spin||0)+dt*(q.style==='aquaSpin'?10:4);
         if(q.curve){ q.vy += q.curve*dt; }
         if(q.style==='iceChargeOrb'){ q.trail=q.trail||[]; q.trail.push({x:q.x,y:q.y,t:.75}); if(q.trail.length>22)q.trail.shift(); q.trail.forEach(v=>v.t-=dt); q.trail=q.trail.filter(v=>v.t>0); }
+
+        // JUMP版アクアショット：上へ消え、相手付近へ落下して戻る。
+        if(q.style==='aquaDrop' && q.dropPhase==='rising' && q.y<-85){
+          const target=q.owner&&q.owner.isPlayer?enemy:player;
+          const tx=target&&target.hp>0?target.x:(q.dropTargetX||q.x);
+          q.x=Math.max(28,Math.min(innerWidth-28,tx));
+          q.y=-118; // 一度完全に画面外へ消える
+          q.vx=0;
+          q.vy=325;
+          q.baseVy=325;
+          q.dropPhase='falling';
+        }
+
         q.x+=q.vx*dt;
         q.y+=q.vy*dt + Math.sin((q.spin||0)*2)*(q.wobble||0)*18*dt;
         const target=q.owner&&q.owner.isPlayer?enemy:player;
@@ -6884,6 +6948,7 @@ function drawBackground(dt){
             // 反射：所有者を入れ替え、相手方向へ返す。ラリーごとに少し加速・大型化。
             spawnImpact(q.x,q.y,'guard'); playSfx('guard');
             q.owner=target; q.vx=-q.vx*1.08; q.vy=-q.vy*.94;
+            if(q.style==='aquaDrop') q.dropPhase='reflected';
             // 泡は大きくなり過ぎない。ほかの弾も成長を控えめにしてラリーを見やすくする。
             const grow=(q.style==='bubble')?1.015:1.035;
             const cap=(q.style==='bubble')?23:25;
@@ -6907,7 +6972,7 @@ function drawBackground(dt){
           }
         }
       });
-      water2Shots=water2Shots.filter(q=>!q.hit&&(q.age||0)<(q.maxAge||18)&&q.x>-100&&q.x<innerWidth+100&&q.y>-100&&q.y<innerHeight+100);
+      water2Shots=water2Shots.filter(q=>!q.hit&&(q.age||0)<(q.maxAge||18)&&q.x>-100&&q.x<innerWidth+100&&q.y>(q.style==='aquaDrop'?-150:-100)&&q.y<innerHeight+100);
 
       toxicWaters.forEach(v=>{
         v.t-=dt;

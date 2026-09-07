@@ -103,3 +103,11 @@ v2.5 - vertical-battle character tuning: Mikael
 - Burning Shot speed reduced from 315 to 190.
 - Burning Kick now auto-aims its launch angle at the opponent (capped at ±55 degrees).
 - Burning Cyclone horizontal launch/maintenance speed greatly reduced.
+
+
+v2.6 - Gabriel vertical tuning
+- Aqua Tornado angle increased to about 35 degrees upward.
+- Aqua Stream angle increased to about 32 degrees downward.
+- Aqua Vortex unchanged.
+- Aqua Shot redesigned: launches upward, disappears above the screen once, then drops vertically near the opponent.
+- Reflected Aqua Shot stops its scripted drop behavior and becomes a normal reflected projectile.
