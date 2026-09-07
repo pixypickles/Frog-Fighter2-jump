@@ -155,3 +155,9 @@ v2.13 - Raphael vertical blade correction
 - Back + Kick Air Blade: spawns directly below the opponent and travels straight up.
 - Both attacks use a broad guillotine-blade wind shape instead of a crescent projectile.
 - Airborne Raphael gets a modest speed/size/damage bonus.
+
+v2.14 - Raphael hover attacks
+- Air Cutter can now be fired during Air Hover.
+- Air Guillotine and upward Air Blade can now be fired during Air Hover.
+- Using these attacks does not cancel Air Hover or reset its remaining duration.
+- Normal attack recovery still applies, so attacks cannot be infinitely stacked on the same frame.

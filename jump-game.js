@@ -4203,10 +4203,14 @@
   }
 
   function specialPressureBlade(f,angleDeg=0,source='punch'){
-    if(gameOver || f.stun>0 || f.guard || f.specialT>0) return false;
+    const hovering=f && f.type==='yellow' && f.specialType==='raphaelBubbleMove' && (f.raphaelHoverT||0)>0;
+    if(gameOver || f.stun>0 || f.guard || (f.specialT>0 && !hovering)) return false;
 
-    f.specialType='pressureBlade';
-    f.specialT=.42;
+    // エアホバー中はホバー状態と残り時間を維持したまま攻撃できる。
+    if(!hovering){
+      f.specialType='pressureBlade';
+      f.specialT=.42;
+    }
     f.attack=source==='kick' ? 'kick' : 'punch';
     f.attackT=.42;
 
@@ -4244,14 +4248,18 @@
   }
 
   function specialAirBlade(f,variant='down'){
-    if(gameOver || f.stun>0 || f.guard || f.specialT>0 || f.attackT>0) return false;
+    const hovering=f && f.type==='yellow' && f.specialType==='raphaelBubbleMove' && (f.raphaelHoverT||0)>0;
+    if(gameOver || f.stun>0 || f.guard || (f.specialT>0 && !hovering) || f.attackT>0) return false;
 
     const target=f.isPlayer?enemy:player;
     const airborne=f.y < jumpFloorY()-18;
     const charge=.34;
 
-    f.specialType='airBladeWindup';
-    f.specialT=charge+.26;
+    // ホバー中に撃っても specialType / specialT はエアホバーのまま。
+    if(!hovering){
+      f.specialType='airBladeWindup';
+      f.specialT=charge+.26;
+    }
     f.attack=variant==='down'?'punch':'kick';
     f.attackVariant=variant==='down'?'up':'down';
     f.attackT=charge+.26;
