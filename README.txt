@@ -1,3 +1,11 @@
+FROG FIGHTER 2 JUMP Prototype v0.6
+
+v0.6 fixes:
+- Above-water title styling; removed bubbles.
+- Portrait roster locks fighter face to center with name directly below.
+- Rounded four-tier stadium with clipped spectators.
+- Added central aisle, tier concourses, entrance runway, and deluxe lotus rim.
+
 FROG FIGHTER 2 JUMP Prototype v0.5
 
 - タイトルロゴの黒背景を透過PNG化

@@ -6257,81 +6257,120 @@
 function drawBackground(dt){
     const w=innerWidth,h=innerHeight,t=performance.now()/1000;
     const themes=[
-      ['#76cfff','#d9f6ff','#3b7d55'],['#ffcf83','#fff0c4','#526f45'],
-      ['#9fb5ca','#e1e6df','#495b50'],['#30223f','#9a6170','#292632']
+      ['#79d7f2','#e9fff3','#88c975'],['#ffd391','#fff2c9','#92ad65'],
+      ['#b7c9da','#edf0e6','#708579'],['#453451','#b97980','#454055']
     ];
     const th=themes[Math.max(0,Math.min(3,stageTheme||0))];
     const sky=ctx.createLinearGradient(0,0,0,h);sky.addColorStop(0,th[0]);sky.addColorStop(.58,th[1]);sky.addColorStop(1,th[2]);
     ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
 
-    // v0.5: 蓮の葉競技場の「器」として客席を一体化。
-    // 四角い板を4枚置くのではなく、丸いスタジアムの内壁に沿って4段が連なる。
     const floor=jumpFloorY();
-    const top=Math.max(150,h*.22);
-    const bottom=Math.min(floor-122,h*.70);
+    const top=Math.max(168,h*.225);
+    const bottom=Math.min(floor-105,h*.705);
+    const side=Math.max(18,w*.035);
+    const outerR=Math.min(62,w*.09);
     const tierGap=(bottom-top)/4;
-    const side=Math.max(14,w*.025);
-    const outerR=Math.min(54,w*.08);
 
-    // stadium shell / side frame connects the stands visually to the lotus arena.
     ctx.save();
-    ctx.fillStyle='rgba(21,43,49,.78)';
+    // Main stadium shell: rounded, slightly flared toward the arena.
+    ctx.fillStyle='rgba(35,58,56,.94)';
+    ctx.strokeStyle='rgba(238,226,166,.82)';ctx.lineWidth=5;
     ctx.beginPath();
     ctx.moveTo(side,top+outerR);
     ctx.quadraticCurveTo(side,top,side+outerR,top);
     ctx.lineTo(w-side-outerR,top);
     ctx.quadraticCurveTo(w-side,top,w-side,top+outerR);
-    ctx.lineTo(w-side,bottom-18);
-    ctx.quadraticCurveTo(w-side,bottom+18,w*.86,bottom+42);
-    ctx.quadraticCurveTo(w*.72,bottom+72,w*.62,floor+8);
-    ctx.lineTo(w*.38,floor+8);
-    ctx.quadraticCurveTo(w*.28,bottom+72,w*.14,bottom+42);
-    ctx.quadraticCurveTo(side,bottom+18,side,bottom-18);
-    ctx.closePath();ctx.fill();
-    ctx.strokeStyle='rgba(219,239,201,.55)';ctx.lineWidth=3;ctx.stroke();
+    ctx.lineTo(w-side,bottom-10);
+    ctx.quadraticCurveTo(w-side,bottom+28,w*.80,bottom+60);
+    ctx.lineTo(w*.61,floor+10);
+    ctx.lineTo(w*.39,floor+10);
+    ctx.lineTo(w*.20,bottom+60);
+    ctx.quadraticCurveTo(side,bottom+28,side,bottom-10);
+    ctx.closePath();ctx.fill();ctx.stroke();
 
-    // four curved seating bands.
+    // Decorative inner rim.
+    ctx.strokeStyle='rgba(125,211,174,.9)';ctx.lineWidth=2.5;
+    ctx.beginPath();ctx.roundRect(side+10,top+12,w-side*2-20,bottom-top-2,Math.max(24,outerR-14));ctx.stroke();
+
+    // Four curved seating tiers. Spectators are clipped to each tier.
     for(let tier=0;tier<4;tier++){
-      const y0=top+tier*tierGap+6;
-      const y1=top+(tier+1)*tierGap-6;
-      const inset=side+8+tier*2;
-      ctx.fillStyle=tier%2?'rgba(23,55,60,.92)':'rgba(30,67,69,.94)';
+      const y0=top+20+tier*tierGap;
+      const y1=top+(tier+1)*tierGap-8;
+      const inset=side+18+tier*2;
+      ctx.save();
       ctx.beginPath();
-      ctx.moveTo(inset,y0+10);
-      ctx.quadraticCurveTo(w*.5,y0-9,w-inset,y0+10);
-      ctx.lineTo(w-inset,y1-8);
-      ctx.quadraticCurveTo(w*.5,y1+9,inset,y1-8);
-      ctx.closePath();ctx.fill();
-      ctx.strokeStyle='rgba(180,232,225,.65)';ctx.lineWidth=2.4;ctx.stroke();
+      ctx.moveTo(inset,y0+8);
+      ctx.quadraticCurveTo(w*.5,y0-7,w-inset,y0+8);
+      ctx.lineTo(w-inset,y1-7);
+      ctx.quadraticCurveTo(w*.5,y1+8,inset,y1-7);
+      ctx.closePath();
+      ctx.fillStyle=tier%2?'rgba(16,74,69,.95)':'rgba(19,84,76,.96)';ctx.fill();
+      ctx.strokeStyle='rgba(151,220,194,.65)';ctx.lineWidth=2;ctx.stroke();
+      ctx.clip();
 
-      const rows=2, gap=Math.max(24,w/13.5);
-      for(let r=0;r<rows;r++)for(let x=inset+10+(tier%2)*7;x<w-inset-4;x+=gap){
-        const arch=Math.pow((x-w*.5)/(w*.5),2);
-        const bob=Math.sin(t*3+x*.13+tier)*1.5;
-        const fc=['#79d65c','#52aee8','#e7cf52','#b46be0','#ef8d45'][(Math.floor(x/gap)+tier+r)%5];
-        const fy=y0+23+r*Math.max(22,tierGap*.28)+arch*6+bob, sc=Math.max(.72,Math.min(1.0,w/720));
-        ctx.save();ctx.translate(x,fy);ctx.scale(sc,sc);
-        ctx.fillStyle=fc;
-        ctx.beginPath();ctx.ellipse(0,4,6.2,7.2,0,0,Math.PI*2);ctx.fill();
-        ctx.beginPath();ctx.arc(-3.8,-2.5,3.2,0,Math.PI*2);ctx.arc(3.8,-2.5,3.2,0,Math.PI*2);ctx.fill();
-        ctx.fillStyle='rgba(255,255,255,.94)';ctx.beginPath();ctx.arc(-3.8,-2.5,1.8,0,Math.PI*2);ctx.arc(3.8,-2.5,1.8,0,Math.PI*2);ctx.fill();
-        ctx.fillStyle='rgba(20,38,30,.92)';ctx.beginPath();ctx.arc(-3.4,-2.5,.75,0,Math.PI*2);ctx.arc(4.2,-2.5,.75,0,Math.PI*2);ctx.fill();
-        if((Math.floor(x/gap)+tier+r)%5===0){ctx.strokeStyle=fc;ctx.lineWidth=2;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-4,5);ctx.lineTo(-8,-2);ctx.moveTo(4,5);ctx.lineTo(8,-3);ctx.stroke();}
-        ctx.restore();
+      const rows=2;
+      const gap=Math.max(27,w/12.4);
+      const aisleHalf=Math.max(23,w*.047);
+      for(let r=0;r<rows;r++){
+        for(let x=inset+18+(r?gap*.45:0);x<w-inset-12;x+=gap){
+          if(Math.abs(x-w*.5)<aisleHalf) continue; // central aisle
+          const arch=Math.pow((x-w*.5)/(w*.5),2);
+          const bob=Math.sin(t*3+x*.12+tier+r)*1.3;
+          const fc=['#6dd75d','#4db9e8','#efd24e','#b86ee3','#f28b42'][(Math.floor(x/gap)+tier+r)%5];
+          const fy=y0+21+r*Math.max(20,tierGap*.27)+arch*5+bob;
+          const sc=Math.max(.70,Math.min(.95,w/760));
+          ctx.save();ctx.translate(x,fy);ctx.scale(sc,sc);
+          ctx.fillStyle=fc;ctx.beginPath();ctx.ellipse(0,4,6.4,7.5,0,0,Math.PI*2);ctx.fill();
+          ctx.beginPath();ctx.arc(-3.8,-2.6,3.3,0,Math.PI*2);ctx.arc(3.8,-2.6,3.3,0,Math.PI*2);ctx.fill();
+          ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-3.8,-2.6,1.85,0,Math.PI*2);ctx.arc(3.8,-2.6,1.85,0,Math.PI*2);ctx.fill();
+          ctx.fillStyle='#18302a';ctx.beginPath();ctx.arc(-3.4,-2.6,.72,0,Math.PI*2);ctx.arc(4.2,-2.6,.72,0,Math.PI*2);ctx.fill();
+          ctx.restore();
+        }
+      }
+      ctx.restore();
+
+      // Horizontal concourse between tiers.
+      if(tier<3){
+        const ay=y1+4;
+        ctx.fillStyle='rgba(222,211,156,.88)';
+        ctx.beginPath();ctx.moveTo(side+16,ay-3);ctx.quadraticCurveTo(w*.5,ay+5,w-side-16,ay-3);ctx.lineTo(w-side-16,ay+5);ctx.quadraticCurveTo(w*.5,ay+13,side+16,ay+5);ctx.closePath();ctx.fill();
       }
     }
-    // lights mounted on the stadium rim.
-    for(let i=0;i<4;i++){const x=(i+.5)*w/4;ctx.fillStyle='rgba(255,250,196,.8)';ctx.beginPath();ctx.arc(x,top-18,7,0,Math.PI*2);ctx.fill();}
-    ctx.font='900 13px system-ui';ctx.textAlign='center';ctx.fillStyle='rgba(255,255,225,.9)';ctx.fillText('FROG FIGHTER Ⅱ  •  LOTUS STADIUM',w/2,bottom+30);
+
+    // Central aisle / player entrance, like a boxing arena passage.
+    const aisleTop=top+18, aisleBottom=bottom+51;
+    ctx.fillStyle='rgba(225,212,157,.93)';
+    ctx.beginPath();ctx.moveTo(w*.455,aisleTop);ctx.lineTo(w*.545,aisleTop);ctx.lineTo(w*.585,aisleBottom);ctx.lineTo(w*.415,aisleBottom);ctx.closePath();ctx.fill();
+    ctx.fillStyle='rgba(63,109,82,.95)';
+    ctx.beginPath();ctx.moveTo(w*.472,aisleTop);ctx.lineTo(w*.528,aisleTop);ctx.lineTo(w*.548,aisleBottom);ctx.lineTo(w*.452,aisleBottom);ctx.closePath();ctx.fill();
+    ctx.strokeStyle='rgba(255,242,187,.9)';ctx.lineWidth=2;ctx.stroke();
+
+    // Entrance runway from stands to the lotus platform.
+    ctx.fillStyle='rgba(218,202,139,.95)';
+    ctx.beginPath();ctx.moveTo(w*.415,bottom+48);ctx.lineTo(w*.585,bottom+48);ctx.lineTo(w*.655,floor+38);ctx.lineTo(w*.345,floor+38);ctx.closePath();ctx.fill();
+    ctx.fillStyle='rgba(70,131,85,.96)';
+    ctx.beginPath();ctx.moveTo(w*.445,bottom+48);ctx.lineTo(w*.555,bottom+48);ctx.lineTo(w*.60,floor+38);ctx.lineTo(w*.40,floor+38);ctx.closePath();ctx.fill();
+
+    // Rim lamps.
+    for(let i=0;i<4;i++){const x=(i+.5)*w/4;ctx.fillStyle='rgba(255,246,178,.95)';ctx.beginPath();ctx.arc(x,top-18,7,0,Math.PI*2);ctx.fill();}
+    ctx.font='900 13px system-ui';ctx.textAlign='center';ctx.fillStyle='rgba(255,248,205,.95)';ctx.fillText('FROG FIGHTER Ⅱ  •  LOTUS STADIUM',w/2,bottom+29);
     ctx.restore();
 
-    // pond and giant competition lotus leaf.
-    const waterY=floor+48;
-    const wg=ctx.createLinearGradient(0,waterY-35,0,h);wg.addColorStop(0,'rgba(86,194,211,.93)');wg.addColorStop(1,'rgba(20,87,128,.99)');ctx.fillStyle=wg;ctx.fillRect(0,waterY-32,w,h-waterY+32);
-    ctx.save();ctx.translate(w*.5,floor+53);ctx.fillStyle='#4c9f49';ctx.strokeStyle='#b7ed78';ctx.lineWidth=5;ctx.beginPath();ctx.ellipse(0,0,w*.62,61,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+    // Ground / pond surface is only below the arena, not an underwater backdrop.
+    const groundY=floor+46;
+    const gg=ctx.createLinearGradient(0,groundY-25,0,h);gg.addColorStop(0,'rgba(92,177,128,.88)');gg.addColorStop(1,'rgba(29,112,103,.98)');
+    ctx.fillStyle=gg;ctx.fillRect(0,groundY-24,w,h-groundY+24);
+
+    // Luxurious competition lotus platform: double gold-green rim + inner leaf.
+    ctx.save();ctx.translate(w*.5,floor+53);
+    ctx.fillStyle='rgba(226,204,113,.96)';ctx.beginPath();ctx.ellipse(0,2,w*.635,68,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#3e9146';ctx.strokeStyle='#dff18a';ctx.lineWidth=5;ctx.beginPath();ctx.ellipse(0,0,w*.615,61,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+    ctx.strokeStyle='rgba(255,233,139,.9)';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(0,0,w*.585,54,0,0,Math.PI*2);ctx.stroke();
     ctx.fillStyle='rgba(126,199,83,.48)';ctx.beginPath();ctx.ellipse(-8,-7,w*.48,43,0,0,Math.PI*2);ctx.fill();
     ctx.strokeStyle='rgba(38,111,48,.7)';ctx.lineWidth=2;for(let a=-2.8;a<=2.8;a+=.42){ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(Math.cos(a)*w*.49,Math.sin(a)*45);ctx.stroke();}
-    ctx.fillStyle='rgba(40,135,160,.95)';ctx.beginPath();ctx.moveTo(0,-2);ctx.lineTo(35,-48);ctx.lineTo(9,-7);ctx.closePath();ctx.fill();ctx.restore();
+    ctx.fillStyle='rgba(40,135,160,.9)';ctx.beginPath();ctx.moveTo(0,-2);ctx.lineTo(35,-48);ctx.lineTo(9,-7);ctx.closePath();ctx.fill();
+    ctx.restore();
+
     if((stageTheme||0)>=2){for(let i=0;i<26;i++){const x=(i*83+t*18)%w,y=(i*47+t*34)%(h*.72);ctx.save();ctx.translate(x,y);ctx.rotate(t+i);ctx.fillStyle=['#fff2a3','#e77b91','#8ee7ff'][i%3];ctx.fillRect(-2,-5,4,10);ctx.restore();}}
   }
 
