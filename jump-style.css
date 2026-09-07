@@ -4654,3 +4654,97 @@ body.portrait-play .pause-button{z-index:46 !important;}
     z-index:4 !important;
   }
 }
+
+
+/* ===== v1.5: clean title sky + full-width move panel ===== */
+
+/* TITLE: remove the banded/green pseudo scenery from earlier versions. */
+#titleScreen{
+  background:linear-gradient(180deg,#fafdff 0%,#eefaff 48%,#dff5fb 100%) !important;
+}
+#titleScreen::before{
+  content:"" !important;
+  position:absolute !important;
+  right:8vw !important;
+  top:7vh !important;
+  width:62px !important;
+  height:62px !important;
+  border-radius:50% !important;
+  background:#fff0a6 !important;
+  box-shadow:0 0 0 13px rgba(255,255,255,.38),0 0 30px rgba(255,238,150,.2) !important;
+  z-index:0 !important;
+}
+#titleScreen::after{
+  content:"" !important;
+  position:absolute !important;
+  left:-5% !important;
+  right:-5% !important;
+  bottom:-5vh !important;
+  height:18vh !important;
+  background:
+    radial-gradient(ellipse 19% 45% at 8% 83%, #74bd69 0 70%, transparent 72%),
+    radial-gradient(ellipse 22% 48% at 33% 90%, #8acb76 0 70%, transparent 72%),
+    radial-gradient(ellipse 21% 46% at 67% 88%, #70b965 0 70%, transparent 72%),
+    radial-gradient(ellipse 18% 43% at 94% 86%, #86c773 0 70%, transparent 72%) !important;
+  opacity:.82 !important;
+  z-index:0 !important;
+  pointer-events:none !important;
+}
+
+/* SELECT: selected move details occupy the whole grid row.
+   CSS grid lets the selected card span all 3 columns, so it cannot be
+   clipped by the next row. */
+@media (orientation:portrait), (max-width:760px){
+  #selectScreen.screen.active .fighter-grid{
+    grid-auto-flow:row !important;
+    grid-auto-rows:auto !important;
+    align-items:start !important;
+  }
+
+  #selectScreen.screen.active .fighter-card{
+    min-height:166px !important;
+    height:auto !important;
+  }
+
+  #selectScreen.screen.active .fighter-card.selected{
+    grid-column:1 / -1 !important;
+    display:grid !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    min-height:0 !important;
+    padding:8px 8px 10px !important;
+    overflow:visible !important;
+  }
+
+  /* Keep selected portrait visually the size of one card, centered in row. */
+  #selectScreen.screen.active .fighter-card.selected > .fighter-emoji{
+    grid-column:2 !important;
+    grid-row:1 !important;
+    justify-self:center !important;
+    margin-top:31px !important;
+  }
+  #selectScreen.screen.active .fighter-card.selected > strong{
+    grid-column:2 !important;
+    grid-row:2 !important;
+    justify-self:center !important;
+    margin-top:8px !important;
+  }
+
+  /* Full-width readable move sheet directly below the selected portrait. */
+  #selectScreen.screen.active .fighter-card.selected > .special-hint,
+  #selectScreen.screen.active .fighter-card.selected > .move-names{
+    grid-column:1 / -1 !important;
+    grid-row:3 !important;
+    position:relative !important;
+    width:100% !important;
+    min-height:96px !important;
+    height:auto !important;
+    max-height:none !important;
+    margin:12px 0 0 !important;
+    padding:12px 14px !important;
+    overflow:visible !important;
+    font-size:13px !important;
+    line-height:1.55 !important;
+    border-radius:14px !important;
+    box-sizing:border-box !important;
+  }
+}

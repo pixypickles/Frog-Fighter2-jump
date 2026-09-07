@@ -49,3 +49,6 @@ v1.3: portrait fighter cards no longer scale while selected, preventing eye/head
 
 
 v1.4: structural portrait roster fix. Fighter faces/names/move panels now use normal vertical flow rather than stacked absolute positioning. Root dark-teal fallback removed. Title is pale sky with lotus leaves at the bottom.
+
+
+v1.5: title changed to pale sky with lotus leaves only at bottom. Selected fighter now spans the full roster grid row and shows a full-width move sheet below the portrait, preventing clipping by the next fighter row.
