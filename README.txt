@@ -173,3 +173,8 @@ v2.16
 
 v2.17
 - Remiel Frost Shot: projectile radius 15 -> 22 (about 1.47x), speed 270 -> 210 (about 78%).
+
+v2.18
+- Jihal Lightning Dash damage -20%: 9.5 -> 7.6.
+- Thunder Charge damage -10% across charge levels.
+- Bolt Shot redesigned as a long horizontal lightning spear with a wider horizontal hitbox.

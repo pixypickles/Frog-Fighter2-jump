@@ -4676,7 +4676,7 @@
   function specialJihalBolt(f){
     if(gameOver||!f||f.type!=='jihal'||f.stun>0||f.guard||f.specialT>0||f.attackT>0)return false;
     f.specialType='jihalBolt';f.specialT=.40;f.attack='punch';f.attackT=.40;
-    jihalBolts.push({owner:f,x:f.x+f.face*48,y:f.y-10,vx:f.face*350,vy:0,r:13,t:2.4,damage:5,reflects:0});
+    jihalBolts.push({owner:f,x:f.x+f.face*58,y:f.y-10,vx:f.face*350,vy:0,r:13,halfW:36,halfH:11,t:2.4,damage:5,reflects:0});
     comboEl.textContent='ボルトショット!';return true;
   }
   function specialLightningDash(f){
@@ -6849,7 +6849,7 @@ function drawBackground(dt){
           const elapsed=.34-f.specialT;
           if(elapsed<=.21 && !f.jihalDashHit && Math.abs(o.x-f.x)<78 && Math.abs(o.y-f.y)<76){
             f.jihalDashHit=true;
-            damageHit(f,o,9.5*f.damageMul,365*f.face,-45);
+            damageHit(f,o,7.6*f.damageMul,365*f.face,-45);
             spawnImpact(o.x,o.y,'hit');
           }
         }
@@ -6861,7 +6861,7 @@ function drawBackground(dt){
             const c=Math.max(0,Math.min(1,f.jihalChargePower||0));
             const dir=f.jihalRushDir||f.face||1;
             const keepVx=dir*(980+520*c);
-            damageHit(f,o,(10.5+6*c)*f.damageMul,(410+180*c)*dir,-70);
+            damageHit(f,o,(9.45+5.4*c)*f.damageMul,(410+180*c)*dir,-70);
             // hit処理後も速度を完全復元し、相手の反対側へ抜ける。
             f.vx=keepVx;
             f.x=o.x+dir*(o.radius+f.radius+16);
@@ -6874,7 +6874,7 @@ function drawBackground(dt){
       [player,enemy].forEach(f=>{if(f&&f.type==='jihal'&&f.jihalCharging){f.jihalCharge=Math.min(1,(f.jihalCharge||0)+dt/.95);f.specialT=999;f.vx*=.75;}});
       jihalBolts.forEach(q=>{
         q.t-=dt;q.x+=q.vx*dt;q.y+=q.vy*dt;const t=q.owner.isPlayer?enemy:player;
-        if(t&&q.t>0&&Math.abs(q.x-t.x)<50&&Math.abs(q.y-t.y)<62){
+        if(t&&q.t>0&&Math.abs(q.x-t.x)<((q.halfW||20)+30)&&Math.abs(q.y-t.y)<((q.halfH||13)+42)){
           if(t.guard){q.owner=t;q.vx=-q.vx*1.06;q.reflects++;q.x=t.x+Math.sign(q.vx)*52;spawnImpact(t.x,t.y,'guard');if(q.reflects>=5)q.t=0;}
           else{damageHit(q.owner,t,q.damage,Math.sign(q.vx)*160,-30);spawnImpact(q.x,q.y,'hit');q.t=0;}
         }
@@ -7853,13 +7853,13 @@ function drawBackground(dt){
     jihalBolts.forEach(q=>{
       ctx.save();ctx.translate(q.x,q.y);ctx.globalCompositeOperation='lighter';
       const dir=Math.sign(q.vx)||1;ctx.scale(dir,1);
-      ctx.shadowColor='#ffe44d';ctx.shadowBlur=18;
-      // よくある「⚡」シルエットを横向きにして飛ばす。
+      ctx.shadowColor='#ffe44d';ctx.shadowBlur=20;
+      // JUMP版：横長の雷槍。縦幅は抑え、正面への制圧力を強調。
       ctx.fillStyle='#fff36a';
       ctx.beginPath();
-      ctx.moveTo(-20,-11);ctx.lineTo(1,-11);ctx.lineTo(-5,-2);
-      ctx.lineTo(20,-2);ctx.lineTo(-4,15);ctx.lineTo(2,5);
-      ctx.lineTo(-20,5);ctx.closePath();ctx.fill();
+      ctx.moveTo(-38,-10);ctx.lineTo(3,-10);ctx.lineTo(-8,-2);
+      ctx.lineTo(39,-2);ctx.lineTo(-9,13);ctx.lineTo(4,5);
+      ctx.lineTo(-38,5);ctx.closePath();ctx.fill();
       ctx.strokeStyle='rgba(255,255,210,.9)';ctx.lineWidth=2;ctx.stroke();
       ctx.restore();
     });
