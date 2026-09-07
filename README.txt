@@ -220,3 +220,9 @@ v2.25
 v2.26
 - Lilith Guillotine Kick now keeps its attack hitbox active for the entire downward dive.
 - Added swept vertical collision between the previous and current frame positions so the fast dive cannot skip through an opponent.
+
+v2.27
+- Fixed Guillotine Kick collision being accidentally placed inside the kick-button press handler.
+- Guillotine Kick collision now runs every frame throughout the downward dive.
+- Collision follows the visible horizontal kicking leg and sweeps from the previous to current frame position.
+- Guillotine Kick remains active for a full high-altitude fall and ends on landing.

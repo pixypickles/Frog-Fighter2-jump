@@ -1336,8 +1336,34 @@
         }
       }
 
+      const movePrevX=this.x, movePrevY=this.y;
       this.x += this.vx * dt;
       this.y += this.vy * dt;
+
+      // リリス：ギロチンキックは急降下の全行程で蹴り足に判定。
+      // 前フレーム→現在フレームを縦長の帯として判定するので、高速落下でもすり抜けない。
+      if(this.specialType==='lilithGuillotineKick' && !this.lilithGuillotineHit){
+        const other=this.isPlayer?enemy:player;
+        if(other){
+          const footX0=movePrevX + this.face*38;
+          const footX1=this.x + this.face*38;
+          const minX=Math.min(footX0,footX1)-42;
+          const maxX=Math.max(footX0,footX1)+42;
+          const minHitY=Math.min(movePrevY,this.y)+8;
+          const maxHitY=Math.max(movePrevY,this.y)+72;
+          const r=other.radius||35;
+
+          if(other.x+r>=minX && other.x-r<=maxX &&
+             other.y+r>=minHitY && other.y-r<=maxHitY){
+            this.lilithGuillotineHit=true;
+            damageHit(this,other,7.4*this.damageMul,95*this.face,285);
+            other.vy=Math.max(other.vy,330);
+            spawnImpact(other.x,other.y,'hit');
+            this.vy=-165;
+          }
+        }
+      }
+
       const minY=78, maxY=innerHeight-65;
 
       // 舌投げで壁・床に当たった瞬間に追加ダメージ
@@ -1393,6 +1419,13 @@
       this.y=Math.max(minY,Math.min(lotusFloor,this.y));
       if(this.y>=lotusFloor && !this.throwState){
         this.y=lotusFloor;
+        if(this.specialType==='lilithGuillotineKick'){
+          this.specialType=null;
+          this.specialT=0;
+          this.attack=null;
+          this.attackT=0;
+          this.lilithGuillotinePrevY=null;
+        }
         // 着地した瞬間に次のジャンプ。JUMPシリーズの基本リズム。
         if(this.vy>=0) this.vy=-JUMP_SPEED;
       }
@@ -3901,8 +3934,8 @@
 
   function specialLilithGuillotineKick(f){
     if(gameOver || !f || f.type!=='purple' || f.stun>0 || f.guard || f.throwState || f.specialT>0 || f.attackT>0) return false;
-    f.specialType='lilithGuillotineKick';f.specialT=.72;
-    f.attack='kick';f.attackVariant='mid';f.attackT=.72;
+    f.specialType='lilithGuillotineKick';f.specialT=2.4;
+    f.attack='kick';f.attackVariant='mid';f.attackT=2.4;
     f.lilithGuillotineHit=false;
     f.lilithGuillotinePrevY=f.y;
     // 横キックの足を出したまま真下へ急降下。
@@ -5399,23 +5432,6 @@
     if(f.type==='purple' && kind==='kick'){
       const downHeld=input.y>.35;
       if(downHeld && specialLilithGuillotineKick(f)){ playSfx('special'); return; }
-      if(f.specialType==='lilithGuillotineKick' && !f.lilithGuillotineHit){
-      const other=f.isPlayer?enemy:player;
-      // 急降下開始から着地まで、横に伸ばした蹴り足に常時当たり判定。
-      // 高速で1フレームの間に相手を通り抜けても拾えるよう、前フレーム位置から現在位置までを判定する。
-      const prevY=(f.lilithGuillotinePrevY==null?f.y:f.lilithGuillotinePrevY);
-      const top=Math.min(prevY,f.y)-42;
-      const bottom=Math.max(prevY,f.y)+78;
-      if(other && Math.abs(other.x-(f.x+f.face*28))<78 && other.y>top && other.y<bottom){
-        f.lilithGuillotineHit=true;
-        damageHit(f,other,7.4*f.damageMul,95*f.face,285);
-        other.vy=Math.max(other.vy,330);
-        spawnImpact(other.x,other.y,'hit');
-        f.vy=-165;
-      }
-      f.lilithGuillotinePrevY=f.y;
-    }
-
     if(f.specialType==='lilithBackSpin'){
         if(specialLilithBackSpin(f,true)){ playSfx('special'); return; }
       }
