@@ -59,3 +59,10 @@ v1.6
 - Selected fighter now expands naturally and the complete move list remains visible.
 - Unselected fighter cards remain compact in a 3-column grid.
 - Title background is forced to a very pale white-blue sky; lotus leaves stay only along the bottom.
+
+
+v1.7
+- Title now uses an actual opaque pale-sky layer inside the title screen; shared/select-screen teal cannot show through.
+- Lotus leaves are real bottom scenery elements, not full-screen pseudo gradients.
+- Fighter cards stay in a fixed 3-column compact grid.
+- Move list is a separate full-width panel inserted directly below the selected fighter's row, so names remain visible and long move lists are never clipped.
