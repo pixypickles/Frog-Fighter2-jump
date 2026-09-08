@@ -291,3 +291,8 @@ v2.47
 - Restored the JUMP 2.9 in-battle Azazel dragonfly and Belial spider rendering instead of legacy fish/crayfish bodies.
 - Story progression now uses a transition lock. The result button is hidden during interludes, repeated taps cannot advance multiple fights, and each narrative callback starts exactly one battle.
 - startStoryMode now sets gameMode='story' before the opening narrative.
+
+v2.48
+- Fixed Azazel's character-select portrait visibility by explicitly sizing the restored JUMP 2.9 SVG.
+- Belial is normally always connected to the top of the screen by a spider thread.
+- The thread breaks during throws and strong downward slam hits, then reconnects quickly after recovery.

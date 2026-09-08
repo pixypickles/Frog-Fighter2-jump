@@ -1230,6 +1230,32 @@
         }
       }
 
+      // ベリアルさん：通常時は常に天井の糸に接続。
+      // 投げ／強い下叩きつけでいったん切れ、短い間を置いてすぐ再接続する。
+      if(this.type==='crayfish'){
+        if(this.belialThreadGrow==null)this.belialThreadGrow=1;
+        if(this.belialThreadReconnectT==null)this.belialThreadReconnectT=0;
+
+        const thrownNow=!!this.throwState;
+        if(thrownNow && !this._belialWasThrown){
+          this.belialThreadGrow=0;
+          this.belialThreadReconnectT=.18;
+        }
+        if(!thrownNow && this._belialWasThrown){
+          this.belialThreadReconnectT=Math.max(this.belialThreadReconnectT,.10);
+        }
+        this._belialWasThrown=thrownNow;
+
+        if(!thrownNow){
+          if(this.belialThreadReconnectT>0){
+            this.belialThreadReconnectT=Math.max(0,this.belialThreadReconnectT-dt);
+          }else{
+            // 再接続は素早く。0→1まで約0.2秒。
+            this.belialThreadGrow=Math.min(1,this.belialThreadGrow+dt*5.2);
+          }
+        }
+      }
+
       if(this.type==='crayfish' && this.crayfishCounterT>0){
         this.crayfishCounterT-=dt;
         if(this.crayfishCounterT<=0){
@@ -1603,7 +1629,9 @@
           ctx.lineWidth=2.3;
           ctx.beginPath();
           ctx.moveTo(0,-17);
-          ctx.quadraticCurveTo(10,-this.y*.55*grow,0,-this.y*grow);
+          // 体から画面上端まで一本の糸。切断中は grow=0、再接続時に上へ伸びる。
+          const threadTop=-Math.max(28,this.y-4)*grow;
+          ctx.quadraticCurveTo(10,threadTop*.55,0,threadTop);
           ctx.stroke();
           ctx.restore();
         }
@@ -5692,6 +5720,12 @@
     if(attacker&&attacker.type==='green'&&attacker.michaelBoostAttackT>0)dmg*=1.35;
     if(attacker && !attacker.isPlayer && target && target.isPlayer){
       dmg*=difficultyProfile().damage;
+    }
+    // ベリアルさん：下方向へ強く叩きつけられた攻撃では天井の糸が切れる。
+    // 投げは update 側で throwState を検出して同様に切る。
+    if(target && target.type==='crayfish' && ky>=240){
+      target.belialThreadGrow=0;
+      target.belialThreadReconnectT=.20;
     }
     // アスモデウスさんのクロー・カウンター：
     // 近距離打撃だけ無効化。飛び道具は普通に受ける。
