@@ -232,3 +232,7 @@ v2.28
 
 v2.29
 - Added the missing Beelzebub character card directly to the selection HTML, between Flauros and Samael. It is always visible.
+
+v2.30
+- Corrected Beelzebub character-select colors to match the in-game design:
+  near-black purple body, vivid toxic-green eye bumps, white eye areas, green mouth and muted magenta cheeks.
