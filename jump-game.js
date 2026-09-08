@@ -412,9 +412,9 @@
       'ミラージュ（上）：上 ＋ ガード','ミラージュ（下）：下 ＋ ガード','ミラージュカウンター：後ろ ＋ ガード','アクアパリィ：前 ＋ ガード / ジャストガード','フロストショット：前 ＋ パンチ','ミラージュキック：前 ＋ キック'
     ],
     seraphiel:[
-      'セラフィックアッパー：上 ＋ パンチ',
+      'セラフィックアッパー：上 ＋ パンチ（上昇力3倍）',
       'セラフィックキック：前 ＋ キック',
-      'セラフィックショット：後ろ ＋ パンチ',
+      'セラフィックショット：後ろ ＋ パンチ（大型・螺旋軌道）',
       'セラフィックサイクロン：下 → 後ろ ＋ キック',
       'セラフィックレイ：下 → 前 ＋ パンチ（セラフィエル独自技）'
     ],
@@ -1811,6 +1811,11 @@
         const progress=Math.max(0,Math.min(1,(total-this.specialT)/total));
         const spinDir=this.face>0?-1:1;
         ctx.rotate(spinDir*progress*Math.PI*6);
+      }else if(this.type==='seraphiel' && this.specialType==='seraphicCyclone' && this.specialT>0){
+        // 逆さ絵で止まって見えないよう、技時間中に滑らかに約3回転。
+        const total=.95;
+        const progress=Math.max(0,Math.min(1,(total-this.specialT)/total));
+        ctx.rotate((this.face>0?1:-1)*progress*Math.PI*6);
       }else if(this.throwState || Math.abs(this.spinAngle)>.02){
         ctx.rotate(this.spinAngle);
       }
@@ -4868,7 +4873,7 @@
     if(gameOver||!f||f.type!=='seraphiel'||f.stun>0||f.guard||f.specialT>0||f.attackT>0)return false;
     f.specialType='seraphicUpper';f.specialT=.68;f.attack='punch';f.attackVariant='up';f.attackT=.68;
     f.seraphicAura='hand'; f.seraphicAuraT=.68;
-    f.vx=f.face*105; f.vy=-235;
+    f.vx=f.face*105; f.vy=-705;
     const other=f.isPlayer?enemy:player,dir=f.face;
     setTimeout(()=>{if(other&&Math.abs(other.x-f.x)<112&&Math.abs(other.y-f.y)<105){
       damageHit(f,other,13.2*f.damageMul,175*dir,-315);spawnImpact(other.x,other.y,'hit');
@@ -4897,7 +4902,6 @@
     let hits=0;
     const timer=setInterval(()=>{
       if(gameOver||!other||f.specialType!=='seraphicCyclone'){clearInterval(timer);return;}
-      f.spinAngle=(f.spinAngle||0)+1.5;
       if(Math.abs(other.x-f.x)<105&&Math.abs(other.y-f.y)<90&&hits<3){
         hits++; damageHit(f,other,4.2*f.damageMul,105*f.face,(hits===3?-155:-35));spawnImpact(other.x,other.y,'hit');
       }
@@ -5245,7 +5249,7 @@
           clearCommand();return specialSeraphicRay(f);
         }
         if(water2HeldDir(f,'back')){
-          clearCommand();return specialWater2Shot(f,{name:'セラフィックショット',attack:'punch',color:'seraphic',style:'seraphicShot',speed:310,damage:5.8,r:15,charge:.36,maxReflect:5});
+          clearCommand();return specialWater2Shot(f,{name:'セラフィックショット',attack:'punch',color:'seraphic',style:'seraphicShot',speed:300,damage:5.8,r:27,charge:.36,maxReflect:5,spiral:true});
         }
       }
     }
@@ -6270,7 +6274,7 @@
       if(enemy.type==='remiel' && enemy.specialT<=0){const roll=Math.random();if(!remielMirages.some(m=>m.owner===enemy)&&roll<dt*.10){remielMakeMirage(enemy,Math.random()<.5?'up':'down');return;}if(dist>190&&roll<dt*.28){specialRemielFrostShot(enemy);return;}if(dist<150&&roll<dt*.18){specialMirageKick(enemy);return;}if(dist<115&&roll<dt*.10){specialAquaParry(enemy,false);return;}}
       if(enemy.type==='seraphiel' && enemy.specialT<=0){
         const roll=Math.random();
-        if(dist>220 && roll<dt*.22){specialWater2Shot(enemy,{name:'セラフィックショット',attack:'punch',color:'seraphic',style:'seraphicShot',speed:310,damage:5.8,r:15,charge:.36,maxReflect:5});return;}
+        if(dist>220 && roll<dt*.22){specialWater2Shot(enemy,{name:'セラフィックショット',attack:'punch',color:'seraphic',style:'seraphicShot',speed:300,damage:5.8,r:27,charge:.36,maxReflect:5,spiral:true});return;}
         if(dist>180 && roll<dt*.10){specialSeraphicRay(enemy);return;}
         if(dist<135 && roll<dt*.24){specialSeraphicKick(enemy);return;}
         if(dist<110 && roll<dt*.12){specialSeraphicUpper(enemy);return;}
@@ -7089,6 +7093,8 @@ function drawBackground(dt){
       // セラフィエル：セラフィックレイ。予告0.32秒後に短時間だけ攻撃判定。
       seraphielRays.forEach(r=>{
         r.t-=dt;
+        // 発動中はレイの根元がセラフィエル本人についてくる。
+        if(r.owner){r.x=r.owner.x+r.dir*55;r.y=r.owner.y-8;}
         const elapsed=r.life-r.t;
         r.active=elapsed>.32 && elapsed<.50;
         const target=r.owner.isPlayer?enemy:player;
@@ -7208,6 +7214,10 @@ function drawBackground(dt){
         q.age=(q.age||0)+dt;
         q.spin=(q.spin||0)+dt*(q.style==='aquaSpin'?10:4);
         if(q.curve){ q.vy += q.curve*dt; }
+        if(q.style==='seraphicShot'){
+          // 前進しながら上下へ滑らかに螺旋運動。
+          q.vy=Math.cos((q.age||0)*11.5)*118;
+        }
         if(q.style==='bubble' && q.riseAfter>0 && q.age>q.riseAfter){ q.vy-=q.riseAccel*dt; }
         if(q.style==='iceChargeOrb'){ q.trail=q.trail||[]; q.trail.push({x:q.x,y:q.y,t:.75}); if(q.trail.length>22)q.trail.shift(); q.trail.forEach(v=>v.t-=dt); q.trail=q.trail.filter(v=>v.t>0); }
         if(q.style==='aquaPressure'){ q.trail=q.trail||[]; q.trail.push({x:q.x,y:q.y,t:.28}); if(q.trail.length>10)q.trail.shift(); q.trail.forEach(v=>v.t-=dt); q.trail=q.trail.filter(v=>v.t>0); }
@@ -8270,6 +8280,16 @@ ctx.closePath();ctx.fill();}ctx.restore();});
         ctx.strokeStyle='#bffaff';ctx.lineWidth=4;
         for(let i=0;i<3;i++){ctx.rotate(Math.PI*2/3);ctx.beginPath();ctx.arc(0,0,q.r*.78,-1.0,1.0);ctx.stroke();}
         ctx.fillStyle='rgba(95,207,255,.52)';ctx.beginPath();ctx.arc(0,0,q.r*.72,0,Math.PI*2);ctx.fill();
+      }else if(q.style==='seraphicShot'){
+        // 大きな光球＋周囲を巻く二重の螺旋光。
+        ctx.shadowColor='#fff0a0';ctx.shadowBlur=24;
+        const rg=ctx.createRadialGradient(-q.r*.28,-q.r*.30,2,0,0,q.r*1.08);
+        rg.addColorStop(0,'#ffffff');rg.addColorStop(.32,'#fff9cf');rg.addColorStop(.72,'#f2cf72');rg.addColorStop(1,'#b98631');
+        ctx.fillStyle=rg;ctx.beginPath();ctx.arc(0,0,q.r,0,Math.PI*2);ctx.fill();
+        const phase=(q.age||0)*11.5;
+        ctx.lineWidth=4;ctx.strokeStyle='rgba(255,255,235,.92)';
+        for(let k=0;k<2;k++){ctx.beginPath();for(let i=-28;i<=28;i+=3){const yy=Math.sin(i*.16+phase+k*Math.PI)*10; if(i===-28)ctx.moveTo(i,yy);else ctx.lineTo(i,yy);}ctx.stroke();}
+        ctx.fillStyle='rgba(255,255,255,.88)';ctx.beginPath();ctx.ellipse(-q.r*.28,-q.r*.30,q.r*.20,q.r*.11,-.5,0,Math.PI*2);ctx.fill();
       }else if(q.style==='whiteOrb'){
         ctx.shadowColor='#ffffff';ctx.shadowBlur=24;ctx.fillStyle='#f8ffff';ctx.beginPath();ctx.arc(0,0,q.r,0,Math.PI*2);ctx.fill();
         ctx.strokeStyle='rgba(210,245,255,.9)';ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,0,q.r+4,0,Math.PI*2);ctx.stroke();
