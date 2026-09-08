@@ -4060,15 +4060,19 @@
     f.specialT=.68;
     f.bossSpecialCooldown=2.4;
 
-    toxicWaters.push({
-      owner:f,
-      t:4.2,
-      life:4.2,
-      tick:0,
-      // v6.34: ベルゼブブ本人を中心に毒煙が広がる。
-      originX:f.x,
-      originY:f.y,
-      seed:Math.random()*1000
+    // JUMP版：空中から3方向へ毒液を噴き出し、落下後は蓮の葉付近に毒溜まりが少し残る。
+    [
+      {vx:-145,vy:-520},
+      {vx:0,   vy:-585},
+      {vx:145, vy:-520}
+    ].forEach((v,i)=>{
+      toxicWaters.push({
+        owner:f,t:4.4,life:4.4,tick:0,
+        x:f.x+(i-1)*10,y:f.y-24,
+        vx:v.vx,vy:v.vy,r:20,
+        landed:false,seed:Math.random()*1000,
+        airHitAt:0
+      });
     });
 
     comboEl.textContent='ヴェノム・ウォーター!';
@@ -5371,7 +5375,7 @@
     }
 
     if(f.type==='beelzebub'){
-      if(kind==='punch' && water2HeldDir(f,'forward')){ clearCommand(); return specialWater2Shot(f,{name:'ベノムショット',attack:'punch',color:'venom',style:'venomGloss',speed:235,damage:4.5,r:16,charge:.50,poisonDuration:2.2,maxReflect:4}); }
+      if(kind==='punch' && water2HeldDir(f,'forward')){ clearCommand(); return specialWater2Shot(f,{name:'ベノムショット',attack:'punch',color:'venom',style:'venomGloss',speed:225,angle:-27,curve:235,damage:4.8,r:27,charge:.48,poisonDuration:2.2,maxReflect:4}); }
       if(kind==='punch' && water2HeldDir(f,'up')){ clearCommand(); return specialAbyssShock(f,'upper'); }
       if(kind==='kick' && water2HeldDir(f,'down')){ clearCommand(); return specialAbyssShock(f,'lower'); }
     }
@@ -6267,7 +6271,7 @@
         const roll=Math.random();
         if(roll<dt*.10){ specialVenomWater(enemy); return; }
         if(roll<dt*.26){ specialAbyssShock(enemy,dy<0?'upper':'lower'); return; }
-        if(dist>150 && roll<dt*.46){ specialWater2Shot(enemy,{name:'ベノムショット',attack:'punch',color:'venom',style:'venomGloss',speed:235,damage:4.5,r:16,charge:.50,poisonDuration:2.2,maxReflect:4}); return; }
+        if(dist>150 && roll<dt*.46){ specialWater2Shot(enemy,{name:'ベノムショット',attack:'punch',color:'venom',style:'venomGloss',speed:225,angle:-27,curve:235,damage:4.8,r:27,charge:.48,poisonDuration:2.2,maxReflect:4}); return; }
       }
       if(enemy.type==='satanael'&&enemy.specialT<=0){const r=Math.random();if(dist>190&&r<dt*.16){specialDisasterFlare(enemy);return;}if(dist>220&&r<dt*.28){specialDarkRay(enemy);return;}if(r<dt*.38){specialDarkPressure(enemy);return;}if(r<dt*.50){specialInfernoWave(enemy);return;}}
       if(enemy.type==='flauros'&&enemy.specialT<=0){const r=Math.random();if(dist>180&&r<dt*.20){specialHellFlame(enemy);return;}if(dist>170&&r<dt*.38){specialFlameClaw(enemy);return;}if(dist<250&&r<dt*.52){specialLeopardRush(enemy);return;}if(dist>130&&r<dt*.59){specialInfernoClaw(enemy);return;}}
@@ -7268,19 +7272,47 @@ function drawBackground(dt){
 
       toxicWaters.forEach(v=>{
         v.t-=dt;
-        v.tick-=dt;
-        const target=v.owner && v.owner.isPlayer ? enemy : player;
-        if(target && v.tick<=0){
-          v.tick=.60;
-          // 紫の水の間、相手だけ。毒耐性持ちは継続毒を受けない。
-          if(!target.guard && !isPoisonImmune(target)){
+        const target=v.owner&&v.owner.isPlayer?enemy:player;
+
+        if(!v.landed){
+          v.vy+=JUMP_GRAVITY*.78*dt;
+          v.x+=v.vx*dt;
+          v.y+=v.vy*dt;
+
+          // 空中の毒液にも当たり判定。
+          if(target){
+            const now=performance.now();
+            if(Math.hypot(target.x-v.x,target.y-v.y)<target.radius+v.r+7 && now-(v.airHitAt||0)>650){
+              v.airHitAt=now;
+              const guarded=target.guard;
+              v.owner._projectileHit=true;
+              damageHit(v.owner,target,2.0*v.owner.damageMul,22*Math.sign(v.vx||v.owner.face),18);
+              v.owner._projectileHit=false;
+              if(!guarded)applyPoison(target,v.owner,2.2);
+            }
+          }
+
+          const floor=jumpFloorY()-7;
+          if(v.y>=floor){
+            v.y=floor;v.vx=0;v.vy=0;v.landed=true;
+            v.r=42;v.tick=0;
+            // 空中時間とは別に、毒溜まりは短めに残す。
+            v.t=Math.min(v.t,1.75);
+            spawnImpact(v.x,v.y,'hit');
+          }
+        }else{
+          v.tick-=dt;
+          if(target&&v.tick<=0&&Math.hypot(target.x-v.x,target.y-v.y)<target.radius+v.r+16){
+            v.tick=.52;
+            const guarded=target.guard;
             v.owner._projectileHit=true;
-            damageHit(v.owner,target,1.15*v.owner.damageMul,0,0);
+            damageHit(v.owner,target,1.15*v.owner.damageMul,0,-10);
             v.owner._projectileHit=false;
+            if(!guarded)applyPoison(target,v.owner,1.15);
           }
         }
       });
-      toxicWaters=toxicWaters.filter(v=>v.t>0);
+      toxicWaters=toxicWaters.filter(v=>v.t>0&&v.x>-110&&v.x<innerWidth+110);
 
       bossFish.forEach(fish=>{
         fish.t-=dt;
@@ -7834,68 +7866,53 @@ function drawBackground(dt){
     }
 
     toxicWaters.forEach(v=>{
-      // v6.34:
-      // 土煙のようにベルゼブブから紫の毒が一気に広がる。
-      // 発動直後 -> 画面がほぼ見えない濃さ -> その後は薄い毒水として残る。
-      const age=v.life-v.t;
-      const spread=Math.min(1,age/.82);
-      const denseIn=Math.min(1,age/.48);
-      const denseOut=age<1.45 ? 1 : Math.max(0,1-(age-1.45)/1.05);
-      const dense=denseIn*denseOut;
-      const linger=Math.max(0,Math.min(1,v.t/1.0));
-      const ox=Number.isFinite(v.originX)?v.originX:(v.owner?v.owner.x:innerWidth/2);
-      const oy=Number.isFinite(v.originY)?v.originY:(v.owner?v.owner.y:innerHeight/2);
-      const maxR=Math.hypot(innerWidth,innerHeight)*1.15;
-      const now=performance.now()/1000;
-
       ctx.save();
+      const pulse=1+.05*Math.sin(performance.now()/110+(v.seed||0));
 
-      // 中心から外へ膨らむ巨大な紫煙。
-      const grad=ctx.createRadialGradient(ox,oy,0,ox,oy,maxR*spread);
-      grad.addColorStop(0,`rgba(91,12,119,${0.76*dense + 0.18*linger})`);
-      grad.addColorStop(.45,`rgba(119,24,157,${0.72*dense + 0.15*linger})`);
-      grad.addColorStop(.82,`rgba(159,41,196,${0.64*dense + 0.10*linger})`);
-      grad.addColorStop(1,'rgba(116,18,150,0)');
-      ctx.fillStyle=grad;
-      ctx.beginPath();
-      ctx.arc(ox,oy,maxR*spread,0,Math.PI*2);
-      ctx.fill();
+      if(!v.landed){
+        ctx.translate(v.x,v.y);
+        ctx.scale(pulse,pulse);
+        ctx.globalCompositeOperation='lighter';
+        ctx.shadowColor='#8dff36';
+        ctx.shadowBlur=18;
+        const rg=ctx.createRadialGradient(-v.r*.28,-v.r*.34,1,0,0,v.r*1.18);
+        rg.addColorStop(0,'#e8ff9e');
+        rg.addColorStop(.2,'#9fff42');
+        rg.addColorStop(.58,'#4bc516');
+        rg.addColorStop(1,'#183907');
+        ctx.fillStyle=rg;
+        ctx.beginPath();ctx.arc(0,0,v.r,0,Math.PI*2);ctx.fill();
 
-      // 土煙感のある塊。発生源から外側へ拡散。
-      for(let i=0;i<28;i++){
-        const ang=(i*2.3999632297)+(v.seed||0);
-        const lane=.18+((i*37)%83)/100;
-        const rr=maxR*spread*lane;
-        const wobble=Math.sin(now*1.7+i*2.1)*18;
-        const x=ox+Math.cos(ang)*rr+wobble;
-        const y=oy+Math.sin(ang)*rr*.72+Math.cos(now*1.3+i)*14;
-        const rad=38+(i%7)*13+spread*34;
-        ctx.globalAlpha=(.08+.22*dense)*Math.min(1,spread*2.4);
-        ctx.fillStyle=i%3===0?'#d84cff':(i%3===1?'#71118f':'#9d27bd');
+        ctx.globalAlpha=.72;
+        ctx.fillStyle='#f7ffd4';
+        ctx.beginPath();ctx.ellipse(-v.r*.28,-v.r*.34,v.r*.23,v.r*.12,-.55,0,Math.PI*2);ctx.fill();
+
+        ctx.globalAlpha=.55;
+        ctx.fillStyle='#8cff31';
+        for(let i=0;i<3;i++){
+          const a=(v.seed||0)+i*2.1+performance.now()/520;
+          ctx.beginPath();
+          ctx.arc(Math.cos(a)*(v.r+6+i*2),Math.sin(a)*(v.r*.65+3),3+i,0,Math.PI*2);
+          ctx.fill();
+        }
+      }else{
+        ctx.translate(v.x,v.y);
+        ctx.globalCompositeOperation='lighter';
+        ctx.globalAlpha=Math.min(.72,Math.max(.18,v.t/.9));
+        const rg=ctx.createRadialGradient(0,0,3,0,0,v.r);
+        rg.addColorStop(0,'rgba(155,255,67,.72)');
+        rg.addColorStop(.55,'rgba(87,201,26,.50)');
+        rg.addColorStop(1,'rgba(42,91,11,0)');
+        ctx.fillStyle=rg;
+        ctx.shadowColor='#78dc2b';
+        ctx.shadowBlur=14;
         ctx.beginPath();
-        ctx.arc(x,y,rad,0,Math.PI*2);
+        ctx.ellipse(0,0,v.r,v.r*.28,0,0,Math.PI*2);
         ctx.fill();
       }
 
-      // 一度だけ「ほぼ見えない」ピークを作る。
-      if(dense>.05){
-        ctx.globalAlpha=.78*dense;
-        ctx.fillStyle='#4b075f';
-        ctx.fillRect(0,0,innerWidth,innerHeight);
-        ctx.globalAlpha=.25*dense;
-        ctx.fillStyle='#c83ff0';
-        ctx.fillRect(0,0,innerWidth,innerHeight);
-      }
-
-      // ピーク後は従来より薄い紫の水だけが残る。
-      const thin=Math.max(0,Math.min(1,(age-1.6)/.9))*linger;
-      if(thin>0){
-        ctx.globalAlpha=.15*thin;
-        ctx.fillStyle='#7d24a8';
-        ctx.fillRect(0,0,innerWidth,innerHeight);
-      }
       ctx.restore();
-    });
+    });;
 
     bossFish.forEach(fish=>{
       ctx.save();
