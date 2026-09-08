@@ -8098,7 +8098,18 @@ function drawBackground(dt){
       ctx.restore();
     });
 
-    flaurosPillars.forEach(p=>{ctx.save();const armed=!p.fired;ctx.globalCompositeOperation='lighter';if(armed){ctx.globalAlpha=.65;ctx.strokeStyle='#ff5138';ctx.lineWidth=4;ctx.beginPath();ctx.ellipse(p.x,p.y,48,12,0,0,Math.PI*2);ctx.stroke();}else{const topY=Math.max(120,p.y-300);const g=ctx.createLinearGradient(p.x,p.y,p.x,topY);g.addColorStop(0,'#ff281d');g.addColorStop(.55,'#ff7a28');g.addColorStop(1,'rgba(255,235,120,.82)');ctx.fillStyle=g;ctx.shadowColor='#ff5a20';ctx.shadowBlur=28;ctx.beginPath();ctx.moveTo(p.x-34,p.y);ctx.quadraticCurveTo(p.x-24,(p.y+topY)*.56,p.x-15,topY);ctx.quadraticCurveTo(p.x,(topY-18),p.x+15,topY);ctx.quadraticCurveTo(p.x+25,(p.y+topY)*.56,p.x+34,p.y);ctx.closePath();ctx.fill();}ctx.restore();});
+    flaurosPillars.forEach(p=>{ctx.save();const armed=!p.fired;ctx.globalCompositeOperation='lighter';if(armed){ctx.globalAlpha=.65;ctx.strokeStyle='#ff5138';ctx.lineWidth=4;ctx.beginPath();ctx.ellipse(p.x,p.y,48,12,0,0,Math.PI*2);ctx.stroke();}else{const topY=Math.max(120,p.y-300);const g=ctx.createLinearGradient(p.x,p.y,p.x,topY);g.addColorStop(0,'#ff281d');g.addColorStop(.55,'#ff7a28');g.addColorStop(1,'rgba(255,235,120,.82)');ctx.fillStyle=g;ctx.shadowColor='#ff5a20';ctx.shadowBlur=28;ctx.beginPath();
+ctx.moveTo(p.x-36,p.y);
+ctx.quadraticCurveTo(p.x-29,p.y-105,p.x-23,topY+58);
+ctx.lineTo(p.x-10,topY+30);
+ctx.lineTo(p.x-16,topY+11);
+ctx.lineTo(p.x-3,topY+23);
+ctx.lineTo(p.x+2,topY-22);
+ctx.lineTo(p.x+11,topY+18);
+ctx.lineTo(p.x+22,topY+4);
+ctx.lineTo(p.x+18,topY+39);
+ctx.quadraticCurveTo(p.x+30,p.y-105,p.x+36,p.y);
+ctx.closePath();ctx.fill();}ctx.restore();});
     flaurosClaws.forEach(c=>{if(c.t>.08)return;ctx.save();ctx.translate(c.x,c.y);ctx.globalCompositeOperation='lighter';ctx.strokeStyle='#ff3028';ctx.shadowColor='#ff1f18';ctx.shadowBlur=16;ctx.lineWidth=5;ctx.globalAlpha=.8;for(let j=-1;j<=1;j++){ctx.beginPath();ctx.moveTo(-34,-22+j*15);ctx.lineTo(36,18+j*15);ctx.stroke();}ctx.restore();});
 
 
