@@ -262,3 +262,9 @@ v2.39
 v2.40
 - Restored the old Kawazu secret-technique tongue-wrap visual/rotation sequence based on the legacy behavior.
 - Spin Kick Cutter cross-light projectiles now rotate much faster.
+
+v2.43
+- JUMP story non-frog encounters are Azazel (dragonfly) and Belial (spider), using the existing piranha/crayfish internal boss implementations from the old JUMP data.
+- Their story battles now use a dedicated outdoor lotus-pond stage instead of LOTUS STADIUM.
+- Outdoor stage: bright sky, clouds, pond water, reeds, natural lotus leaves/flowers, large battle lotus leaf, no grandstand and no referee.
+- Story text updated from Leviathan/Asmodeus water-version names to Azazel/Belial.

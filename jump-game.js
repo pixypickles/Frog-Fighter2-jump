@@ -3317,7 +3317,7 @@
     return {
       green:'ミカエルさん', blue:'ガブリエルさん', black:'ルシファーさん',
       purple:'リリスさん', yellow:'ラファエルさん', orange:'ウリエルさん',
-      piranha:'リヴァイアさん', crayfish:'アスモデウスさん',
+      piranha:'アザゼルさん', crayfish:'ベリアルさん',
       beelzebub:'ベルゼブブさん', flauros:'フラウロスさん', satanael:'サタナエルさん', samael:'サマエルさん', seraphiel:'セラフィエルさん', remiel:'レミエルさん', jihal:'ジィハルさん', kokabiel:'コカビエルさん', sariel:'サリエルさん', kawazu:'カワズさん'
     }[type]||type;
   }
@@ -3465,15 +3465,15 @@
       showStoryNarrative([
         '――大会1日目、三回戦終了。',
         '観客席がまだ熱気に包まれている、そのときだった。\n\n「ちょ、ちょっと！ 大変だよ！」',
-        '「外の池でリヴァイアさんが暴れてるんだ！ このままだと大会どころじゃないよ！ 何とかしてよ！」',
+        '「外の蓮池でアザゼルさんが暴れてるんだ！ このままだと大会どころじゃないよ！ 何とかしてよ！」',
         '……なぜ大会の合間に池のトラブルまで解決することになったのか。\n\nともかく、外の池へ急げ！',
-        'EXTRA BATTLE\nVS リヴァイアさん'
+        'EXTRA BATTLE\nVS アザゼルさん'
       ],callback);return true;
     }
     if(nextIndex===4){
       storyDay=2;
       showStoryNarrative([
-        'リヴァイアさんを何とか静め、大会会場へ戻った。\n\nそして翌日――。',
+        'アザゼルさんを何とか退け、大会会場へ戻った。\n\nそして翌日――。',
         '大会2日目。\n\n昨日より照明は鮮やかに、競技場の緑も少し深くなっている。',
         `四回戦――VS ${fighterDisplayName(storyQueue[4])}！`
       ],callback);return true;
@@ -3481,15 +3481,15 @@
     if(nextIndex===6){
       showStoryNarrative([
         '――大会2日目、全試合終了。\n\nこれで残すは最終日の決勝戦……のはずだった。',
-        '「また大変だよ！」\n\n「今度はアスモデウスさんが外の池で暴れてる！」',
+        '「また大変だよ！」\n\n「今度はベリアルさんが外の蓮池で暴れてる！」',
         '「なんで毎日ひとりずつ暴れるの！？」\n\n理由を考えている暇はない。再び外の池へ！',
-        'EXTRA BATTLE\nVS アスモデウスさん'
+        'EXTRA BATTLE\nVS ベリアルさん'
       ],callback);return true;
     }
     if(nextIndex===7){
       storyDay=3;
       showStoryNarrative([
-        'アスモデウスさんも撃破。\n\nそして――最終日。',
+        'ベリアルさんも撃破。\n\nそして――最終日。',
         '決勝用に飾られた蓮の葉競技場は、これまでとは別物だった。\n\n光が水面から幾重にも差し込み、会場中の照明と旗がきらめき、四段の観客席が熱気に包まれている。',
         '反対側のブロックを勝ち上がってきたのは――あまり見かけない、かなり強いヤツらしい。\n\n「あっちの池から呼ばれたヤツだろうか？」',
         'サマエルさん「……待っていた」',
@@ -3538,7 +3538,7 @@
       '大会優勝、突然のサタナエルさん乱入、そして主催者との特別試合。\n\nとんでもなく長い一日になった。',
       'こうして、蓮の葉格闘大会は今度こそ本当に終了した。\n\n優勝者を称える紙吹雪が競技場いっぱいに舞い、みんなは勝った負けたと好き勝手に騒いでいる。',
       'ベルゼブブさん「次はもっとルールを減らそう」\n\n誰か「増やすんじゃなくて！？」\n\nカワズさんは隅で静かに首を振った。',
-      'そして外の池では――。\n\nリヴァイアさんとアスモデウスさんが、何事もなかったような顔で泳いでいた。',
+      'そして外の池では――。\n\nアザゼルさんはトンボらしく水面の上を飛び、ベリアルさんは蓮の陰に糸を張っていた。',
       '「……次の大会も、やる？」',
       '一瞬の沈黙。\n\n「やる！」\n\n池の平和は戻った。\n\nたぶん。\n\n少なくとも、次の招待状が届くまでは――。',
       'フロッグファイター2 JUMP\n\nTHE END'
@@ -3552,7 +3552,7 @@
     const nextType=storyQueue[storyFightIndex];
 
     // 水槽照明：1日目→2日目→決勝。外の池は別テーマ。
-    if(nextType==='piranha'||nextType==='crayfish')stageTheme=0;
+    if(nextType==='piranha'||nextType==='crayfish')stageTheme=4;
     else if(nextType==='samael'||nextType==='seraphiel'||nextType==='satanael')stageTheme=3;
     else stageTheme=storyFightIndex>=4?2:1;
 
@@ -6684,6 +6684,71 @@
 
 function drawBackground(dt){
     const w=innerWidth,h=innerHeight,t=performance.now()/1000;
+
+    // STORYのアザゼル／ベリアル戦専用：大会会場ではなく、外の蓮池。
+    if(stageTheme===4){
+      const sky=ctx.createLinearGradient(0,0,0,h);
+      sky.addColorStop(0,'#bfeaff');sky.addColorStop(.48,'#eaf8ff');sky.addColorStop(1,'#91d7b0');
+      ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
+
+      // 遠景の雲
+      ctx.save();ctx.globalAlpha=.72;ctx.fillStyle='#ffffff';
+      for(let i=0;i<5;i++){
+        const x=((i*173+t*7)%(w+180))-90, y=80+(i%3)*58;
+        ctx.beginPath();ctx.ellipse(x,y,48,18,0,0,Math.PI*2);ctx.ellipse(x+36,y+4,38,15,0,0,Math.PI*2);ctx.ellipse(x-32,y+6,31,13,0,0,Math.PI*2);ctx.fill();
+      }
+      ctx.restore();
+
+      // 遠くの葦と池の水平線
+      const waterY=h*.48;
+      const wg=ctx.createLinearGradient(0,waterY,0,h);
+      wg.addColorStop(0,'#71cbd0');wg.addColorStop(1,'#2e9e91');
+      ctx.fillStyle=wg;ctx.fillRect(0,waterY,w,h-waterY);
+      ctx.fillStyle='rgba(63,143,73,.75)';
+      for(let x=8;x<w;x+=18){
+        const rh=24+((x*7)%43);
+        ctx.fillRect(x,waterY-rh,3,rh+4);
+        ctx.beginPath();ctx.ellipse(x+7,waterY-rh*.72,13,4,-.55,0,Math.PI*2);ctx.fill();
+      }
+
+      // 遠景の蓮葉・花。観客席やレフリーは置かない。
+      for(let i=0;i<12;i++){
+        const x=(i*97+43)%w, y=waterY+42+(i%5)*45;
+        ctx.save();ctx.translate(x,y);
+        ctx.fillStyle=i%3?'#3aa84e':'#4cb75c';
+        ctx.beginPath();ctx.ellipse(0,0,38+(i%4)*6,12+(i%3)*2,0,0,Math.PI*2);ctx.fill();
+        ctx.strokeStyle='rgba(31,112,57,.65)';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(30,0);ctx.stroke();
+        if(i===2||i===8){
+          ctx.fillStyle='#f6b6d4';
+          for(let a=0;a<Math.PI*2;a+=Math.PI/4){ctx.beginPath();ctx.ellipse(Math.cos(a)*8,-10+Math.sin(a)*5,8,4,a,0,Math.PI*2);ctx.fill();}
+          ctx.fillStyle='#f4d55c';ctx.beginPath();ctx.arc(0,-10,4,0,Math.PI*2);ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      // 戦闘用の大きな自然の蓮葉
+      const floor=jumpFloorY();
+      ctx.save();ctx.translate(w*.5,floor+45);
+      ctx.fillStyle='rgba(24,113,65,.35)';ctx.beginPath();ctx.ellipse(5,14,w*.46,58,0,0,Math.PI*2);ctx.fill();
+      const lg=ctx.createRadialGradient(-w*.10,-20,8,0,0,w*.43);
+      lg.addColorStop(0,'#76d45d');lg.addColorStop(.55,'#43b54d');lg.addColorStop(1,'#21883e');
+      ctx.fillStyle=lg;ctx.strokeStyle='#176f38';ctx.lineWidth=4;
+      ctx.beginPath();ctx.ellipse(0,0,w*.43,54,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+      ctx.strokeStyle='rgba(29,119,48,.68)';ctx.lineWidth=1.6;
+      for(let a=-2.8;a<=2.8;a+=.42){ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(Math.cos(a)*w*.36,Math.sin(a)*42);ctx.stroke();}
+      ctx.fillStyle='#3997a1';ctx.beginPath();ctx.moveTo(0,-2);ctx.lineTo(28,-40);ctx.lineTo(8,-6);ctx.closePath();ctx.fill();
+      ctx.restore();
+
+      // 壁張り付き位置だけは自然物っぽい黄色い蓮の実で示す。
+      const anchorYs=[h*.31,h*.43,h*.55,h*.67];
+      anchorYs.forEach(ay=>[-1,1].forEach(side=>{
+        const ax=side<0?5:w-5;
+        ctx.fillStyle='#d9b947';ctx.beginPath();ctx.arc(ax,ay,6,0,Math.PI*2);ctx.fill();
+        ctx.strokeStyle='#8a7124';ctx.lineWidth=1.5;ctx.stroke();
+      }));
+      return;
+    }
+
     const themes=[
       ['#75cfee','#f8f1c9','#7bc66a'],['#ffd6a3','#fff5d7','#92b96b'],
       ['#b8cad9','#f0efe0','#768d78'],['#51415e','#b9898a','#4e4b56']
@@ -6816,6 +6881,7 @@ function drawBackground(dt){
   }
 
   function drawLotusReferee(dt){
+    if(stageTheme===4) return;
     const w=innerWidth,h=innerHeight,floor=jumpFloorY();
     refereeFrog.t=(refereeFrog.t||0)+(dt||.016);
     // JUMP版ではレフリーは競技用の大蓮葉の外側で見守る。
