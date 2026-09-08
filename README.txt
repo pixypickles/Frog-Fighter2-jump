@@ -229,3 +229,6 @@ v2.27
 
 v2.28
 - Beelzebub is now always visible and selectable as a normal character; no unlock flag is required.
+
+v2.29
+- Added the missing Beelzebub character card directly to the selection HTML, between Flauros and Samael. It is always visible.
