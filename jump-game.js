@@ -154,7 +154,7 @@
     jihal:{speed:184,tongue:190,damage:1.02,defense:.97,sink:5,hue:0,scale:1.00},
     remiel:{speed: 170, tongue: 205, damage: .98, defense:1.00, sink:5, hue:0, scale:1.00},
     seraphiel:{speed: 178, tongue: 205, damage: 1.24, defense:.84, sink:5, hue:0, scale:1.02},
-    samael: {speed: 158, tongue: 235, damage: 1.10, defense:1.06, sink:7, hue:0, scale:1.08},
+    samael: {speed: 158, tongue: 210, damage: 1.10, defense:1.06, sink:7, hue:0, scale:1.08},
     satanael:{speed:166,tongue:225,damage:1.20,defense:1.10,sink:8,hue:0,scale:1.10},
     kawazu: {speed: 205, tongue: 225, damage: 0.98, defense:0.90, sink:4, hue:0, scale:0.90},
     pascal: {speed: 176, tongue: 185, damage: 0.68, defense:0.86, sink:4, hue:0, scale:0.78},
@@ -426,7 +426,7 @@
     ],
     samael:[
       'ポイズンゲート：方向 ＋ パンチ（指定方向に発生点 → 相手へ毒弾）',
-      'ヴェノムタン：舌（舌先から毒弾）',
+      'ヴェノムタン：前 ＋ 舌（舌先から毒弾）',
       'デッドリー・アクア：前 → 下 → 後ろ ＋ キック'
     ],
     kawazu:[
@@ -5266,7 +5266,7 @@
         else if(water2HeldDir(f,'back')) side='back';
         if(side){ clearCommand(); return specialSamaelGate(f,side); }
       }
-      if(kind==='tongue'){ clearCommand(); return specialSamaelTongueShot(f); }
+      if(kind==='tongue' && water2HeldDir(f,'forward')){ clearCommand(); return specialSamaelTongueShot(f); }
     }
 
     // カワズさん：4キャラ運用を前提に入力を短く。
@@ -8277,15 +8277,16 @@ ctx.closePath();ctx.fill();}ctx.restore();});
         ctx.fillStyle='rgba(255,255,255,.78)';ctx.beginPath();ctx.ellipse(-q.r*.32,-q.r*.35,q.r*.22,q.r*.12,-.6,0,Math.PI*2);ctx.fill();
       }else if(q.style==='venomGloss'){
         const rg=ctx.createRadialGradient(-q.r*.3,-q.r*.35,1,0,0,q.r*1.15);
-        rg.addColorStop(0,'#f3c4ff');rg.addColorStop(.18,'#c55cff');rg.addColorStop(.68,'#7023a8');rg.addColorStop(1,'#3e0f62');
-        ctx.shadowColor='#c865ff';ctx.shadowBlur=22;ctx.fillStyle=rg;ctx.beginPath();ctx.arc(0,0,q.r,0,Math.PI*2);ctx.fill();
-        ctx.fillStyle='rgba(255,255,255,.72)';ctx.beginPath();ctx.ellipse(-q.r*.28,-q.r*.32,q.r*.23,q.r*.12,-.6,0,Math.PI*2);ctx.fill();
+        rg.addColorStop(0,'#b56acb');rg.addColorStop(.18,'#7d269d');rg.addColorStop(.68,'#4b1268');rg.addColorStop(1,'#260833');
+        ctx.shadowBlur=0;ctx.fillStyle=rg;ctx.beginPath();ctx.arc(0,0,q.r,0,Math.PI*2);ctx.fill();
+        ctx.strokeStyle='rgba(48,8,61,.9)';ctx.lineWidth=2;ctx.stroke();
+        ctx.fillStyle='rgba(245,218,250,.70)';ctx.beginPath();ctx.ellipse(-q.r*.28,-q.r*.32,q.r*.23,q.r*.12,-.6,0,Math.PI*2);ctx.fill();
       }else if(q.style==='samaelVenom'){
         const rg=ctx.createRadialGradient(-q.r*.32,-q.r*.35,1,0,0,q.r*1.2);
-        rg.addColorStop(0,'#f2c8ff');rg.addColorStop(.18,'#d774ff');rg.addColorStop(.48,'#9a39df');rg.addColorStop(.78,'#5b1a91');rg.addColorStop(1,'#2b0b48');
-        ctx.shadowColor='#b64cff';ctx.shadowBlur=25;ctx.fillStyle=rg;ctx.beginPath();ctx.arc(0,0,q.r,0,Math.PI*2);ctx.fill();
-        ctx.strokeStyle='rgba(205,116,255,.78)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,q.r+2,0,Math.PI*2);ctx.stroke();
-        ctx.fillStyle='rgba(255,230,255,.75)';ctx.beginPath();ctx.ellipse(-q.r*.28,-q.r*.33,q.r*.22,q.r*.11,-.6,0,Math.PI*2);ctx.fill();
+        rg.addColorStop(0,'#b96fd0');rg.addColorStop(.18,'#8129a2');rg.addColorStop(.48,'#5b1678');rg.addColorStop(.78,'#3b0d52');rg.addColorStop(1,'#21062d');
+        ctx.shadowBlur=0;ctx.fillStyle=rg;ctx.beginPath();ctx.arc(0,0,q.r,0,Math.PI*2);ctx.fill();
+        ctx.strokeStyle='rgba(55,9,72,.9)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,q.r+1,0,Math.PI*2);ctx.stroke();
+        ctx.fillStyle='rgba(246,220,250,.72)';ctx.beginPath();ctx.ellipse(-q.r*.28,-q.r*.33,q.r*.22,q.r*.11,-.6,0,Math.PI*2);ctx.fill();
       }else if(q.style==='spinCutterBlade'){
         // カワズさん専用：丸弾ではなく、回転する薄い三日月状の水圧カッター。
         ctx.rotate(q.spin||0);
