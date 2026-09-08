@@ -236,3 +236,8 @@ v2.29
 v2.30
 - Corrected Beelzebub character-select colors to match the in-game design:
   near-black purple body, vivid toxic-green eye bumps, white eye areas, green mouth and muted magenta cheeks.
+
+v2.31
+- Flauros Hell Flame changed to a very tall vertical fire pillar rising from near the lotus/playfield floor to the top of the screen.
+- Hell Flame hit area now follows the full vertical pillar.
+- Inferno Claw lower endpoint raised so Flauros no longer dives beneath the lotus leaves / too far below the visible play area.

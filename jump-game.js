@@ -3178,7 +3178,7 @@
       jihal:['前 ＋ パンチ：ボルトショット','前 ＋ キック：ライトニングダッシュ','後ろ ＋ キック長押し → 離す：サンダーチャージ','下 ＋ パンチ：スパークバースト'],
       remiel:['上 ＋ ガード：ミラージュ（上）','下 ＋ ガード：ミラージュ（下）','後ろ ＋ ガード：ミラージュカウンター','前 ＋ ガード：アクアパリィ','前 ＋ パンチ：フロストショット','前 ＋ キック：ミラージュキック'],
       seraphiel:['上 ＋ パンチ：セラフィックアッパー','前 ＋ キック：セラフィックキック','後ろ ＋ パンチ：セラフィックショット','下 → 後ろ ＋ キック：セラフィックサイクロン','下 → 前 ＋ パンチ：セラフィックレイ'],
-      flauros:['上 ＋ パンチ：ヘルフレイム（相手の足元から火柱）','前 ＋ パンチ：フレイムクロー（3方向の炎爪）','前 ＋ キック：レオパードラッシュ','上 ＋ キック：インフェルノクロー（壁から急降下→時間差5連斬）'],
+      flauros:['上 ＋ パンチ：ヘルフレイム（下から上へ超ロング火柱）','前 ＋ パンチ：フレイムクロー（3方向の炎爪）','前 ＋ キック：レオパードラッシュ','上 ＋ キック：インフェルノクロー（壁から画面下寄りまで急降下→時間差5連斬）'],
       satanael:[
       'ディザスターフレア：後ろ ＋ パンチ',
       'ダークレイ：前 ＋ パンチ',
@@ -5161,7 +5161,7 @@
     if(gameOver||!f||f.stun>0||f.guard||f.specialT>0)return false;
     const target=f.isPlayer?enemy:player;if(!target)return false;
     f.specialType='hellFlame';f.specialT=.58;f.attack='punch';f.attackT=.58;
-    flaurosPillars.push({owner:f,x:target.x,y:Math.min(innerHeight-62,target.y+70),t:.48,life:.95,fired:false,hit:false});
+    flaurosPillars.push({owner:f,x:target.x,y:innerHeight-86,t:.48,life:.95,fired:false,hit:false});
     comboEl.textContent='ヘルフレイム…';return true;
   }
   function specialFlameClaw(f){
@@ -5188,7 +5188,7 @@
     // まず「自分の後ろ側」の上壁へ飛ぶ。右向きなら左上、左向きなら右上。
     f.infernoFromX=f.x;f.infernoFromY=f.y;
     f.infernoWallX=f.face>0?62:innerWidth-62;f.infernoWallY=92;
-    f.infernoEndX=f.face>0?innerWidth-62:62;f.infernoEndY=innerHeight-76;
+    f.infernoEndX=f.face>0?innerWidth-62:62;f.infernoEndY=innerHeight-150;
     comboEl.textContent='インフェルノクロー!';return true;
   }
 
@@ -7203,7 +7203,7 @@ function drawBackground(dt){
       flaurosPillars.forEach(p=>{
         p.t-=dt;const target=p.owner&&p.owner.isPlayer?enemy:player;if(!target)return;
         if(!p.fired&&p.t<=0){p.fired=true;p.t=.42;comboEl.textContent='ヘルフレイム!';}
-        if(p.fired&&!p.hit&&Math.abs(target.x-p.x)<48&&Math.abs(target.y-(p.y-75))<115){p.hit=true;damageHit(p.owner,target,7.2*p.owner.damageMul,45*Math.sign(target.x-p.x||1),-175);spawnImpact(target.x,target.y,'hit');}
+        if(p.fired&&!p.hit&&Math.abs(target.x-p.x)<54&&target.y>=70&&target.y<=p.y+18){p.hit=true;damageHit(p.owner,target,7.2*p.owner.damageMul,45*Math.sign(target.x-p.x||1),-175);spawnImpact(target.x,target.y,'hit');}
       });
       flaurosPillars=flaurosPillars.filter(p=>p.t>0||!p.fired);
       flaurosClaws.forEach(c=>{c.t-=dt;if(c.t<=0&&!c.hit&&c.target&&c.target.hp>0){c.hit=true;const last=c.index===4;damageHit(c.owner,c.target,(last?2.5:1.55)*c.owner.damageMul,(last?145:20)*c.owner.face,last?-75:-8);spawnImpact(c.target.x,c.target.y,'hit');}});
@@ -8098,7 +8098,7 @@ function drawBackground(dt){
       ctx.restore();
     });
 
-    flaurosPillars.forEach(p=>{ctx.save();const armed=!p.fired;ctx.globalCompositeOperation='lighter';if(armed){ctx.globalAlpha=.65;ctx.strokeStyle='#ff5138';ctx.lineWidth=4;ctx.beginPath();ctx.ellipse(p.x,p.y,42,12,0,0,Math.PI*2);ctx.stroke();}else{const g=ctx.createLinearGradient(p.x,p.y,p.x,p.y-170);g.addColorStop(0,'#ff281d');g.addColorStop(.45,'#ff7a28');g.addColorStop(1,'rgba(255,235,120,0)');ctx.fillStyle=g;ctx.shadowColor='#ff5a20';ctx.shadowBlur=25;ctx.beginPath();ctx.moveTo(p.x-30,p.y);ctx.quadraticCurveTo(p.x-18,p.y-100,p.x,p.y-175);ctx.quadraticCurveTo(p.x+22,p.y-95,p.x+30,p.y);ctx.fill();}ctx.restore();});
+    flaurosPillars.forEach(p=>{ctx.save();const armed=!p.fired;ctx.globalCompositeOperation='lighter';if(armed){ctx.globalAlpha=.65;ctx.strokeStyle='#ff5138';ctx.lineWidth=4;ctx.beginPath();ctx.ellipse(p.x,p.y,48,12,0,0,Math.PI*2);ctx.stroke();}else{const topY=34;const g=ctx.createLinearGradient(p.x,p.y,p.x,topY);g.addColorStop(0,'#ff281d');g.addColorStop(.55,'#ff7a28');g.addColorStop(1,'rgba(255,235,120,.82)');ctx.fillStyle=g;ctx.shadowColor='#ff5a20';ctx.shadowBlur=28;ctx.beginPath();ctx.moveTo(p.x-34,p.y);ctx.quadraticCurveTo(p.x-24,(p.y+topY)*.56,p.x-15,topY);ctx.quadraticCurveTo(p.x,(topY-18),p.x+15,topY);ctx.quadraticCurveTo(p.x+25,(p.y+topY)*.56,p.x+34,p.y);ctx.closePath();ctx.fill();}ctx.restore();});
     flaurosClaws.forEach(c=>{if(c.t>.08)return;ctx.save();ctx.translate(c.x,c.y);ctx.globalCompositeOperation='lighter';ctx.strokeStyle='#ff3028';ctx.shadowColor='#ff1f18';ctx.shadowBlur=16;ctx.lineWidth=5;ctx.globalAlpha=.8;for(let j=-1;j<=1;j++){ctx.beginPath();ctx.moveTo(-34,-22+j*15);ctx.lineTo(36,18+j*15);ctx.stroke();}ctx.restore();});
 
 
