@@ -430,7 +430,7 @@
       'デッドリー・アクア：前 → 下 → 後ろ ＋ キック'
     ],
     kawazu:[
-      'トリプルアッパー：前 ＋ パンチ',
+      'ファントムラッシュ：前 ＋ パンチ',
       '水圧ラッシュ：パンチ連打',
       'ミラージュキック：前 ＋ キック',
       'スピンキックカッター：後ろ ＋ キック（十字光3連発）'
@@ -3224,7 +3224,7 @@
       'インフェルノウェーブ：下 ＋ キック（蓮の葉から通常ジャンプ高までの黒炎壁）'
     ],
     samael:['方向 ＋ パンチ：ポイズンゲート（指定方向から毒弾）','舌：ヴェノムタン（舌先から毒弾）','前 → 下 → 後ろ ＋ キック：デッドリー・アクア'],
-      kawazu:['前 ＋ パンチ：トリプルアッパー（背後へ3回すり抜け）','パンチ連打：水圧ラッシュ','前 ＋ キック：ミラージュキック','後ろ ＋ キック：スピンキックカッター（十字光3連発）','隠し：方向キー1回転 ＋ 舌']
+      kawazu:['前 ＋ パンチ：ファントムラッシュ（アッパー×2→キック×2→両側アッパー）','パンチ連打：水圧ラッシュ','前 ＋ キック：ミラージュキック','後ろ ＋ キック：スピンキックカッター（十字光3連発）','隠し：方向キー1回転 ＋ 舌']
     };
     return map[type] || ['専用必殺技：練習対象外'];
   }
@@ -4614,30 +4614,51 @@
     if(gameOver||!f||f.type!=='kawazu'||f.stun>0||f.guard||f.specialT>0||f.attackT>0)return false;
     const other=f.isPlayer?enemy:player;
     if(!other)return false;
-    f.specialType='kawazuTripleUpper';f.specialT=.92;f.attack='punch';f.attackVariant='up';f.attackT=.92;
-    other.stun=Math.max(other.stun,.95);
-    comboEl.textContent='トリプルアッパー!';
+    f.specialType='kawazuTripleUpper';f.specialT=1.42;f.attack='punch';f.attackVariant='up';f.attackT=1.42;
+    other.stun=Math.max(other.stun,1.45);
+    comboEl.textContent='ファントムラッシュ!';
 
     let side=f.x<other.x?-1:1;
-    const strike=(i)=>{
-      if(gameOver||!other||other.hp<=0)return;
-      const oldX=f.x,oldY=f.y;
-      side*=-1;
-      f.x=Math.max(48,Math.min(innerWidth-48,other.x+side*72));
-      f.y=Math.max(70,Math.min(jumpFloorY()-70,other.y+34));
-      f.face=other.x>=f.x?1:-1;
-      kawazuGhosts.push({x:oldX,y:oldY,t:.20,life:.20,angle:0});
-      f.attack='punch';f.attackVariant='up';f.attackT=Math.max(f.attackT,.22);
-      const dmg=[3.0,3.3,4.1][i];
-      const lift=[-245,-295,-365][i];
-      damageHit(f,other,dmg*f.damageMul,32*f.face,lift);
-      other.vy=Math.min(other.vy,lift);
-      spawnImpact(other.x,other.y,'hit');
+    const warpStrike=(kind,dmg,lift,delay)=>{
+      setTimeout(()=>{
+        if(gameOver||!other||other.hp<=0)return;
+        const oldX=f.x,oldY=f.y;
+        side*=-1;
+        f.x=Math.max(48,Math.min(innerWidth-48,other.x+side*74));
+        f.y=Math.max(70,Math.min(jumpFloorY()-70,other.y+36));
+        f.face=other.x>=f.x?1:-1;
+        kawazuGhosts.push({x:oldX,y:oldY,t:.30,life:.30,angle:0});
+        f.attack=kind==='kick'?'kick':'punch';
+        f.attackVariant=kind==='kick'?'side':'up';
+        f.attackT=Math.max(f.attackT,.18);
+        damageHit(f,other,dmg*f.damageMul,kind==='kick'?78*f.face:30*f.face,lift);
+        other.vy=Math.min(other.vy,lift);
+        spawnImpact(other.x,other.y,'hit');
+      },delay);
     };
-    setTimeout(()=>strike(0),105);
-    setTimeout(()=>strike(1),315);
-    setTimeout(()=>strike(2),535);
-    setTimeout(()=>{if(comboEl.textContent==='トリプルアッパー!')comboEl.textContent='';},850);
+
+    warpStrike('upper',2.7,-230,95);
+    warpStrike('upper',2.9,-275,275);
+    warpStrike('kick',2.8,-135,455);
+    warpStrike('kick',3.0,-165,625);
+
+    // 最後は左右に「同時に2人いる」ような濃い残像を出し、両側からアッパー。
+    setTimeout(()=>{
+      if(gameOver||!other||other.hp<=0)return;
+      const y=Math.max(70,Math.min(jumpFloorY()-70,other.y+36));
+      const lx=Math.max(48,other.x-78), rx=Math.min(innerWidth-48,other.x+78);
+      kawazuGhosts.push({x:lx,y,t:.34,life:.34,angle:0});
+      kawazuGhosts.push({x:rx,y,t:.34,life:.34,angle:0});
+      // 本体も一方に置き、もう一方を濃い残像にしてほぼ同時攻撃に見せる。
+      f.x=lx; f.y=y; f.face=1;
+      f.attack='punch';f.attackVariant='up';f.attackT=.28;
+      damageHit(f,other,4.8*f.damageMul,0,-410);
+      other.vy=Math.min(other.vy,-410);
+      spawnImpact(other.x-12,other.y,'hit');
+      setTimeout(()=>spawnImpact(other.x+12,other.y,'hit'),28);
+    },815);
+
+    setTimeout(()=>{if(comboEl.textContent==='ファントムラッシュ!')comboEl.textContent='';},1250);
     clearCommand();return true;
   }
 
@@ -4745,7 +4766,7 @@
         const a=i*Math.PI*2/7;
         f.x=Math.max(45,Math.min(innerWidth-45,other.x+Math.cos(a)*64));
         f.y=Math.max(55,Math.min(innerHeight-55,other.y+Math.sin(a)*48));
-        kawazuGhosts.push({x:f.x,y:f.y,t:.18,life:.18,angle:a});
+        kawazuGhosts.push({x:f.x,y:f.y,t:.27,life:.27,angle:a});
         if(Math.hypot(f.x-other.x,f.y-other.y)<100){
           damageHit(f,other,(i===13?3.2:.72)*f.damageMul,(i===13?225:8)*dir,(i===13?-65:0));
         }
@@ -8007,7 +8028,7 @@ function drawBackground(dt){
       ctx.beginPath();
       ctx.arc(0,0,w.r,-1.08,1.08);
       ctx.stroke();
-      ctx.globalAlpha=.28*a;
+      ctx.globalAlpha=.52*a;
       ctx.strokeStyle='#8fff2c';
       ctx.lineWidth=34;
       ctx.beginPath();
