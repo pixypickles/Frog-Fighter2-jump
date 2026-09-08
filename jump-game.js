@@ -4766,7 +4766,7 @@
         const a=i*Math.PI*2/7;
         f.x=Math.max(45,Math.min(innerWidth-45,other.x+Math.cos(a)*64));
         f.y=Math.max(55,Math.min(innerHeight-55,other.y+Math.sin(a)*48));
-        kawazuGhosts.push({x:f.x,y:f.y,t:.27,life:.27,angle:a});
+        kawazuGhosts.push({x:f.x,y:f.y,t:.42,life:.42,angle:a});
         if(Math.hypot(f.x-other.x,f.y-other.y)<100){
           damageHit(f,other,(i===13?3.2:.72)*f.damageMul,(i===13?225:8)*dir,(i===13?-65:0));
         }
@@ -8028,7 +8028,7 @@ function drawBackground(dt){
       ctx.beginPath();
       ctx.arc(0,0,w.r,-1.08,1.08);
       ctx.stroke();
-      ctx.globalAlpha=.52*a;
+      ctx.globalAlpha=.82*(0.55+0.45*a);
       ctx.strokeStyle='#8fff2c';
       ctx.lineWidth=34;
       ctx.beginPath();
