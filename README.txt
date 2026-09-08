@@ -285,3 +285,9 @@ v2.46
 - Azazel character-select icon is now a custom dragonfly graphic, not a fly emoji.
 - Fixed runtime Fighter names so Practice/Free Battle show Azazel and Belial instead of legacy Leviathan/Asmodeus.
 - Old Leviathan/Asmodeus strings remain only as legacy input aliases for compatibility.
+
+v2.47
+- Restored Azazel's JUMP 2.9 character-select art: black/yellow oniyanma-style dragonfly face with large turquoise compound eyes.
+- Restored the JUMP 2.9 in-battle Azazel dragonfly and Belial spider rendering instead of legacy fish/crayfish bodies.
+- Story progression now uses a transition lock. The result button is hidden during interludes, repeated taps cannot advance multiple fights, and each narrative callback starts exactly one battle.
+- startStoryMode now sets gameMode='story' before the opening narrative.

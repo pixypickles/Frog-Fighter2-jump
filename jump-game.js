@@ -67,6 +67,7 @@
   let stageTheme=0;
   let storyQueue=[];
   let storyFightIndex=0;
+  let storyTransitionLocked=false;
   let storyLosses=0;
   let storyWins=0;
   let storyFinished=false;
@@ -586,6 +587,7 @@
       storyNarrativeNext.textContent=i===pages.length-1?'進む':'次へ';
     };
     storyNarrative.hidden=false;
+    if(gameMode==='story') restartButton.hidden=true;
     render();
     storyNarrativeNext.onclick=()=>{
       i++;
@@ -779,6 +781,7 @@
       }else continueAllBattle();
     }
     else if(gameMode==='story'){
+      if(storyTransitionLocked)return;
       if(storyFinished){
         if(storyHud) storyHud.hidden=true;
         gameMode='battle';
@@ -1497,12 +1500,11 @@
       }
 
 
-      // トンボ：アザゼルさん
+      // トンボ：アザゼルさん。オニヤンマを意識した黒＋黄の大型トンボ。
       if(this.type==='piranha'){
         if(this.face<0) ctx.scale(-1,1);
-        // パンチは前転で背びれ斬り、キックはバク転で尻尾斬り
         if((this.specialType==='piranhaDivePunch'||this.specialType==='piranhaDiveKick') && this.piranhaDivePhase>=2){
-          ctx.rotate(Math.PI/2); // 口を真下へ向けて急降下
+          ctx.rotate(Math.PI/2);
         }else if(this.attack==='punch' && this.specialType!=='piranhaDivePunch'){
           const t=Math.max(0,Math.min(1,this.attackT/.34)); ctx.rotate((1-t)*Math.PI*2);
         }else if(this.attack==='kick' && this.specialType!=='piranhaDiveKick'){
@@ -1510,104 +1512,75 @@
         }
         if(this.flash>0) ctx.globalAlpha=.55;
 
-        // 胴体
-        ctx.fillStyle='#d63b32';
-        ctx.beginPath();
-        ctx.ellipse(0,8,43,28,0,0,Math.PI*2);
-        ctx.fill();
+        const flap=Math.sin(performance.now()/42)*.14;
+        ctx.fillStyle='rgba(180,225,238,.62)';
+        ctx.beginPath();ctx.ellipse(-3,-8,45,10,-.50+flap,0,Math.PI*2);ctx.fill();
+        ctx.beginPath();ctx.ellipse(-5,7,45,10,.48-flap,0,Math.PI*2);ctx.fill();
+        ctx.beginPath();ctx.ellipse(8,-7,39,9,.42-flap,0,Math.PI*2);ctx.fill();
+        ctx.beginPath();ctx.ellipse(8,8,39,9,-.42+flap,0,Math.PI*2);ctx.fill();
 
-        // 腹側
-        ctx.fillStyle='#e97850';
-        ctx.beginPath();
-        ctx.ellipse(4,16,29,15,0,0,Math.PI*2);
-        ctx.fill();
+        ctx.fillStyle='#171717';
+        ctx.beginPath();ctx.ellipse(7,5,21,18,0,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle='#f2d928';
+        ctx.fillRect(-5,-9,6,27);
+        ctx.fillRect(8,-11,7,30);
 
-        // 尾びれ
-        ctx.fillStyle='#2fae55';
-        ctx.beginPath();
-        ctx.moveTo(-37,6);
-        ctx.lineTo(-67,-16);
-        ctx.lineTo(-58,7);
-        ctx.lineTo(-68,29);
-        ctx.closePath();
-        ctx.fill();
-
-        // 背びれ
-        ctx.fillStyle='#279c4c';
-        ctx.beginPath();
-        ctx.moveTo(-8,-17);
-        ctx.lineTo(8,-39);
-        ctx.lineTo(18,-15);
-        ctx.closePath();
-        ctx.fill();
-
-        // 緑の斑点模様
-        ctx.fillStyle='#35b95d';
-        ctx.beginPath();
-        ctx.ellipse(-10,-3,11,7,-.25,0,Math.PI*2);
-        ctx.ellipse(10,15,8,5,.35,0,Math.PI*2);
-        ctx.fill();
-
-        // 目
-        if(this.hurtFaceT>0 || this.throwState){
-          ctx.strokeStyle='#20292b';
-          ctx.lineWidth=4;
-          ctx.lineCap='round';
-          ctx.beginPath();
-          ctx.moveTo(15,-4); ctx.lineTo(22,0); ctx.lineTo(29,-4);
-          ctx.stroke();
-        }else{
-          ctx.fillStyle='#fff';
-          ctx.beginPath();
-          ctx.arc(22,-4,7,0,Math.PI*2);
-          ctx.fill();
-          ctx.fillStyle='#111';
-          ctx.beginPath();
-          ctx.arc(24,-4,3,0,Math.PI*2);
-          ctx.fill();
+        ctx.strokeStyle='#171717';
+        ctx.lineWidth=14;
+        ctx.lineCap='round';
+        ctx.beginPath();ctx.moveTo(-8,7);ctx.lineTo(-102,8);ctx.stroke();
+        ctx.strokeStyle='#f2d928';
+        ctx.lineWidth=5;
+        for(let x=-22;x>=-92;x-=18){
+          ctx.beginPath();ctx.moveTo(x,2);ctx.lineTo(x,14);ctx.stroke();
         }
+        ctx.strokeStyle='#171717';ctx.lineWidth=7;
+        ctx.beginPath();ctx.moveTo(-99,8);ctx.lineTo(-122,8);ctx.stroke();
 
-        // ピラニアらしい口と歯
-        ctx.fillStyle='#26343b';
+        ctx.fillStyle='#242424';ctx.beginPath();ctx.arc(31,3,16,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle=(this.hurtFaceT>0||this.throwState)?'#7e5b4c':'#38b7a4';
+        ctx.beginPath();ctx.ellipse(37,1,11,14,.15,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle='rgba(255,255,255,.62)';
+        ctx.beginPath();ctx.arc(40,-4,3,0,Math.PI*2);ctx.fill();
+
+        ctx.strokeStyle='#111';ctx.lineWidth=4;ctx.lineCap='round';
         ctx.beginPath();
-        ctx.moveTo(35,7);
-        ctx.lineTo(56,-2);
-        ctx.lineTo(53,15);
-        ctx.closePath();
-        ctx.fill();
+        ctx.moveTo(13,15);ctx.lineTo(30,34);ctx.lineTo(35,44);
+        ctx.moveTo(4,16);ctx.lineTo(13,40);ctx.lineTo(8,52);
+        ctx.moveTo(-5,14);ctx.lineTo(-19,35);ctx.lineTo(-23,47);
+        ctx.stroke();
 
-        ctx.fillStyle='#fff';
-        for(let i=0;i<4;i++){
-          ctx.beginPath();
-          ctx.moveTo(39+i*4,4);
-          ctx.lineTo(41+i*4,9);
-          ctx.lineTo(43+i*4,4);
-          ctx.closePath();
-          ctx.fill();
-        }
-
-        if(this.hurtFaceT>0 || this.throwState){
-          // やられ時は口角を下げる線を重ねる
-          ctx.strokeStyle='#411f23';
-          ctx.lineWidth=4;
-          ctx.beginPath();
-          ctx.arc(43,13,12,1.15*Math.PI,1.85*Math.PI);
-          ctx.stroke();
-        }
-
-        // 通常パンチ/キック相当：体当たりや尾びれ攻撃に見える簡易表現
         if(this.attack==='punch'){
-          ctx.strokeStyle='#c8e3ec';
-          ctx.lineWidth=6;
-          ctx.beginPath();
-          ctx.moveTo(34,2); ctx.lineTo(62,-8);
-          ctx.stroke();
+          ctx.strokeStyle='rgba(220,248,255,.95)';
+          ctx.lineWidth=7;
+          ctx.beginPath();ctx.arc(32,3,34,-1.0,.75);ctx.stroke();
         }
         if(this.attack==='kick'){
-          ctx.strokeStyle='#536b76';
-          ctx.lineWidth=10;
+          ctx.strokeStyle='rgba(245,225,80,.9)';
+          ctx.lineWidth=8;
+          ctx.beginPath();ctx.arc(-82,8,38,2.2,4.1);ctx.stroke();
+        }
+
+        if(this.specialType==='piranhaRush'){
+          const bite=(Math.sin(performance.now()/48)+1)*.5;
+          // v2.9: 以前の約1/4の見た目。実物寄りに黒い大顎＋視認用の黄色い縁。
+          const reach=4.5+3.5*(1-bite);
+          ctx.lineCap='round';
+
+          // 黄色い縁取りを先に太く描く。
+          ctx.strokeStyle='#f3d72d';
+          ctx.lineWidth=8;
           ctx.beginPath();
-          ctx.moveTo(-35,8); ctx.lineTo(-72,6);
+          ctx.moveTo(43,-3);ctx.quadraticCurveTo(49+reach,-6,56+reach,-2);
+          ctx.moveTo(43,4);ctx.quadraticCurveTo(49+reach,7,56+reach,3);
+          ctx.stroke();
+
+          // 本体の顎は黒。
+          ctx.strokeStyle='#111';
+          ctx.lineWidth=5;
+          ctx.beginPath();
+          ctx.moveTo(43,-3);ctx.quadraticCurveTo(49+reach,-6,56+reach,-2);
+          ctx.moveTo(43,4);ctx.quadraticCurveTo(49+reach,7,56+reach,3);
           ctx.stroke();
         }
 
@@ -1615,178 +1588,114 @@
         return;
       }
 
-      // クモ：ベリアルさん
+
+      // クモ：ベリアルさん。天井から伸びる糸に繋がり、空中を自在に移動。
       if(this.type==='crayfish'){
         if(this.face<0) ctx.scale(-1,1);
         if(this.flash>0) ctx.globalAlpha=.55;
 
-        // 胴体
-        ctx.fillStyle='#9b3f2f';
+        // 天井へ続く蜘蛛の糸。投げられている間は切れ、復帰後に上へ伸び直す。
+        if((this.belialThreadGrow||0)>0 && !this.throwState){
+          const grow=Math.max(0,Math.min(1,this.belialThreadGrow||0));
+          ctx.save();
+          if(this.face<0) ctx.scale(-1,1);
+          ctx.strokeStyle='rgba(238,244,238,.88)';
+          ctx.lineWidth=2.3;
+          ctx.beginPath();
+          ctx.moveTo(0,-17);
+          ctx.quadraticCurveTo(10,-this.y*.55*grow,0,-this.y*grow);
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // 腹部と頭
+        ctx.fillStyle='#44354f';
+        ctx.beginPath();ctx.ellipse(-3,17,31,36,0,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle='#5a4568';
+        ctx.beginPath();ctx.ellipse(8,-11,23,21,0,0,Math.PI*2);ctx.fill();
+
+        // 8本脚。ラッシュ中は先端を高速に振る。
+        const rush=this.specialType==='crayfishRush';
+        const wig=rush?Math.sin(performance.now()/34)*16:0;
+        ctx.strokeStyle='#392b43';ctx.lineWidth=8;ctx.lineCap='round';
         ctx.beginPath();
-        ctx.ellipse(-2,16,28,34,0,0,Math.PI*2);
-        ctx.fill();
+        const legYs=[-5,7,19,30];
+        legYs.forEach((yy,i)=>{
+          const ext=38+i*4+(rush?10:0);
+          ctx.moveTo(-18,yy);ctx.lineTo(-45,yy-18-i*3);ctx.lineTo(-ext-18,yy-8+wig*(i%2?1:-1));
+          ctx.moveTo(18,yy);ctx.lineTo(45,yy-18-i*3);ctx.lineTo(ext+18,yy-8-wig*(i%2?1:-1));
+        });
+        ctx.stroke();
 
-        if(this.type==='kokabiel'&&(this.specialType==='gravityBall'||this.specialType==='gravityZone'||this.specialType==='meteorRain')){
-        ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.28;ctx.strokeStyle='#75e6ee';ctx.lineWidth=2.5;ctx.shadowColor='#6de6ef';ctx.shadowBlur=12;ctx.beginPath();ctx.ellipse(0,18,46,59,0,0,Math.PI*2);ctx.stroke();ctx.restore();
-      }
-
-      if((this.gravityHeavyT||0)>0){
-        ctx.save();ctx.globalCompositeOperation='lighter';
-        ctx.globalAlpha=.20+.10*Math.sin(performance.now()/85);
-        ctx.strokeStyle='#75e6ee';ctx.lineWidth=3;ctx.shadowColor='#52dce8';ctx.shadowBlur=12;
-        for(let i=-1;i<=1;i++){
-          ctx.beginPath();ctx.moveTo(i*18,34);ctx.lineTo(i*18,78);ctx.stroke();
-          ctx.beginPath();ctx.moveTo(i*18-6,68);ctx.lineTo(i*18,78);ctx.lineTo(i*18+6,68);ctx.stroke();
+        // 顔。カウンター待機中は複眼が赤く光る。
+        const counter=this.specialType==='crayfishCounter';
+        ctx.fillStyle=counter?'#ff382e':'#d9e6dc';
+        for(const [ex,ey] of [[0,-18],[10,-20],[19,-15],[5,-9],[15,-7],[25,-5]]){
+          ctx.beginPath();ctx.arc(ex,ey,3.6,0,Math.PI*2);ctx.fill();
         }
-        ctx.restore();
-      }
-      if(this.type==='kokabiel'&&this.specialType==='gravityDive'&&this.specialT>0){
-        ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.34;
-        ctx.strokeStyle='#76e9f1';ctx.lineWidth=7;ctx.lineCap='round';ctx.shadowColor='#54dce8';ctx.shadowBlur=14;
-        ctx.beginPath();ctx.moveTo(-this.face*18,-35);ctx.lineTo(-this.face*55,-88);ctx.stroke();ctx.restore();
-      }
-
-      if(this.type==='sariel'){
-        if(this.specialType==='evilEye'&&this.specialT>0){
-          ctx.save();ctx.globalCompositeOperation='lighter';ctx.fillStyle='#ff334c';ctx.shadowColor='#ff1f38';ctx.shadowBlur=18;
-          ctx.beginPath();ctx.arc(-19,-29,6,0,Math.PI*2);ctx.arc(19,-29,6,0,Math.PI*2);ctx.fill();ctx.restore();
+        if(counter){
+          ctx.save();ctx.globalCompositeOperation='lighter';ctx.fillStyle='rgba(255,50,35,.35)';
+          ctx.beginPath();ctx.arc(11,-14,24,0,Math.PI*2);ctx.fill();ctx.restore();
         }
-        if(this.specialType==='moonSalt'&&this.specialT>0){
-          ctx.save();ctx.globalCompositeOperation='lighter';ctx.translate(0,20);
-          ctx.globalAlpha=.52;ctx.strokeStyle='#e8ecff';ctx.lineWidth=7;ctx.lineCap='round';ctx.shadowColor='#cbd4ff';ctx.shadowBlur=16;
-          // 3本の回転残像で高速回転を明確に見せる。
-          for(let i=0;i<3;i++){
-            ctx.rotate(Math.PI*2/3);
-            ctx.beginPath();ctx.arc(0,0,55,-.15,1.45);ctx.stroke();
-            ctx.beginPath();ctx.moveTo(30,0);ctx.lineTo(62,0);ctx.stroke();
+
+        // 糸を使う攻撃の簡易表現
+        if(this.attack==='crayfishStab' || this.specialType==='crayfishBottomSmash'){
+          ctx.strokeStyle='rgba(245,250,245,.92)';ctx.lineWidth=5;
+          ctx.beginPath();ctx.moveTo(18,-2);ctx.lineTo(70,this.specialType==='crayfishBottomSmash'?54:4);ctx.stroke();
+        }
+        if(this.specialType==='crayfishCounterHit'){
+          ctx.strokeStyle='#392b43';ctx.lineWidth=11;ctx.beginPath();
+          ctx.moveTo(18,0);ctx.lineTo(58,45);ctx.moveTo(-18,0);ctx.lineTo(-58,45);ctx.stroke();
+        }
+
+        if(this.attack==='crayfishHammer'){
+          const jab=16+Math.sin(performance.now()/42)*5;
+          ctx.strokeStyle='#2f2338';ctx.lineWidth=10;ctx.lineCap='round';
+          ctx.beginPath();
+          ctx.moveTo(19,-5);ctx.lineTo(52+jab,-18);ctx.lineTo(78+jab,-8);
+          ctx.moveTo(18,6);ctx.lineTo(49+jab,4);ctx.lineTo(76+jab,14);
+          ctx.stroke();
+          ctx.strokeStyle='rgba(238,244,238,.72)';ctx.lineWidth=3;
+          ctx.beginPath();ctx.moveTo(70+jab,-5);ctx.lineTo(88+jab,-7);ctx.stroke();
+        }
+
+        if(this.attack==='crayfishUpper'){
+          const kick=18+Math.sin(performance.now()/48)*4;
+          ctx.strokeStyle='#2f2338';ctx.lineWidth=11;ctx.lineCap='round';
+          ctx.beginPath();
+          ctx.moveTo(17,22);ctx.lineTo(52+kick,38);ctx.lineTo(81+kick,31);
+          ctx.moveTo(10,31);ctx.lineTo(44+kick,55);ctx.lineTo(74+kick,52);
+          ctx.stroke();
+        }
+
+        // ベリアルの舌ボタン＝カエルの舌と同じ性能。ただし見た目は白い蜘蛛糸。
+        if(this.tongueT>0 || (this.tonguePullTarget && this.tonguePullTimer>0) || (this.tongueClashTarget && this.tongueClashTimer>0)){
+          const target=this.tongueClashTarget || this.tonguePullTarget || (this.isPlayer?enemy:player);
+          if(target){
+            const dx=(target.x-this.x)*this.face;
+            const dy=target.y-this.y;
+            const len=Math.min(this.tongueRange,Math.max(0,dx));
+            const ty=Math.max(-70,Math.min(70,dy));
+            ctx.strokeStyle='rgba(250,253,250,.96)';
+            ctx.lineWidth=4;
+            ctx.lineCap='round';
+            ctx.beginPath();
+            ctx.moveTo(24,-7);
+            ctx.lineTo(len,-7+ty);
+            ctx.stroke();
+
+            // 糸先の小さな粘着輪。
+            ctx.lineWidth=2;
+            ctx.beginPath();
+            ctx.arc(len,-7+ty,7,0,Math.PI*2);
+            ctx.stroke();
           }
-          ctx.restore();
-        }
-      }
-      if((this.sarielParalyzeT||0)>0){ctx.save();ctx.globalCompositeOperation='lighter';ctx.strokeStyle='#ff465b';ctx.lineWidth=3;ctx.globalAlpha=.45;for(let i=0;i<3;i++){ctx.beginPath();ctx.arc(0,10,43+i*7,i,Math.PI+i);ctx.stroke();}ctx.restore();}
-      if((this.bloodSlowT||0)>0){ctx.save();ctx.globalAlpha=.22;ctx.fillStyle='#8e1e35';ctx.beginPath();ctx.ellipse(0,18,48,62,0,0,Math.PI*2);ctx.fill();ctx.restore();}
-
-      // 頭
-        ctx.fillStyle='#b64d37';
-        ctx.beginPath();
-        ctx.ellipse(3,-10,29,24,0,0,Math.PI*2);
-        ctx.fill();
-
-        // 尻尾の節
-        ctx.fillStyle='#873427';
-        for(let i=0;i<3;i++){
-          ctx.beginPath();
-          ctx.ellipse(-8-i*10,43+i*7,18-i*2,10,0,0,Math.PI*2);
-          ctx.fill();
-        }
-
-        // 目
-        if(this.hurtFaceT>0 || this.throwState){
-          ctx.strokeStyle='#3b1d18';
-          ctx.lineWidth=3.5;
-          ctx.lineCap='round';
-          ctx.beginPath();
-          ctx.moveTo(7,-23); ctx.lineTo(14,-19); ctx.lineTo(21,-23);
-          ctx.moveTo(-10,-23); ctx.lineTo(-3,-19); ctx.lineTo(4,-23);
-          ctx.stroke();
-        }else{
-          ctx.fillStyle='#fff';
-          ctx.beginPath();
-          ctx.arc(14,-23,5.5,0,Math.PI*2);
-          ctx.arc(-3,-23,5.5,0,Math.PI*2);
-          ctx.fill();
-          ctx.fillStyle='#111';
-          ctx.beginPath();
-          ctx.arc(15,-23,2.5,0,Math.PI*2);
-          ctx.arc(-2,-23,2.5,0,Math.PI*2);
-          ctx.fill();
-        }
-
-        // ハサミ：腕だけでなくハサミ本体ごと振る
-        let clawExtend=0, clawY=7, armStartY=0;
-        if(this.attack==='crayfishStab') clawExtend=28;
-        if(this.attack==='crayfishHammer'){ clawExtend=8; clawY=42; armStartY=4; }
-        if(this.attack==='crayfishUpper'){ clawExtend=8; clawY=-34; armStartY=-4; }
-        if(this.specialType==='crayfishRush'){
-          clawExtend=18+Math.sin(performance.now()/45)*10;
-          clawY=Math.sin(performance.now()/55)*12;
-        }
-        ctx.strokeStyle='#a94331'; ctx.lineWidth=11; ctx.lineCap='round';
-        ctx.beginPath();
-        ctx.moveTo(18,armStartY); ctx.lineTo(42+clawExtend,clawY);
-        ctx.moveTo(-18,2); ctx.lineTo(-39,13); ctx.stroke();
-
-        ctx.fillStyle='#c95b40'; ctx.beginPath();
-        ctx.ellipse(49+clawExtend,clawY,19,14,.15,0,Math.PI*2);
-        ctx.ellipse(-45,13,17,12,-.15,0,Math.PI*2); ctx.fill();
-
-        if(this.attack==='crayfishHammer'||this.attack==='crayfishUpper'){
-          ctx.fillStyle='#e57a58'; ctx.beginPath();
-          ctx.ellipse(59+clawExtend,clawY-2,10,8,.2,0,Math.PI*2); ctx.fill();
-        }
-
-        // ハサミ割れ
-        ctx.strokeStyle='#793025';
-        ctx.lineWidth=3;
-        ctx.beginPath();
-        ctx.moveTo(49+clawExtend,clawY-11); ctx.lineTo(51+clawExtend,clawY+11);
-        ctx.moveTo(-45,2); ctx.lineTo(-45,23);
-        ctx.stroke();
-
-        // 触角
-        ctx.strokeStyle='#c7674f';
-        ctx.lineWidth=2.5;
-        ctx.beginPath();
-        ctx.moveTo(12,-28); ctx.quadraticCurveTo(39,-48,58,-39);
-        ctx.moveTo(-2,-28); ctx.quadraticCurveTo(-31,-49,-51,-37);
-        ctx.stroke();
-
-          if(this.type==='crayfish' && this.specialType==='crayfishCounter'){
-          // 待機中は通常の腕をそのまま使い、両目だけ赤く発光。
-          ctx.save();
-          ctx.globalCompositeOperation='lighter';
-          ctx.fillStyle='#ff2a20';
-          ctx.shadowColor='#ff1d12';
-          ctx.shadowBlur=13;
-          ctx.beginPath();
-          ctx.arc(-14,-25,6.5,0,Math.PI*2);
-          ctx.arc(14,-25,6.5,0,Math.PI*2);
-          ctx.fill();
-          ctx.restore();
-        }
-
-        if(this.type==='crayfish' && this.specialType==='crayfishCounterHit'){
-          // 反撃は両腕を上から振り下ろす
-          ctx.save();
-          ctx.strokeStyle='#a94331';
-          ctx.lineWidth=12;
-          ctx.lineCap='round';
-          ctx.beginPath();
-          ctx.moveTo(18,0); ctx.lineTo(54,46);
-          ctx.moveTo(-18,0); ctx.lineTo(-48,43);
-          ctx.stroke();
-
-          ctx.fillStyle='#d36a4c';
-          ctx.beginPath();
-          ctx.ellipse(61,48,20,15,.2,0,Math.PI*2);
-          ctx.ellipse(-55,45,20,15,-.2,0,Math.PI*2);
-          ctx.fill();
-          ctx.restore();
-        }
-
-      // ボトムスマッシュ時は両ハサミを下へ
-        if(this.specialType==='crayfishBottomSmash'){
-          ctx.strokeStyle='#7a2f24';
-          ctx.lineWidth=12;
-          ctx.beginPath();
-          ctx.moveTo(12,5); ctx.lineTo(35,48);
-          ctx.moveTo(-12,7); ctx.lineTo(-28,50);
-          ctx.stroke();
         }
 
         ctx.restore();
         return;
       }
+
 
       // ウリエルさんは少し大柄
       if(this.bodyScale && this.bodyScale!==1) ctx.scale(this.bodyScale,this.bodyScale);
@@ -3436,6 +3345,8 @@
   }
 
   function startStoryMode(){
+    gameMode='story';
+    storyTransitionLocked=false;
     if(leafMiniHud){leafMiniHud.hidden=true;leafMiniHud.style.display='none';}
     if(guardMiniHud){guardMiniHud.hidden=true;guardMiniHud.style.display='none';}
     leafMiniActive=false;guardMiniActive=false;leafTargets=[];guardTargets=[];
@@ -3534,6 +3445,7 @@
   }
 
   function showStoryEnding(){
+    storyTransitionLocked=true;
     storyFinished=true;gameOver=true;unlockStoryBosses();
     comboEl.textContent=`STORY CLEAR!　${storyWins}勝 ${storyLosses}敗`;
     restartButton.hidden=true;
@@ -3546,25 +3458,32 @@
       '「……次の大会も、やる？」',
       '一瞬の沈黙。\n\n「やる！」\n\n池の平和は戻った。\n\nたぶん。\n\n少なくとも、次の招待状が届くまでは――。',
       'フロッグファイター2 JUMP\n\nTHE END'
-    ],()=>{restartButton.hidden=false;restartButton.textContent='キャラ選択へ';});
+    ],()=>{storyTransitionLocked=false;restartButton.hidden=false;restartButton.textContent='キャラ選択へ';});
   }
 
   function continueStory(){
-    if(storyFinished)return;
+    if(storyFinished || storyTransitionLocked)return;
+    storyTransitionLocked=true;
+    restartButton.hidden=true;
+
     storyFightIndex++;
-    if(storyFightIndex>=storyQueue.length){showStoryEnding();return;}
+    if(storyFightIndex>=storyQueue.length){
+      showStoryEnding();
+      return;
+    }
     const nextType=storyQueue[storyFightIndex];
 
-    // 水槽照明：1日目→2日目→決勝。外の池は別テーマ。
     if(nextType==='piranha'||nextType==='crayfish')stageTheme=4;
     else if(nextType==='samael'||nextType==='seraphiel'||nextType==='satanael')stageTheme=3;
     else stageTheme=storyFightIndex>=4?2:1;
 
-    const go=()=>startGame('story',nextType);
+    const go=()=>{
+      storyTransitionLocked=false;
+      startGame('story',nextType);
+    };
     if(storyInterlude(storyFightIndex,go))return;
     go();
   }
-
 
   function chooseAttackVariant(f, other, kind){
     const dy=other.y-f.y;
@@ -5878,6 +5797,7 @@
     }
 
     if(gameMode==='story'){
+      storyTransitionLocked=false;
       storyLastWon=!!playerWon;
       if(playerWon)storyWins++;else storyLosses++;
 

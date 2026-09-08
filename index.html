@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
   <meta name="theme-color" content="#eefaff" />
-  <title>フロッグファイター2 JUMP Prototype v2.46</title>
+  <title>フロッグファイター2 JUMP Prototype v2.47</title>
   <link rel="stylesheet" href="jump-style.css?v=2.34" />
 
 
@@ -179,20 +179,6 @@
     color:#fff0a0 !important;
   }
 }
-
-  .dragonfly-icon{position:relative;display:block;width:82px;height:52px;margin:0 auto;}
-  .dragonfly-icon::before,.dragonfly-icon::after{
-    content:"";position:absolute;left:10px;top:15px;width:62px;height:14px;
-    border-radius:70% 15% 70% 15%;background:rgba(195,236,255,.92);
-    border:2px solid rgba(48,112,140,.72);transform:rotate(20deg);
-    box-shadow:0 1px 3px rgba(0,0,0,.18);
-  }
-  .dragonfly-icon::after{transform:rotate(-20deg);top:25px;}
-  .dragonfly-body{position:absolute;z-index:2;left:37px;top:3px;width:9px;height:45px;
-    border-radius:55% 55% 40% 40%;background:linear-gradient(#3e7789,#21515f 42%,#4a8795);
-    border:1px solid #173d48;}
-  .dragonfly-body::before{content:"";position:absolute;left:-3px;top:-6px;width:13px;height:13px;
-    border-radius:50%;background:#315d68;border:1px solid #173d48;}
 </style>
 
 
@@ -262,7 +248,7 @@
       <p class="frog-logo-sub">LOTUS STADIUM JUMP BATTLE</p>
       <p class="rotate-note">蓮の葉競技場・縦ジャンプバトル</p>
       <div class="build-marker">BUILD JUMP 0.4</div>
-      <div class="start-version">FROG FIGHTER 2 JUMP　PROTOTYPE v2.46</div>
+      <div class="start-version">FROG FIGHTER 2 JUMP　PROTOTYPE v2.47</div>
       <div class="title-start-actions">
         <button id="portraitStart" class="soft-btn portrait-start-btn">はじめる</button>
         
@@ -419,7 +405,27 @@
           <span class="special-hint move-names">セラフィックアッパー / セラフィックレイ</span>
         </button>
         <button class="fighter-card" data-fighter="piranha">
-          <span class="fighter-emoji creature-emoji dragonfly-icon" aria-label="トンボ"><span class="dragonfly-body"></span></span>
+          <span class="fighter-emoji creature-emoji azazel-card-icon" aria-hidden="true">
+<svg viewBox="0 0 100 82" role="img" aria-label="アザゼルさんの顔">
+  <!-- 正面のオニヤンマ風の顔。大きな複眼だけでなく、頭部と黄色い模様をしっかり見せる -->
+  <path d="M22 17 Q50 3 78 17 L86 45 Q82 70 50 76 Q18 70 14 45 Z"
+        fill="#1b1b1b" stroke="#101010" stroke-width="3"/>
+  <!-- 額の黄色 -->
+  <path d="M39 11 Q50 7 61 11 L66 20 Q50 17 34 20 Z" fill="#f2d928"/>
+  <!-- 緑の複眼 -->
+  <ellipse cx="31" cy="34" rx="22" ry="25" fill="#20bfa8" stroke="#111" stroke-width="4"/>
+  <ellipse cx="69" cy="34" rx="22" ry="25" fill="#20bfa8" stroke="#111" stroke-width="4"/>
+  <ellipse cx="26" cy="27" rx="6" ry="10" fill="rgba(255,255,255,.38)"/>
+  <ellipse cx="64" cy="27" rx="6" ry="10" fill="rgba(255,255,255,.38)"/>
+  <!-- 目の間の黒い鼻筋 -->
+  <path d="M46 19 Q50 25 54 19 L57 47 Q50 53 43 47 Z" fill="#151515"/>
+  <!-- オニヤンマらしい黄色い口元 -->
+  <path d="M28 52 Q50 46 72 52 L68 62 Q50 66 32 62 Z" fill="#f2d928" stroke="#111" stroke-width="2"/>
+  <path d="M35 64 Q50 70 65 64" stroke="#f2d928" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M40 58 Q50 62 60 58" stroke="#111" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- 短い触角／顎のシルエット -->
+  <path d="M27 63 L16 75 M73 63 L84 75" stroke="#171717" stroke-width="5" stroke-linecap="round"/>
+</svg></span>
           <strong>アザゼルさん</strong>
         
           <span class="special-hint move-names">高速突進噛みつき / 急降下背びれ / 急降下テール</span>
