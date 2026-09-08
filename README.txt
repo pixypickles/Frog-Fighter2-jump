@@ -296,3 +296,6 @@ v2.48
 - Fixed Azazel's character-select portrait visibility by explicitly sizing the restored JUMP 2.9 SVG.
 - Belial is normally always connected to the top of the screen by a spider thread.
 - The thread breaks during throws and strong downward slam hits, then reconnects quickly after recovery.
+
+v2.49
+- Reduced Azazel's character-select portrait to match the visual scale of the surrounding portraits.
