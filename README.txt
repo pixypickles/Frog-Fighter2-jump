@@ -268,3 +268,15 @@ v2.43
 - Their story battles now use a dedicated outdoor lotus-pond stage instead of LOTUS STADIUM.
 - Outdoor stage: bright sky, clouds, pond water, reeds, natural lotus leaves/flowers, large battle lotus leaf, no grandstand and no referee.
 - Story text updated from Leviathan/Asmodeus water-version names to Azazel/Belial.
+
+v2.44
+- Character select intentionally keeps Leviathan and Asmodeus.
+- Story special encounters remain Azazel (dragonfly) and Belial (spider).
+- Story boss start now explicitly forces the outdoor lotus-pond theme and narrative callback is single-fire to prevent skipping.
+- Practice help now states: wall-side direction + Tongue button = wall cling.
+
+v2.45
+- Character select and opponent select renamed Leviathan -> Azazel, Asmodeus -> Belial.
+- Character-card icons changed from fish/crayfish to flying-insect/spider imagery.
+- Story restriction message updated to Azazel/Belial.
+- Legacy Leviathan/Asmodeus name aliases remain internally for old save compatibility.

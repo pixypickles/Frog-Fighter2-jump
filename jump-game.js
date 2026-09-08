@@ -592,7 +592,8 @@
       if(i>=pages.length){
         storyNarrative.hidden=true;
         storyNarrativeNext.onclick=null;
-        if(onDone)onDone();
+        const done=onDone; onDone=null;
+        if(done)done();
       }else render();
     };
   }
@@ -606,7 +607,7 @@
     btn.disabled=blocked;
     btn.classList.toggle('story-disabled',blocked);
     btn.setAttribute('aria-disabled',blocked?'true':'false');
-    btn.title=blocked?'リヴァイアさん／アスモデウスさんはストーリーでは使用できません':'';
+    btn.title=blocked?'アザゼルさん／ベリアルさんはストーリーでは使用できません':'';
   }
 
   document.querySelectorAll('.fighter-card').forEach(card => {
@@ -1269,7 +1270,7 @@
         }
       }
 
-      // リヴァイアさん：高速突進噛みつき
+      // アザゼルさん（トンボ）：高速突進攻撃
       if(this.specialType==='piranhaRush' && !this.piranhaRushHit){
         const other=this.isPlayer?enemy:player;
         if(other && Math.hypot(other.x-this.x,other.y-this.y)<other.radius+this.radius+12){
@@ -1277,7 +1278,7 @@
           other.hurtFace='both'; other.hurtFaceT=.65;
         }
       }
-      // リヴァイアさん：上空から急降下
+      // アザゼルさん（トンボ）：上空から急降下
       if((this.specialType==='piranhaDivePunch'||this.specialType==='piranhaDiveKick') && this.piranhaDivePhase===2){
         const other=this.isPlayer?enemy:player;
         if(other && Math.hypot(other.x-this.x,other.y-this.y)<other.radius+this.radius+15){
@@ -3355,6 +3356,9 @@
     comboHits=0; comboTimer=0; comboEl.textContent='';
 
     const rivalType=enemyType || selectedOpponent || 'blue';
+    // STORY特殊戦は開始時にも明示的に外の蓮池へ固定。
+    // ナレーション経由でも大会会場テーマへ戻らないようにする。
+    if(gameMode==='story' && (rivalType==='piranha'||rivalType==='crayfish')) stageTheme=4;
     player=new Fighter(innerWidth*.28,innerHeight*.52,true,selectedFighter);
     enemy=new Fighter(innerWidth*.72,innerHeight*.48,false,rivalType);
     enemy.hp=100;
@@ -3437,7 +3441,7 @@
     leafMiniActive=false;guardMiniActive=false;leafTargets=[];guardTargets=[];
 
     storyTournament=buildTournamentStory();
-    // 1～3回戦 → リヴァイア → 4～5回戦 → アスモデウス → 決勝サマエル → エキシビション・セラフィエル
+    // 1～3回戦 → アザゼル（トンボ） → 4～5回戦 → ベリアル（クモ） → 決勝サマエル → 特別戦
     storyQueue=[
       storyTournament[0],storyTournament[1],storyTournament[2],
       'piranha',
