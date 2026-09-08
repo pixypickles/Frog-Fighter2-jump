@@ -2505,6 +2505,18 @@
         ctx.stroke();
       }
 
+      // カワズさん隠し技：旧版の「舌でグルグル巻き」表示。
+      if(this.throwState && this.throwState.tongueWrapped && this.throwState.owner && this.throwState.owner.type==='kawazu'){
+        ctx.save();
+        ctx.filter='none';
+        ctx.strokeStyle='#ff718e';ctx.lineWidth=7;ctx.lineCap='round';ctx.lineJoin='round';
+        ctx.shadowColor='rgba(255,90,145,.35)';ctx.shadowBlur=5;
+        for(let i=0;i<4;i++){
+          ctx.beginPath();ctx.ellipse(0,-7+i*13,47-i*2,12,0,0,Math.PI*2);ctx.stroke();
+        }
+        ctx.restore();
+      }
+
       if(this.attack==='wave'){
         ctx.save();
         ctx.filter='none';
@@ -4563,30 +4575,35 @@
       if(gameOver||!other||other.guard)return;
       f.specialType='kawazuTonguePiledriver';f.specialT=1.22;
       other.stun=Math.max(other.stun,1.15);
-      other.throwState={endT:1.0,spinSpeed:13};
-      other.vx=0;other.vy=0;
+      other.throwState={owner:f,endT:1.0,spinSpeed:0,noWallDamage:true,tongueWrapped:true};
+      other.vx=0;other.vy=0;f.vx=0;f.vy=0;
       comboEl.textContent='SECRET! 舌巻きパイルドライバー!';
 
-      // 舌で巻きながら一度持ち上げ、逆さまにして真下へ叩き落とす。
+      // 旧版の見た目を復元：ピンクの舌で胴体を何重にも巻き、二人で回転してから逆さまに落とす。
       const cx=(f.x+other.x)*.5;
-      const startY=other.y;
-      [0,1,2,3,4].forEach(i=>setTimeout(()=>{
-        if(gameOver||!other)return;
-        other.x=cx+Math.sin(i*1.8)*18;
-        other.y=startY-32-i*18;
-        other.spinAngle+=Math.PI*.72;
-        spawnImpact(other.x,other.y,'guard');
-      },120+i*75));
+      const cy=Math.max(150,Math.min(jumpFloorY()-170,(f.y+other.y)*.5-18));
+      [0,1,2,3,4,5].forEach(i=>setTimeout(()=>{
+        if(gameOver||!other||!f)return;
+        const a=i*Math.PI*.48;
+        f.x=cx+Math.cos(a)*34; f.y=cy+Math.sin(a)*25;
+        other.x=cx-Math.cos(a)*18; other.y=cy-Math.sin(a)*14;
+        f.spinAngle=a*.72; other.spinAngle=a*.72;
+        other.throwState && (other.throwState.tongueWrapped=true);
+      },90+i*72));
 
       setTimeout(()=>{
         if(gameOver||!other)return;
-        other.spinAngle=Math.PI;
+        // 相手を完全に逆さまへ。カワズは巻き込みから離脱。
+        other.x=cx;other.y=cy+10;other.spinAngle=Math.PI;
+        f.x=Math.max(50,Math.min(innerWidth-50,cx-78*f.face));
+        f.y=cy-22;f.spinAngle=0;
+        if(other.throwState)other.throwState.tongueWrapped=false;
         other.throwState=null;
-        other.vx=0;
-        other.vy=760;
-        damageHit(f,other,9.0*f.damageMul,0,390,true);
+        other.vx=0;other.vy=820;
+        f.vx=-f.face*105;f.vy=-115;
+        damageHit(f,other,9.0*f.damageMul,0,420,true);
         spawnImpact(other.x,other.y,'hit');
-      },560);
+      },575);
 
       setTimeout(()=>{if(comboEl.textContent.includes('SECRET'))comboEl.textContent='';},1050);
     },105);
@@ -7298,7 +7315,7 @@ function drawBackground(dt){
       // フロッグファイター2 JUMP 共通飛び道具：シャボンガードに触れると自動反射。
       water2Shots.forEach(q=>{
         q.age=(q.age||0)+dt;
-        q.spin=(q.spin||0)+dt*(q.style==='aquaSpin'?10:4);
+        q.spin=(q.spin||0)+dt*(q.style==='aquaSpin'?10:(q.style==='spinCutterBlade'?22:4));
         if(q.curve){ q.vy += q.curve*dt; }
         if(q.style==='bubble' && q.riseAfter>0 && q.age>q.riseAfter){ q.vy-=q.riseAccel*dt; }
         if(q.style==='iceChargeOrb'){ q.trail=q.trail||[]; q.trail.push({x:q.x,y:q.y,t:.75}); if(q.trail.length>22)q.trail.shift(); q.trail.forEach(v=>v.t-=dt); q.trail=q.trail.filter(v=>v.t>0); }

@@ -258,3 +258,7 @@ v2.39
 - Kawazu Spin Kick Cutter projectiles are now cross-shaped light blades.
 - Added Kawazu Forward+Punch Triple Upper: three high-speed behind-the-opponent passes with rising uppercuts.
 - Restored Kawazu secret: one full direction rotation + Tongue; grabs, tongue-wraps/spins the opponent, then drops them upside-down.
+
+v2.40
+- Restored the old Kawazu secret-technique tongue-wrap visual/rotation sequence based on the legacy behavior.
+- Spin Kick Cutter cross-light projectiles now rotate much faster.
