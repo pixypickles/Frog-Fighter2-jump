@@ -226,3 +226,6 @@ v2.27
 - Guillotine Kick collision now runs every frame throughout the downward dive.
 - Collision follows the visible horizontal kicking leg and sweeps from the previous to current frame position.
 - Guillotine Kick remains active for a full high-altitude fall and ends on landing.
+
+v2.28
+- Beelzebub is now always visible and selectable as a normal character; no unlock flag is required.

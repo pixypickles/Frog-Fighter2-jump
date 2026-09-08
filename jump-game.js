@@ -489,8 +489,8 @@
   }
 
   function isBeelzebubUnlocked(){
-    try{return localStorage.getItem('kaeru_beelzebub_unlocked')==='1';}
-    catch(e){return false;}
+    // JUMP2ではベルゼブブさんは通常キャラとして最初から表示・選択可能。
+    return true;
   }
 
   function refreshBossUnlock(){
