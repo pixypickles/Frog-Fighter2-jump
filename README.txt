@@ -280,3 +280,8 @@ v2.45
 - Character-card icons changed from fish/crayfish to flying-insect/spider imagery.
 - Story restriction message updated to Azazel/Belial.
 - Legacy Leviathan/Asmodeus name aliases remain internally for old save compatibility.
+
+v2.46
+- Azazel character-select icon is now a custom dragonfly graphic, not a fly emoji.
+- Fixed runtime Fighter names so Practice/Free Battle show Azazel and Belial instead of legacy Leviathan/Asmodeus.
+- Old Leviathan/Asmodeus strings remain only as legacy input aliases for compatibility.

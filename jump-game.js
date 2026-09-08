@@ -1239,7 +1239,7 @@
         }
       }
 
-      // アスモデウスさん：クローラッシュ
+      // ベリアルさん：クローラッシュ
       // 土煙の中でも上下だけ少し相手へ自動追尾する。
       if(this.specialType==='crayfishRush'){
         const other=this.isPlayer?enemy:player;
@@ -1497,7 +1497,7 @@
       }
 
 
-      // ピラニア：リヴァイアサンさん
+      // トンボ：アザゼルさん
       if(this.type==='piranha'){
         if(this.face<0) ctx.scale(-1,1);
         // パンチは前転で背びれ斬り、キックはバク転で尻尾斬り
@@ -1615,7 +1615,7 @@
         return;
       }
 
-      // ザリガニ：アスモデウスさん
+      // クモ：ベリアルさん
       if(this.type==='crayfish'){
         if(this.face<0) ctx.scale(-1,1);
         if(this.flash>0) ctx.globalAlpha=.55;
