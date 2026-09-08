@@ -246,3 +246,15 @@ v2.37
 - Satanael Dark Pressure now leaves a 1.35-second lingering downward pull after the initial pressure.
 - Inferno Wave now rises from around the lotus/playfield level to about normal jump height (~300px), with a wider flame-wall hitbox and matching visuals.
 - Dark Ray and Seraphic Ray unchanged.
+
+v2.38
+- Seraphic Upper vertical launch increased about 3x (-235 -> -705).
+- Seraphic Ray origin now follows Seraphiel throughout charge/fire instead of remaining at the activation point.
+- Seraphic Cyclone rotation changed to continuous time-based spin so it no longer visually lingers upside-down.
+- Seraphic Shot enlarged (r15 -> r25) and given a strong sinusoidal/helical flight path.
+
+v2.39
+- Satanael Dark Ray root now follows Satanael's current position/facing.
+- Kawazu Spin Kick Cutter projectiles are now cross-shaped light blades.
+- Added Kawazu Forward+Punch Triple Upper: three high-speed behind-the-opponent passes with rising uppercuts.
+- Restored Kawazu secret: one full direction rotation + Tongue; grabs, tongue-wraps/spins the opponent, then drops them upside-down.

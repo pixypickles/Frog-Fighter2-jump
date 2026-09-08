@@ -412,9 +412,9 @@
       'ミラージュ（上）：上 ＋ ガード','ミラージュ（下）：下 ＋ ガード','ミラージュカウンター：後ろ ＋ ガード','アクアパリィ：前 ＋ ガード / ジャストガード','フロストショット：前 ＋ パンチ','ミラージュキック：前 ＋ キック'
     ],
     seraphiel:[
-      'セラフィックアッパー：上 ＋ パンチ（上昇力3倍）',
+      'セラフィックアッパー：上 ＋ パンチ',
       'セラフィックキック：前 ＋ キック',
-      'セラフィックショット：後ろ ＋ パンチ（大型・螺旋軌道）',
+      'セラフィックショット：後ろ ＋ パンチ',
       'セラフィックサイクロン：下 → 後ろ ＋ キック',
       'セラフィックレイ：下 → 前 ＋ パンチ（セラフィエル独自技）'
     ],
@@ -430,9 +430,10 @@
       'デッドリー・アクア：前 → 下 → 後ろ ＋ キック'
     ],
     kawazu:[
+      'トリプルアッパー：前 ＋ パンチ',
       '水圧ラッシュ：パンチ連打',
       'ミラージュキック：前 ＋ キック',
-      'スピンキックカッター：後ろ ＋ キック（カッター3連発）'
+      'スピンキックカッター：後ろ ＋ キック（十字光3連発）'
     ],
     piranha:[
       '高速突進噛みつき：後ろ → 前 ＋ 舌',
@@ -1180,6 +1181,10 @@
         if(this.throwState){
           this.spinAngle += this.throwState.spinSpeed * dt;
         }
+      } else if(this.specialType==='seraphicCyclone'){
+        // JUMP版：時間ベースで連続回転。逆さまの静止絵に見えないよう高速で滑らかに回す。
+        const elapsed=Math.max(0,performance.now()-(this.seraphicCycloneStart||performance.now()))/1000;
+        this.spinAngle=elapsed*24*(this.face>0?1:-1);
       } else {
         this.spinAngle *= Math.pow(.03, dt);
       }
@@ -1811,11 +1816,6 @@
         const progress=Math.max(0,Math.min(1,(total-this.specialT)/total));
         const spinDir=this.face>0?-1:1;
         ctx.rotate(spinDir*progress*Math.PI*6);
-      }else if(this.type==='seraphiel' && this.specialType==='seraphicCyclone' && this.specialT>0){
-        // 逆さ絵で止まって見えないよう、技時間中に滑らかに約3回転。
-        const total=.95;
-        const progress=Math.max(0,Math.min(1,(total-this.specialT)/total));
-        ctx.rotate((this.face>0?1:-1)*progress*Math.PI*6);
       }else if(this.throwState || Math.abs(this.spinAngle)>.02){
         ctx.rotate(this.spinAngle);
       }
@@ -2715,6 +2715,22 @@
     return true;
   }
 
+  function hasFullRotation(maxMs=1350){
+    const now=performance.now();
+    const order=['right','downRight','down','downLeft','left','upLeft','up','upRight'];
+    const hist=input.commandHistory.filter(v=>now-v.time<=maxMs && order.includes(v.dir));
+    if(hist.length<6)return false;
+    let total=0,validSteps=0;
+    for(let i=1;i<hist.length;i++){
+      let a=order.indexOf(hist[i-1].dir),b=order.indexOf(hist[i].dir);
+      let d=b-a;
+      if(d>4)d-=8;if(d<-4)d+=8;
+      if(Math.abs(d)<=2 && d!==0){total+=d;validSteps++;}
+    }
+    // スマホで完全な8方向を通らなくても、一周として十分な回転量なら成立。
+    return validSteps>=5 && Math.abs(total)>=6;
+  }
+
   function clearCommand(){
     input.commandHistory=[];
   }
@@ -3196,7 +3212,7 @@
       'インフェルノウェーブ：下 ＋ キック（蓮の葉から通常ジャンプ高までの黒炎壁）'
     ],
     samael:['方向 ＋ パンチ：ポイズンゲート（指定方向から毒弾）','舌：ヴェノムタン（舌先から毒弾）','前 → 下 → 後ろ ＋ キック：デッドリー・アクア'],
-      kawazu:['パンチ連打：水圧ラッシュ','前 ＋ キック：ミラージュキック','後ろ ＋ キック：スピンキックカッター（カッター3連発）']
+      kawazu:['前 ＋ パンチ：トリプルアッパー（背後へ3回すり抜け）','パンチ連打：水圧ラッシュ','前 ＋ キック：ミラージュキック','後ろ ＋ キック：スピンキックカッター（十字光3連発）','隠し：方向キー1回転 ＋ 舌']
     };
     return map[type] || ['専用必殺技：練習対象外'];
   }
@@ -4538,24 +4554,74 @@
     if(!other) return false;
     if(Math.abs(other.x-f.x)>18) f.face=Math.sign(other.x-f.x)||f.face;
 
-    f.attack='tongue'; f.attackT=.42; f.tongueT=.42;
+    f.attack='tongue';f.attackT=.55;f.tongueT=.55;
+    const dx=(other.x-f.x)*f.face,dy=Math.abs(other.y-f.y);
     clearCommand();
-
-    const dx=(other.x-f.x)*f.face, dy=Math.abs(other.y-f.y);
-    if(dx<=0 || dx>f.tongueRange*1.18 || dy>105) return true;
+    if(dx<=0 || dx>(f.tongueRange||205)*1.28 || dy>150)return true;
 
     setTimeout(()=>{
-      if(gameOver || !other || other.guard) return;
-      f.specialType='kawazuTonguePiledriver'; f.specialT=.88;
-      other.stun=Math.max(other.stun,.82);
-      // 水中版は絡めたあと斜め前下へ強く落とす。
-      other.vx=f.face*330;
-      other.vy=390;
-      damageHit(f,other,8.0*f.damageMul,150*f.face,210);
-      comboEl.textContent='SECRET!';
-      setTimeout(()=>{if(comboEl.textContent==='SECRET!')comboEl.textContent='';},600);
-    },120);
+      if(gameOver||!other||other.guard)return;
+      f.specialType='kawazuTonguePiledriver';f.specialT=1.22;
+      other.stun=Math.max(other.stun,1.15);
+      other.throwState={endT:1.0,spinSpeed:13};
+      other.vx=0;other.vy=0;
+      comboEl.textContent='SECRET! 舌巻きパイルドライバー!';
+
+      // 舌で巻きながら一度持ち上げ、逆さまにして真下へ叩き落とす。
+      const cx=(f.x+other.x)*.5;
+      const startY=other.y;
+      [0,1,2,3,4].forEach(i=>setTimeout(()=>{
+        if(gameOver||!other)return;
+        other.x=cx+Math.sin(i*1.8)*18;
+        other.y=startY-32-i*18;
+        other.spinAngle+=Math.PI*.72;
+        spawnImpact(other.x,other.y,'guard');
+      },120+i*75));
+
+      setTimeout(()=>{
+        if(gameOver||!other)return;
+        other.spinAngle=Math.PI;
+        other.throwState=null;
+        other.vx=0;
+        other.vy=760;
+        damageHit(f,other,9.0*f.damageMul,0,390,true);
+        spawnImpact(other.x,other.y,'hit');
+      },560);
+
+      setTimeout(()=>{if(comboEl.textContent.includes('SECRET'))comboEl.textContent='';},1050);
+    },105);
     return true;
+  }
+
+  function specialKawazuTripleUpper(f){
+    if(gameOver||!f||f.type!=='kawazu'||f.stun>0||f.guard||f.specialT>0||f.attackT>0)return false;
+    const other=f.isPlayer?enemy:player;
+    if(!other)return false;
+    f.specialType='kawazuTripleUpper';f.specialT=.92;f.attack='punch';f.attackVariant='up';f.attackT=.92;
+    other.stun=Math.max(other.stun,.95);
+    comboEl.textContent='トリプルアッパー!';
+
+    let side=f.x<other.x?-1:1;
+    const strike=(i)=>{
+      if(gameOver||!other||other.hp<=0)return;
+      const oldX=f.x,oldY=f.y;
+      side*=-1;
+      f.x=Math.max(48,Math.min(innerWidth-48,other.x+side*72));
+      f.y=Math.max(70,Math.min(jumpFloorY()-70,other.y+34));
+      f.face=other.x>=f.x?1:-1;
+      kawazuGhosts.push({x:oldX,y:oldY,t:.20,life:.20,angle:0});
+      f.attack='punch';f.attackVariant='up';f.attackT=Math.max(f.attackT,.22);
+      const dmg=[3.0,3.3,4.1][i];
+      const lift=[-245,-295,-365][i];
+      damageHit(f,other,dmg*f.damageMul,32*f.face,lift);
+      other.vy=Math.min(other.vy,lift);
+      spawnImpact(other.x,other.y,'hit');
+    };
+    setTimeout(()=>strike(0),105);
+    setTimeout(()=>strike(1),315);
+    setTimeout(()=>strike(2),535);
+    setTimeout(()=>{if(comboEl.textContent==='トリプルアッパー!')comboEl.textContent='';},850);
+    clearCommand();return true;
   }
 
   function specialKawazuPressureRush(f){
@@ -4897,7 +4963,7 @@
 
   function specialSeraphicCyclone(f){
     if(gameOver||!f||f.type!=='seraphiel'||f.stun>0||f.guard||f.specialT>0||f.attackT>0)return false;
-    f.specialType='seraphicCyclone';f.specialT=.95;f.attack='kick';f.attackT=.95;
+    f.specialType='seraphicCyclone';f.specialT=.95;f.attack='kick';f.attackT=.95;f.seraphicCycloneStart=performance.now();
     const other=f.isPlayer?enemy:player;
     let hits=0;
     const timer=setInterval(()=>{
@@ -5099,7 +5165,9 @@
         baseVy:Math.sin(angle)*speed,
         maxReflect:opts.maxReflect||5,
         riseAfter:opts.riseAfter||0,
-        riseAccel:opts.riseAccel||0
+        riseAccel:opts.riseAccel||0,
+        spiralAmp:opts.spiralAmp||0,
+        spiralFreq:opts.spiralFreq||0
       };
       water2Shots.push(shot);
       comboEl.textContent=name+'!';
@@ -5249,7 +5317,7 @@
           clearCommand();return specialSeraphicRay(f);
         }
         if(water2HeldDir(f,'back')){
-          clearCommand();return specialWater2Shot(f,{name:'セラフィックショット',attack:'punch',color:'seraphic',style:'seraphicShot',speed:300,damage:5.8,r:27,charge:.36,maxReflect:5,spiral:true});
+          clearCommand();return specialWater2Shot(f,{name:'セラフィックショット',attack:'punch',color:'seraphic',style:'seraphicShot',speed:300,damage:5.8,r:25,charge:.36,maxReflect:5,spiralAmp:28,spiralFreq:11});
         }
       }
     }
@@ -5280,6 +5348,14 @@
 
     // カワズさん：4キャラ運用を前提に入力を短く。
     if(f.type==='kawazu'){
+      if(kind==='tongue' && hasFullRotation(1350)){
+        clearCommand();
+        return specialKawazuTonguePiledriver(f);
+      }
+      if(kind==='punch' && water2HeldDir(f,'forward')){
+        clearCommand();
+        return specialKawazuTripleUpper(f);
+      }
       if(kind==='kick' && water2HeldDir(f,'back')){
         clearCommand();
         return specialKawazuSpinCutter(f);
@@ -6274,7 +6350,7 @@
       if(enemy.type==='remiel' && enemy.specialT<=0){const roll=Math.random();if(!remielMirages.some(m=>m.owner===enemy)&&roll<dt*.10){remielMakeMirage(enemy,Math.random()<.5?'up':'down');return;}if(dist>190&&roll<dt*.28){specialRemielFrostShot(enemy);return;}if(dist<150&&roll<dt*.18){specialMirageKick(enemy);return;}if(dist<115&&roll<dt*.10){specialAquaParry(enemy,false);return;}}
       if(enemy.type==='seraphiel' && enemy.specialT<=0){
         const roll=Math.random();
-        if(dist>220 && roll<dt*.22){specialWater2Shot(enemy,{name:'セラフィックショット',attack:'punch',color:'seraphic',style:'seraphicShot',speed:300,damage:5.8,r:27,charge:.36,maxReflect:5,spiral:true});return;}
+        if(dist>220 && roll<dt*.22){specialWater2Shot(enemy,{name:'セラフィックショット',attack:'punch',color:'seraphic',style:'seraphicShot',speed:300,damage:5.8,r:25,charge:.36,maxReflect:5,spiralAmp:28,spiralFreq:11});return;}
         if(dist>180 && roll<dt*.10){specialSeraphicRay(enemy);return;}
         if(dist<135 && roll<dt*.24){specialSeraphicKick(enemy);return;}
         if(dist<110 && roll<dt*.12){specialSeraphicUpper(enemy);return;}
@@ -6291,9 +6367,10 @@
       }
       if(enemy.type==='kawazu' && enemy.specialT<=0){
         const roll=Math.random();
-        if(dist>135 && roll<dt*.24){ specialKawazuPressureRush(enemy); return; }
-        if(dist<250 && roll<dt*.42){ specialKawazuMirageKick(enemy); return; }
-        if(dist>120 && roll<dt*.58){ specialKawazuSpinCutter(enemy); return; }
+        if(dist<190 && roll<dt*.16){ specialKawazuTripleUpper(enemy); return; }
+        if(dist>135 && roll<dt*.30){ specialKawazuPressureRush(enemy); return; }
+        if(dist<250 && roll<dt*.46){ specialKawazuMirageKick(enemy); return; }
+        if(dist>120 && roll<dt*.62){ specialKawazuSpinCutter(enemy); return; }
       }
 
       if(dist>105){ enemy.vx += Math.sign(dx)*enemy.speed*.9*diff.move*dt; enemy.vy += Math.sign(dy)*enemy.speed*.55*diff.move*dt; }
@@ -7093,8 +7170,11 @@ function drawBackground(dt){
       // セラフィエル：セラフィックレイ。予告0.32秒後に短時間だけ攻撃判定。
       seraphielRays.forEach(r=>{
         r.t-=dt;
-        // 発動中はレイの根元がセラフィエル本人についてくる。
-        if(r.owner){r.x=r.owner.x+r.dir*55;r.y=r.owner.y-8;}
+        // 発動点は本人に追従。ジャンプで離れても光線の根元だけ置き去りにならない。
+        if(r.owner){
+          r.x=r.owner.x+r.dir*55;
+          r.y=r.owner.y-8;
+        }
         const elapsed=r.life-r.t;
         r.active=elapsed>.32 && elapsed<.50;
         const target=r.owner.isPlayer?enemy:player;
@@ -7136,6 +7216,12 @@ function drawBackground(dt){
       // ダークレイ：セラフィックレイの黒版。
       satanaelRays.forEach(r=>{
         r.t-=dt;const elapsed=r.life-r.t;r.active=elapsed>.32&&elapsed<.50;
+        // JUMP版：レイの根元はサタナエル本人に固定して追従。
+        if(r.owner){
+          r.dir=r.owner.face;
+          r.x=r.owner.x+r.dir*55;
+          r.y=r.owner.y-8;
+        }
         const target=r.owner.isPlayer?enemy:player;
         if(r.active&&target&&!r.hit){
           const ahead=(target.x-r.x)*r.dir;
@@ -7214,10 +7300,6 @@ function drawBackground(dt){
         q.age=(q.age||0)+dt;
         q.spin=(q.spin||0)+dt*(q.style==='aquaSpin'?10:4);
         if(q.curve){ q.vy += q.curve*dt; }
-        if(q.style==='seraphicShot'){
-          // 前進しながら上下へ滑らかに螺旋運動。
-          q.vy=Math.cos((q.age||0)*11.5)*118;
-        }
         if(q.style==='bubble' && q.riseAfter>0 && q.age>q.riseAfter){ q.vy-=q.riseAccel*dt; }
         if(q.style==='iceChargeOrb'){ q.trail=q.trail||[]; q.trail.push({x:q.x,y:q.y,t:.75}); if(q.trail.length>22)q.trail.shift(); q.trail.forEach(v=>v.t-=dt); q.trail=q.trail.filter(v=>v.t>0); }
         if(q.style==='aquaPressure'){ q.trail=q.trail||[]; q.trail.push({x:q.x,y:q.y,t:.28}); if(q.trail.length>10)q.trail.shift(); q.trail.forEach(v=>v.t-=dt); q.trail=q.trail.filter(v=>v.t>0); }
@@ -7237,6 +7319,11 @@ function drawBackground(dt){
 
         q.x+=q.vx*dt;
         q.y+=q.vy*dt + Math.sin((q.spin||0)*2)*(q.wobble||0)*18*dt;
+        if(q.spiralAmp>0&&q.spiralFreq>0){
+          const prevPhase=Math.max(0,(q.age-dt))*q.spiralFreq;
+          const nextPhase=q.age*q.spiralFreq;
+          q.y+=(Math.sin(nextPhase)-Math.sin(prevPhase))*q.spiralAmp;
+        }
         const target=q.owner&&q.owner.isPlayer?enemy:player;
         if(!target||q.hit) return;
         if(Math.hypot(target.x-q.x,target.y-q.y)<target.radius+q.r+14){
@@ -8280,16 +8367,6 @@ ctx.closePath();ctx.fill();}ctx.restore();});
         ctx.strokeStyle='#bffaff';ctx.lineWidth=4;
         for(let i=0;i<3;i++){ctx.rotate(Math.PI*2/3);ctx.beginPath();ctx.arc(0,0,q.r*.78,-1.0,1.0);ctx.stroke();}
         ctx.fillStyle='rgba(95,207,255,.52)';ctx.beginPath();ctx.arc(0,0,q.r*.72,0,Math.PI*2);ctx.fill();
-      }else if(q.style==='seraphicShot'){
-        // 大きな光球＋周囲を巻く二重の螺旋光。
-        ctx.shadowColor='#fff0a0';ctx.shadowBlur=24;
-        const rg=ctx.createRadialGradient(-q.r*.28,-q.r*.30,2,0,0,q.r*1.08);
-        rg.addColorStop(0,'#ffffff');rg.addColorStop(.32,'#fff9cf');rg.addColorStop(.72,'#f2cf72');rg.addColorStop(1,'#b98631');
-        ctx.fillStyle=rg;ctx.beginPath();ctx.arc(0,0,q.r,0,Math.PI*2);ctx.fill();
-        const phase=(q.age||0)*11.5;
-        ctx.lineWidth=4;ctx.strokeStyle='rgba(255,255,235,.92)';
-        for(let k=0;k<2;k++){ctx.beginPath();for(let i=-28;i<=28;i+=3){const yy=Math.sin(i*.16+phase+k*Math.PI)*10; if(i===-28)ctx.moveTo(i,yy);else ctx.lineTo(i,yy);}ctx.stroke();}
-        ctx.fillStyle='rgba(255,255,255,.88)';ctx.beginPath();ctx.ellipse(-q.r*.28,-q.r*.30,q.r*.20,q.r*.11,-.5,0,Math.PI*2);ctx.fill();
       }else if(q.style==='whiteOrb'){
         ctx.shadowColor='#ffffff';ctx.shadowBlur=24;ctx.fillStyle='#f8ffff';ctx.beginPath();ctx.arc(0,0,q.r,0,Math.PI*2);ctx.fill();
         ctx.strokeStyle='rgba(210,245,255,.9)';ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,0,q.r+4,0,Math.PI*2);ctx.stroke();
@@ -8321,51 +8398,18 @@ ctx.closePath();ctx.fill();}ctx.restore();});
         ctx.strokeStyle='rgba(55,9,72,.9)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,q.r+1,0,Math.PI*2);ctx.stroke();
         ctx.fillStyle='rgba(246,220,250,.72)';ctx.beginPath();ctx.ellipse(-q.r*.28,-q.r*.33,q.r*.22,q.r*.11,-.6,0,Math.PI*2);ctx.fill();
       }else if(q.style==='spinCutterBlade'){
-        // カワズさん専用：丸弾ではなく、回転する薄い三日月状の水圧カッター。
+        // カワズさん：回転ごとに十字の光刃を飛ばす。
         ctx.rotate(q.spin||0);
-        ctx.shadowColor='#8ff4ff';
-        ctx.shadowBlur=18;
-
-        // 外側の鋭い刃
-        ctx.globalAlpha=.72;
-        ctx.fillStyle='rgba(119,232,255,.34)';
-        ctx.beginPath();
-        ctx.moveTo(27,0);
-        ctx.quadraticCurveTo(4,-18,-23,-11);
-        ctx.quadraticCurveTo(-8,0,-23,11);
-        ctx.quadraticCurveTo(4,18,27,0);
-        ctx.closePath();
-        ctx.fill();
-
+        ctx.globalCompositeOperation='lighter';
+        ctx.shadowColor='#d9fbff';ctx.shadowBlur=22;
         ctx.globalAlpha=.95;
-        ctx.strokeStyle='#e9ffff';
-        ctx.lineWidth=3.2;
-        ctx.lineCap='round';
-        ctx.beginPath();
-        ctx.moveTo(27,0);
-        ctx.quadraticCurveTo(2,-17,-23,-11);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(27,0);
-        ctx.quadraticCurveTo(2,17,-23,11);
-        ctx.stroke();
-
-        // 中央の水圧芯
-        ctx.globalAlpha=.50;
-        ctx.strokeStyle='#67dfff';
-        ctx.lineWidth=2;
-        ctx.beginPath();
-        ctx.moveTo(18,0);
-        ctx.lineTo(-15,0);
-        ctx.stroke();
-
-        // 回転残像
-        ctx.globalAlpha=.20;
-        ctx.strokeStyle='#c9fbff';
-        ctx.lineWidth=2;
-        ctx.beginPath();
-        ctx.arc(0,0,22,-1.15,1.15);
-        ctx.stroke();
+        ctx.strokeStyle='#f4ffff';ctx.lineWidth=5;ctx.lineCap='round';
+        ctx.beginPath();ctx.moveTo(-28,0);ctx.lineTo(28,0);ctx.moveTo(0,-28);ctx.lineTo(0,28);ctx.stroke();
+        ctx.globalAlpha=.55;
+        ctx.strokeStyle='#70e8ff';ctx.lineWidth=10;
+        ctx.beginPath();ctx.moveTo(-21,0);ctx.lineTo(21,0);ctx.moveTo(0,-21);ctx.lineTo(0,21);ctx.stroke();
+        ctx.globalAlpha=.9;ctx.fillStyle='#ffffff';
+        ctx.beginPath();ctx.arc(0,0,5,0,Math.PI*2);ctx.fill();
       }else if(q.style==='spinBlade'){
         // 水圧カッターを縦方向に潰した、薄い高速刃。
         ctx.rotate(q.spin||0);ctx.scale(1.35,.48);
