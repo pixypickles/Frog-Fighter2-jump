@@ -241,3 +241,8 @@ v2.31
 - Flauros Hell Flame changed to a very tall vertical fire pillar rising from near the lotus/playfield floor to the top of the screen.
 - Hell Flame hit area now follows the full vertical pillar.
 - Inferno Claw lower endpoint raised so Flauros no longer dives beneath the lotus leaves / too far below the visible play area.
+
+v2.37
+- Satanael Dark Pressure now leaves a 1.35-second lingering downward pull after the initial pressure.
+- Inferno Wave now rises from around the lotus/playfield level to about normal jump height (~300px), with a wider flame-wall hitbox and matching visuals.
+- Dark Ray and Seraphic Ray unchanged.

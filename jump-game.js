@@ -422,7 +422,7 @@
       'ディザスターフレア：後ろ ＋ パンチ',
       'ダークレイ：前 ＋ パンチ',
       'ダークプレッシャー：下 ＋ ガード',
-      'インフェルノウェーブ：下 ＋ キック'
+      'インフェルノウェーブ：下 ＋ キック（蓮の葉から通常ジャンプ高までの黒炎壁）'
     ],
     samael:[
       'ポイズンゲート：方向 ＋ パンチ（指定方向に発生点 → 相手へ毒弾）',
@@ -1093,6 +1093,11 @@
         this.gravityDragT=Math.max(0,this.gravityDragT-dt);
         // グラビティボール命中後：グラビティキック同様、しばらく下へ引かれる。
         this.vy+=1050*dt;
+      }
+      if(this.darkPressureDragT>0){
+        this.darkPressureDragT=Math.max(0,this.darkPressureDragT-dt);
+        // ダークプレッシャー後：しばらく重圧が残り、下へ引かれ続ける。
+        this.vy+=980*dt;
       }
       if (this.specialT>0){
         this.specialT-=dt;
@@ -3183,7 +3188,7 @@
       'ディザスターフレア：後ろ ＋ パンチ',
       'ダークレイ：前 ＋ パンチ',
       'ダークプレッシャー：下 ＋ ガード',
-      'インフェルノウェーブ：下 ＋ キック'
+      'インフェルノウェーブ：下 ＋ キック（蓮の葉から通常ジャンプ高までの黒炎壁）'
     ],
     samael:['方向 ＋ パンチ：ポイズンゲート（指定方向から毒弾）','舌：ヴェノムタン（舌先から毒弾）','前 → 下 → 後ろ ＋ キック：デッドリー・アクア'],
       kawazu:['パンチ連打：水圧ラッシュ','前 ＋ キック：ミラージュキック','後ろ ＋ キック：スピンキックカッター（カッター3連発）']
@@ -4937,8 +4942,8 @@
     if(gameOver||!f||f.type!=='satanael'||f.stun>0||f.guard||f.specialT>0||f.attackT>0)return false;
     f.specialType='infernoWave';f.specialT=.78;f.attack='kick';f.attackT=.78;
     const dir=f.face;
-    // 常に画面の最下端から噴き上がる。上側は完全な安全地帯。
-    const floorY=innerHeight+4;
+    // JUMP版：蓮の葉付近から通常ジャンプ高まで立ち上がる、太い黒炎の壁。
+    const floorY=innerHeight-82;
     for(let i=0;i<9;i++)satanaelWaves.push({owner:f,x:f.x+dir*(70+i*78),y:floorY,t:.12+i*.085,life:.34,hit:false});
     comboEl.textContent='インフェルノウェーブ!';
     return true;
@@ -7144,6 +7149,7 @@ function drawBackground(dt){
           const floorY=innerHeight-72;
           target.y+=(floorY-target.y)*Math.min(1,dt*7.5);
           target.vy=Math.max(target.vy,240);
+          target.darkPressureDragT=Math.max(target.darkPressureDragT||0,1.35);
         }
       });
       satanaelPressures=satanaelPressures.filter(p=>p.t>0);
@@ -7154,8 +7160,8 @@ function drawBackground(dt){
         if(p.t<=0&&!p.fired){p.fired=true;p.t=p.life;}
         if(p.fired){
           const target=p.owner.isPlayer?enemy:player;
-          // 炎柱は底から約150pxまで。画面上側にいる相手には絶対に当たらない。
-          if(target&&!p.hit&&Math.abs(target.x-p.x)<38&&target.y>innerHeight-150){
+          // 見た目と同じく、蓮の葉付近から約300px上までを攻撃判定にする。
+          if(target&&!p.hit&&Math.abs(target.x-p.x)<48&&target.y>p.y-300&&target.y<p.y+28){
             p.hit=true;
             if(target.guard){damageHit(p.owner,target,1.6*p.owner.damageMul,45*p.owner.face,-25);spawnImpact(target.x,target.y,'guard');}
             else{damageHit(p.owner,target,5.0*p.owner.damageMul,115*p.owner.face,-95);spawnImpact(target.x,target.y,'hit');}
@@ -8206,28 +8212,35 @@ ctx.closePath();ctx.fill();}ctx.restore();});
       const a=Math.max(.15,Math.min(1,p.t/(p.life||.34)));
       ctx.globalAlpha=.92*a;
 
-      // インフェルノウェーブ：底から黒炎柱
-      const fg=ctx.createLinearGradient(p.x,p.y,p.x,p.y-150);
+      // インフェルノウェーブ：蓮の葉から通常ジャンプ高まで立ち上がる太い黒炎の壁
+      const topY=p.y-300;
+      const fg=ctx.createLinearGradient(p.x,p.y,p.x,topY);
       fg.addColorStop(0,'#160006');
       fg.addColorStop(.20,'#8d0a20');
       fg.addColorStop(.48,'#250008');
       fg.addColorStop(.72,'#ae0c27');
-      fg.addColorStop(1,'rgba(0,0,0,0)');
+      fg.addColorStop(1,'rgba(38,0,8,.55)');
       ctx.fillStyle=fg;
       ctx.shadowColor='#c2112c';
-      ctx.shadowBlur=26;
+      ctx.shadowBlur=28;
       ctx.beginPath();
-      ctx.moveTo(p.x-32,p.y);
-      ctx.bezierCurveTo(p.x-31,p.y-58,p.x-19,p.y-102,p.x-4,p.y-150);
-      ctx.bezierCurveTo(p.x+14,p.y-116,p.x+30,p.y-52,p.x+32,p.y);
+      ctx.moveTo(p.x-44,p.y);
+      ctx.bezierCurveTo(p.x-43,p.y-105,p.x-31,topY+72,p.x-18,topY+35);
+      ctx.lineTo(p.x-8,topY+12);
+      ctx.lineTo(p.x,topY-18);
+      ctx.lineTo(p.x+10,topY+20);
+      ctx.lineTo(p.x+23,topY+5);
+      ctx.bezierCurveTo(p.x+34,topY+82,p.x+43,p.y-105,p.x+44,p.y);
       ctx.closePath();ctx.fill();
 
       ctx.globalAlpha=.62*a;
       ctx.fillStyle='#d31a2f';
       ctx.beginPath();
-      ctx.moveTo(p.x-10,p.y);
-      ctx.quadraticCurveTo(p.x-8,p.y-82,p.x+1,p.y-116);
-      ctx.quadraticCurveTo(p.x+13,p.y-78,p.x+11,p.y);
+      ctx.moveTo(p.x-15,p.y);
+      ctx.quadraticCurveTo(p.x-13,p.y-165,p.x-3,topY+58);
+      ctx.lineTo(p.x+4,topY+26);
+      ctx.lineTo(p.x+13,topY+62);
+      ctx.quadraticCurveTo(p.x+18,p.y-155,p.x+16,p.y);
       ctx.closePath();ctx.fill();
       ctx.restore();
     });
