@@ -4055,30 +4055,14 @@
 
   function specialVenomWater(f){
     if(gameOver || !f || f.stun>0 || f.specialT>0 || f.bossSpecialCooldown>0) return false;
-    f.guard=false;
-    f.specialType='venomWater';
-    f.specialT=.68;
-    f.bossSpecialCooldown=2.4;
-
-    // JUMP版：空中から3方向へ毒液を噴き出し、落下後は蓮の葉付近に毒溜まりが少し残る。
-    [
-      {vx:-145,vy:-520},
-      {vx:0,   vy:-585},
-      {vx:145, vy:-520}
-    ].forEach((v,i)=>{
-      toxicWaters.push({
-        owner:f,t:4.4,life:4.4,tick:0,
-        x:f.x+(i-1)*10,y:f.y-24,
-        vx:v.vx,vy:v.vy,r:20,
-        landed:false,seed:Math.random()*1000,
-        airHitAt:0
-      });
+    f.guard=false; f.specialType='venomWater'; f.specialT=.68; f.bossSpecialCooldown=2.4;
+    [{vx:-145,vy:-470},{vx:0,vy:-525},{vx:145,vy:-470}].forEach((v,i)=>{
+      toxicWaters.push({owner:f,t:4.8,life:4.8,tick:0,x:f.x+(i-1)*10,y:f.y-22,
+        vx:v.vx,vy:v.vy,r:21,landed:false,seed:Math.random()*1000,airHitAt:0});
     });
-
     comboEl.textContent='ヴェノム・ウォーター!';
     setTimeout(()=>{if(comboEl.textContent==='ヴェノム・ウォーター!')comboEl.textContent='';},800);
-    clearCommand();
-    return true;
+    clearCommand(); return true;
   }
 
   function specialFishRaid(f){
@@ -5375,7 +5359,7 @@
     }
 
     if(f.type==='beelzebub'){
-      if(kind==='punch' && water2HeldDir(f,'forward')){ clearCommand(); return specialWater2Shot(f,{name:'ベノムショット',attack:'punch',color:'venom',style:'venomGloss',speed:225,angle:-27,curve:235,damage:4.8,r:27,charge:.48,poisonDuration:2.2,maxReflect:4}); }
+      if(kind==='punch' && water2HeldDir(f,'forward')){ clearCommand(); return specialWater2Shot(f,{name:'ベノムショット',attack:'punch',color:'venom',style:'venomGloss',speed:285,angle:-24,curve:285,damage:5.0,r:29,charge:.46,poisonDuration:2.2,maxReflect:4}); }
       if(kind==='punch' && water2HeldDir(f,'up')){ clearCommand(); return specialAbyssShock(f,'upper'); }
       if(kind==='kick' && water2HeldDir(f,'down')){ clearCommand(); return specialAbyssShock(f,'lower'); }
     }
@@ -6271,7 +6255,7 @@
         const roll=Math.random();
         if(roll<dt*.10){ specialVenomWater(enemy); return; }
         if(roll<dt*.26){ specialAbyssShock(enemy,dy<0?'upper':'lower'); return; }
-        if(dist>150 && roll<dt*.46){ specialWater2Shot(enemy,{name:'ベノムショット',attack:'punch',color:'venom',style:'venomGloss',speed:225,angle:-27,curve:235,damage:4.8,r:27,charge:.48,poisonDuration:2.2,maxReflect:4}); return; }
+        if(dist>150 && roll<dt*.46){ specialWater2Shot(enemy,{name:'ベノムショット',attack:'punch',color:'venom',style:'venomGloss',speed:285,angle:-24,curve:285,damage:5.0,r:29,charge:.46,poisonDuration:2.2,maxReflect:4}); return; }
       }
       if(enemy.type==='satanael'&&enemy.specialT<=0){const r=Math.random();if(dist>190&&r<dt*.16){specialDisasterFlare(enemy);return;}if(dist>220&&r<dt*.28){specialDarkRay(enemy);return;}if(r<dt*.38){specialDarkPressure(enemy);return;}if(r<dt*.50){specialInfernoWave(enemy);return;}}
       if(enemy.type==='flauros'&&enemy.specialT<=0){const r=Math.random();if(dist>180&&r<dt*.20){specialHellFlame(enemy);return;}if(dist>170&&r<dt*.38){specialFlameClaw(enemy);return;}if(dist<250&&r<dt*.52){specialLeopardRush(enemy);return;}if(dist>130&&r<dt*.59){specialInfernoClaw(enemy);return;}}
@@ -7273,46 +7257,30 @@ function drawBackground(dt){
       toxicWaters.forEach(v=>{
         v.t-=dt;
         const target=v.owner&&v.owner.isPlayer?enemy:player;
-
         if(!v.landed){
-          v.vy+=JUMP_GRAVITY*.78*dt;
-          v.x+=v.vx*dt;
-          v.y+=v.vy*dt;
-
-          // 空中の毒液にも当たり判定。
+          v.vy+=LAND_GRAVITY*.92*dt; v.x+=v.vx*dt; v.y+=v.vy*dt;
           if(target){
             const now=performance.now();
             if(Math.hypot(target.x-v.x,target.y-v.y)<target.radius+v.r+7 && now-(v.airHitAt||0)>650){
-              v.airHitAt=now;
-              const guarded=target.guard;
+              v.airHitAt=now; const guarded=target.guard;
               v.owner._projectileHit=true;
               damageHit(v.owner,target,2.0*v.owner.damageMul,22*Math.sign(v.vx||v.owner.face),18);
               v.owner._projectileHit=false;
-              if(!guarded)applyPoison(target,v.owner,2.2);
+              if(!guarded && !isPoisonImmune(target)) applyPoison(target,v.owner,2.0);
             }
           }
-
-          const floor=jumpFloorY()-7;
-          if(v.y>=floor){
-            v.y=floor;v.vx=0;v.vy=0;v.landed=true;
-            v.r=42;v.tick=0;
-            // 空中時間とは別に、毒溜まりは短めに残す。
-            v.t=Math.min(v.t,1.75);
-            spawnImpact(v.x,v.y,'hit');
-          }
+          const floor=innerHeight-185;
+          if(v.y>=floor){v.y=floor;v.vx=0;v.vy=0;v.landed=true;v.r=42;v.tick=0;spawnImpact(v.x,v.y,'hit');}
         }else{
           v.tick-=dt;
-          if(target&&v.tick<=0&&Math.hypot(target.x-v.x,target.y-v.y)<target.radius+v.r+16){
-            v.tick=.52;
-            const guarded=target.guard;
-            v.owner._projectileHit=true;
-            damageHit(v.owner,target,1.15*v.owner.damageMul,0,-10);
-            v.owner._projectileHit=false;
-            if(!guarded)applyPoison(target,v.owner,1.15);
+          if(target&&v.tick<=0&&Math.hypot(target.x-v.x,target.y-v.y)<target.radius+v.r+18){
+            v.tick=.52; const guarded=target.guard;
+            v.owner._projectileHit=true; damageHit(v.owner,target,1.25*v.owner.damageMul,0,-10); v.owner._projectileHit=false;
+            if(!guarded && !isPoisonImmune(target)) applyPoison(target,v.owner,1.25);
           }
         }
       });
-      toxicWaters=toxicWaters.filter(v=>v.t>0&&v.x>-110&&v.x<innerWidth+110);
+      toxicWaters=toxicWaters.filter(v=>v.t>0&&v.x>-100&&v.x<innerWidth+100);
 
       bossFish.forEach(fish=>{
         fish.t-=dt;
@@ -7866,53 +7834,22 @@ function drawBackground(dt){
     }
 
     toxicWaters.forEach(v=>{
-      ctx.save();
-      const pulse=1+.05*Math.sin(performance.now()/110+(v.seed||0));
-
+      ctx.save(); ctx.translate(v.x,v.y);
       if(!v.landed){
-        ctx.translate(v.x,v.y);
-        ctx.scale(pulse,pulse);
-        ctx.globalCompositeOperation='lighter';
-        ctx.shadowColor='#8dff36';
-        ctx.shadowBlur=18;
-        const rg=ctx.createRadialGradient(-v.r*.28,-v.r*.34,1,0,0,v.r*1.18);
-        rg.addColorStop(0,'#e8ff9e');
-        rg.addColorStop(.2,'#9fff42');
-        rg.addColorStop(.58,'#4bc516');
-        rg.addColorStop(1,'#183907');
-        ctx.fillStyle=rg;
-        ctx.beginPath();ctx.arc(0,0,v.r,0,Math.PI*2);ctx.fill();
-
-        ctx.globalAlpha=.72;
-        ctx.fillStyle='#f7ffd4';
-        ctx.beginPath();ctx.ellipse(-v.r*.28,-v.r*.34,v.r*.23,v.r*.12,-.55,0,Math.PI*2);ctx.fill();
-
-        ctx.globalAlpha=.55;
-        ctx.fillStyle='#8cff31';
-        for(let i=0;i<3;i++){
-          const a=(v.seed||0)+i*2.1+performance.now()/520;
-          ctx.beginPath();
-          ctx.arc(Math.cos(a)*(v.r+6+i*2),Math.sin(a)*(v.r*.65+3),3+i,0,Math.PI*2);
-          ctx.fill();
-        }
+        const rg=ctx.createRadialGradient(-v.r*.30,-v.r*.38,2,0,0,v.r*1.08);
+        rg.addColorStop(0,'#c97ae8'); rg.addColorStop(.18,'#8f35b5'); rg.addColorStop(.62,'#5b187d'); rg.addColorStop(1,'#2d0b40');
+        ctx.fillStyle=rg; ctx.beginPath(); ctx.ellipse(0,0,v.r*.80,v.r,0,0,Math.PI*2); ctx.fill();
+        ctx.strokeStyle='rgba(45,8,62,.82)'; ctx.lineWidth=2; ctx.stroke();
+        ctx.fillStyle='rgba(255,235,255,.72)'; ctx.beginPath(); ctx.ellipse(-v.r*.27,-v.r*.37,v.r*.18,v.r*.10,-.5,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle='rgba(218,150,238,.32)'; ctx.beginPath(); ctx.ellipse(v.r*.16,v.r*.20,v.r*.25,v.r*.13,-.3,0,Math.PI*2); ctx.fill();
       }else{
-        ctx.translate(v.x,v.y);
-        ctx.globalCompositeOperation='lighter';
-        ctx.globalAlpha=Math.min(.72,Math.max(.18,v.t/.9));
-        const rg=ctx.createRadialGradient(0,0,3,0,0,v.r);
-        rg.addColorStop(0,'rgba(155,255,67,.72)');
-        rg.addColorStop(.55,'rgba(87,201,26,.50)');
-        rg.addColorStop(1,'rgba(42,91,11,0)');
-        ctx.fillStyle=rg;
-        ctx.shadowColor='#78dc2b';
-        ctx.shadowBlur=14;
-        ctx.beginPath();
-        ctx.ellipse(0,0,v.r,v.r*.28,0,0,Math.PI*2);
-        ctx.fill();
+        const a=Math.max(.20,Math.min(1,v.t/1.0)); ctx.globalAlpha=a; ctx.fillStyle='rgba(83,16,112,.86)';
+        ctx.beginPath(); ctx.ellipse(0,4,v.r*1.28,v.r*.34,0,0,Math.PI*2); ctx.fill();
+        ctx.globalAlpha=.42*a; ctx.fillStyle='#a64bc5';
+        for(let i=0;i<5;i++){ctx.beginPath();ctx.arc((i-2)*11,-5-(i%2)*7,8+(i%2)*3,0,Math.PI*2);ctx.fill();}
       }
-
       ctx.restore();
-    });;
+    });
 
     bossFish.forEach(fish=>{
       ctx.save();

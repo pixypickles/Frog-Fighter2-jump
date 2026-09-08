@@ -241,8 +241,3 @@ v2.31
 - Flauros Hell Flame changed to a very tall vertical fire pillar rising from near the lotus/playfield floor to the top of the screen.
 - Hell Flame hit area now follows the full vertical pillar.
 - Inferno Claw lower endpoint raised so Flauros no longer dives beneath the lotus leaves / too far below the visible play area.
-
-v2.34
-- Beelzebub Venom Water now follows the uploaded lotus-pond behavior: three airborne poison globs spread left/up/right, then fall and leave short-lived poison puddles near the lotus floor.
-- Airborne Venom Water can hit and poison; puddles deal light periodic damage and poison.
-- Venom Shot changed to one large poison glob (r27) traveling forward in a visible parabolic arc.
