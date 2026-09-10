@@ -303,3 +303,6 @@ v2.49
 v2.50
 - Lucifer: changed the area around the eyes to blue in character select and battle.
 - Seraphiel: Seraphic Shot now fires three shots simultaneously: diagonal up, straight forward, diagonal down.
+
+v2.51
+- フラウロスさんの技名「レオパードラッシュ」を「レオパードストライク」に変更。
