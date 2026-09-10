@@ -299,3 +299,7 @@ v2.48
 
 v2.49
 - Reduced Azazel's character-select portrait to match the visual scale of the surrounding portraits.
+
+v2.50
+- Lucifer: changed the area around the eyes to blue in character select and battle.
+- Seraphiel: Seraphic Shot now fires three shots simultaneously: diagonal up, straight forward, diagonal down.
